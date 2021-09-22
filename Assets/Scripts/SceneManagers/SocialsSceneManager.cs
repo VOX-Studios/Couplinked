@@ -1,5 +1,4 @@
-﻿using Steamworks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -24,6 +23,9 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         Button _tikTokButton;
 
+        [SerializeField]
+        Button _sourceCodeButton;
+
         void Start()
         {
             EventSystem.current.SetSelectedGameObject(_twitchButton.gameObject);
@@ -35,6 +37,7 @@ namespace Assets.Scripts.SceneManagers
             _discordButton.onClick.AddListener(_handleDiscordButton);
             _instagramButton.onClick.AddListener(_handleInstagramButton);
             _tikTokButton.onClick.AddListener(_handleTikTokButton);
+            _sourceCodeButton.onClick.AddListener(_handleSourceCodeButton);
         }
 
         void Update()
@@ -74,6 +77,11 @@ namespace Assets.Scripts.SceneManagers
         private void _handleTikTokButton()
         {
             Application.OpenURL("https://www.tiktok.com/@voxindie");
+            _gameManager.SoundEffectManager.PlaySelect();
+        }
+        private void _handleSourceCodeButton()
+        {
+            Application.OpenURL("https://github.com/VOX-Studios/Couplinked");
             _gameManager.SoundEffectManager.PlaySelect();
         }
     }
