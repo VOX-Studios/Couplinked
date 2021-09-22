@@ -4,7 +4,9 @@ This is the source code for the game Couplinked  (Currently available on [Steam]
 If you find the source code valuable, please consider donating here:
 
 [![Support via Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=RYXBX9QE9ZZ4N)
+
 BTC: bc1qxzn00h8zcn5gxa8vuk2g89c3hd3zugw4e4fnht
+
 ETH: 0x2E6d007e904a9f8dc1bDcc99Eb23236F94f1233b
 
 # Setup
