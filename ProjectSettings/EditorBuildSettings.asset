@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Initialize.unity
+    guid: 3cbc7fc12409236439f2be90d6b5466a
+  - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 147c5b97dd55d4049bad367b8c7790db
+  - enabled: 1
+    path: Assets/Scenes/Player Mode Selection.unity
+    guid: 87df395f238b37340b6ecd6180a546a9
+  - enabled: 1
+    path: Assets/Scenes/Multiplayer Controller Selection.unity
+    guid: 810dadd9e035446429d33072e559bea4
+  - enabled: 1
+    path: Assets/Scenes/MultiplayerGameModeSelection.unity
+    guid: 2174f813a8ba5e84c850a748e5c15d18
+  - enabled: 1
+    path: Assets/Scenes/GameModeSelection.unity
+    guid: 3b7f516d83e45b143bfb4c170dc3da51
+  - enabled: 1
+    path: Assets/Scenes/Difficulty Selection.unity
+    guid: 4d05094827116814887099282e15a938
+  - enabled: 1
+    path: Assets/Scenes/Level Editor.unity
+    guid: 8560ca536a2851342a35fb898ed6e241
+  - enabled: 1
+    path: Assets/Scenes/Levels.unity
+    guid: 0f8016ee66a51984f997d6516dbbae72
+  - enabled: 1
+    path: Assets/Scenes/LevelEditorSelection.unity
+    guid: 0e353a629ced5c641bd204b1a6ed5f08
+  - enabled: 1
+    path: Assets/Scenes/Instructions.unity
+    guid: db0b41a3e7d732748a9a7c93cf3cc13b
+  - enabled: 1
+    path: Assets/Scenes/Achievements.unity
+    guid: 58840e83906236c4ea0f9278aa372e84
+  - enabled: 1
+    path: Assets/Scenes/Options.unity
+    guid: 63bea782d53f2764bbeeddd09c19ec73
+  - enabled: 1
+    path: Assets/Scenes/Socials.unity
+    guid: b8c7eba7e3cf15042817dbafd48388f6
+  - enabled: 1
+    path: Assets/Scenes/Sound.unity
+    guid: 08d042bffdbf62444978279f3fa502d4
+  - enabled: 1
+    path: Assets/Scenes/Graphics.unity
+    guid: 32639ea55e53344499a8fa290a38e3ac
+  - enabled: 1
+    path: Assets/Scenes/Local Statistics.unity
+    guid: 32d98e34974c09d45b5af698202a3f92
+  - enabled: 1
+    path: Assets/Scenes/Color Selection.unity
+    guid: 8c3f5fecc35f651448fe28697f98d4ea
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: c149b4d9b1e81024aa8a522a3c07af56
+  - enabled: 1
+    path: Assets/Scenes/End.unity
+    guid: 4ccdbfacff4fb604187069f3f9841769
+  m_configObjects: {}

@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Node
+  - Connector
+  - PlacingRow
+  - PlaceableObject
+  - PlacedObject
+  - PlaceableObjectSpawner
+  - Level Editor Buttons BG
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PlayerObject
+  - CollisionObject
+  - GameBackground
+  - PlacingRows
+  - PlacedObject
+  - TimeMarker
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 749018893
+    locked: 0
+  - name: Midground
+    uniqueID: 3409352029
+    locked: 0
+  - name: Foreground
+    uniqueID: 475859197
+    locked: 0
