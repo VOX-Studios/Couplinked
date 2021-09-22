@@ -1,5 +1,5 @@
 # Couplinked
-This is the source code for the game Couplinked  (Currently available on [Steam](https://store.steampowered.com/app/1404870/Couplinked/) and [Itch.io](https://vox-studios.itch.io/couplinked)).  Couplinked is written using C# and [Unity](https://unity.com/).  The source code is currently free and open source under the MIT license, but the game is still available for purchase.
+This is the source code for the game Couplinked  (Currently available on [Steam](https://store.steampowered.com/app/1404870/Couplinked/) and [Itch.io](https://vox-studios.itch.io/couplinked)).  Couplinked is written using [C#](https://docs.microsoft.com/en-us/dotnet/csharp/) and [Unity](https://unity.com/).  The source code is currently free and open source under the MIT license, but the game is still available for purchase.
 
 If you find the source code valuable, please consider donating here:
 
