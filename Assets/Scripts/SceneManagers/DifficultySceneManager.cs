@@ -17,6 +17,13 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         Button _veryEasyButton;
 
+        [SerializeField]
+        Text _descriptionText;
+
+        private const string _HARD_DESCRIPTION= "The way the game was meant to be played.";
+        private const string _EASY_DESCRIPTION = "For casual gamers struggling with hard mode.  Everything is slower here.";
+        private const string _VERY_EASY_DESCRIPTION = "Same as easy mode but lightning is disabled.";
+
         void Start()
         {
             EventSystem.current.SetSelectedGameObject(_hardButton.gameObject);
@@ -36,13 +43,40 @@ namespace Assets.Scripts.SceneManagers
 
                 if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
                 {
-                    _gameManager.LoadScene("Level Editor");
+                    _gameManager.LoadScene(SceneNames.LevelEditor);
                 }
                 else
                 {
-                    _gameManager.LoadScene("GameModeSelection");
+                    _gameManager.LoadScene(SceneNames.GameModeSelection);
                 }
             }
+
+            if (EventSystem.current.currentSelectedGameObject == _hardButton.gameObject)
+            {
+                if (_descriptionText.text != _HARD_DESCRIPTION)
+                {
+                    _descriptionText.text = _HARD_DESCRIPTION;
+                }
+            }
+            else if(EventSystem.current.currentSelectedGameObject == _easyButton.gameObject)
+            {
+                if (_descriptionText.text != _EASY_DESCRIPTION)
+                {
+                    _descriptionText.text = _EASY_DESCRIPTION;
+                }
+            }
+            else if (EventSystem.current.currentSelectedGameObject == _veryEasyButton.gameObject)
+            {
+                if (_descriptionText.text != _VERY_EASY_DESCRIPTION)
+                {
+                    _descriptionText.text = _VERY_EASY_DESCRIPTION;
+                }
+            }
+            else
+            {
+                _descriptionText.text = null;
+            }
+                
         }
 
         private void _handleDifficultySelect(GameDifficultyEnum gameDifficulty)
@@ -53,13 +87,13 @@ namespace Assets.Scripts.SceneManagers
 
             if(_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
             {
-                _gameManager.LoadScene("Game");
+                _gameManager.LoadScene(SceneNames.Game);
             }
             else
             {
                 //go to level select
                 _gameManager.ResetLevelDisplayNumbers();
-                _gameManager.LoadScene("Levels");
+                _gameManager.LoadScene(SceneNames.Levels);
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -64,8 +63,6 @@ class DefaultButtonStyle : MonoBehaviour, IPointerEnterHandler, ISelectHandler, 
     {
         if (!EventSystem.current.alreadySelecting)
             EventSystem.current.SetSelectedGameObject(this.gameObject);
-
-        _setHighlightText();
     }
 
     public void OnDeselect(BaseEventData eventData)

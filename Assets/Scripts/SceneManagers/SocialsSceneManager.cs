@@ -15,9 +15,6 @@ namespace Assets.Scripts.SceneManagers
         Button _discordButton;
 
         [SerializeField]
-        Button _twitterButton;
-
-        [SerializeField]
         Button _instagramButton;
 
         [SerializeField]
@@ -33,7 +30,6 @@ namespace Assets.Scripts.SceneManagers
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
             _twitchButton.onClick.AddListener(_handleTwitchButton);
-            _twitterButton.onClick.AddListener(_handleTwitterButton);
             _discordButton.onClick.AddListener(_handleDiscordButton);
             _instagramButton.onClick.AddListener(_handleInstagramButton);
             _tikTokButton.onClick.AddListener(_handleTikTokButton);
@@ -53,12 +49,6 @@ namespace Assets.Scripts.SceneManagers
         private void _handleTwitchButton()
         {
             Application.OpenURL("https://www.twitch.tv/voxindie");
-            _gameManager.SoundEffectManager.PlaySelect();
-        }
-
-        private void _handleTwitterButton()
-        {
-            Application.OpenURL("https://twitter.com/VOX_Studios");
             _gameManager.SoundEffectManager.PlaySelect();
         }
 

@@ -15,8 +15,8 @@ public class GameDifficultyManager
 	public float ObjectSpeed { get; private set; }
 	private readonly Dictionary<GameDifficultyEnum, float> _objectSpeed = new Dictionary<GameDifficultyEnum, float>()
 	{
-		{  GameDifficultyEnum.VeryEasy, 1.5f },
-		{  GameDifficultyEnum.Easy, 3f },
+		{  GameDifficultyEnum.VeryEasy, 3 },
+		{  GameDifficultyEnum.Easy, 3 },
 		{  GameDifficultyEnum.Hard, 7 },
 	};
 
@@ -26,8 +26,8 @@ public class GameDifficultyManager
 	public float BackgroundParticleSpeed { get; private set; }
 	private readonly Dictionary<GameDifficultyEnum, float> _backgroundParticleSpeed = new Dictionary<GameDifficultyEnum, float>()
 	{
-		{  GameDifficultyEnum.VeryEasy, 1f },
-		{  GameDifficultyEnum.Easy, 2f },
+		{  GameDifficultyEnum.VeryEasy, 2 },
+		{  GameDifficultyEnum.Easy, 2 },
 		{  GameDifficultyEnum.Hard, 5 },
 	};
 

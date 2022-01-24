@@ -190,10 +190,17 @@ namespace Assets.Scripts.SceneManagers
             node1.SetParticleColor(playerColorData.Node1ParticlesColor.Get());
             node2.SetParticleColor(playerColorData.Node2ParticlesColor.Get());
 
-            GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+            //disable lightning manager for very easy mode
+            LightningManager lightningManager = null;
 
-            lightningManager.Initialize(_midground, playerColorData.LightningColor.Get());
+            if (_gameManager.GameDifficultyManager.GameDifficulty != GameDifficultyEnum.VeryEasy)
+            {
+
+                GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+                lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+
+                lightningManager.Initialize(_midground, playerColorData.LightningColor.Get());
+            }
 
             NodePair nodePair = new NodePair(node1, node2, lightningManager);
 

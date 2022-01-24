@@ -65,7 +65,7 @@ class RegularGameService
         _gameManager.Grid.Logic.ApplyDirectedForce(node1Velocity.normalized * 6f * deltaTime, nodePair.Node1.transform.position, .5f);
         _gameManager.Grid.Logic.ApplyDirectedForce(node2Velocity.normalized * 6f * deltaTime, nodePair.Node2.transform.position, .5f);
 
-        nodePair.LightningManager.Run(nodePair.Node1.transform.position, nodePair.Node2.transform.position);
+        nodePair.LightningManager?.Run(nodePair.Node1.transform.position, nodePair.Node2.transform.position);
     }
 
     public void OnHitCollision(Hit hit, Collider2D other)
