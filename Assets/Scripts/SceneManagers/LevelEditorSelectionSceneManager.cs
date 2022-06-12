@@ -33,7 +33,7 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.HandleBack())
             {
                 _gameManager.SoundEffectManager.PlayBack();
-                _gameManager.LoadScene("Start");
+                _gameManager.LoadScene(SceneNames.Start);
             }
         }
 
@@ -45,18 +45,18 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.TheLevelSelectionMode = LevelTypeEnum.LevelEditor;
             _gameManager.SoundEffectManager.PlaySelect();
 
-            _gameManager.LoadScene("Levels");
+            _gameManager.LoadScene(SceneNames.Levels);
         }
 
         private void _handleNewLevelButton()
         {
             _gameManager.IsNewLevel = true;
-            _gameManager.CurrentLevel = new Level();
+            _gameManager.CurrentLevel = new Level(); //TODO: change number of rows to be configurable
 
             _gameManager.TheLevelSelectionMode = LevelTypeEnum.LevelEditor;
             _gameManager.SoundEffectManager.PlaySelect();
 
-            _gameManager.LoadScene("Level Editor");
+            _gameManager.LoadScene(SceneNames.LevelEditor);
         }
     }
 }

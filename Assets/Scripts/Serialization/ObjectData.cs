@@ -4,6 +4,6 @@
 public class ObjectData
 {
 	public float Time;
-	public ObjectRowEnum ObjectRow;
+	public byte ObjectRow;
 	public ObjectTypeEnum ObjectType;
 }

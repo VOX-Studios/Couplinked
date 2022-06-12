@@ -18,11 +18,6 @@ public class MotionBlur : ImageEffectBase
 	
 	override protected void Start()
 	{
-		if(!SystemInfo.supportsRenderTextures)
-		{
-			enabled = false;
-			return;
-		}
 		base.Start();
 	}
 	
@@ -48,7 +43,6 @@ public class MotionBlur : ImageEffectBase
 		if (extraBlur)
 		{
 			RenderTexture blurbuffer = RenderTexture.GetTemporary(source.width/4, source.height/4, 0);
-			accumTexture.MarkRestoreExpected();
 			Graphics.Blit(accumTexture, blurbuffer);
 			Graphics.Blit(blurbuffer,accumTexture);
 			RenderTexture.ReleaseTemporary(blurbuffer);
@@ -61,10 +55,6 @@ public class MotionBlur : ImageEffectBase
 		material.SetTexture("_MainTex", accumTexture);
 		material.SetFloat("_AccumOrig", 1.0F-blurAmount);
 		
-		// We are accumulating motion over frames without clear/discard
-		// by design, so silence any performance warnings from Unity
-		accumTexture.MarkRestoreExpected();
-
 		// Render the image using the motion blur shader
 		Graphics.Blit (source, accumTexture, material);
 		Graphics.Blit (accumTexture, destination);

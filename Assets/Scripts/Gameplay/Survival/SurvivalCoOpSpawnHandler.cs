@@ -10,12 +10,15 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
     private SurvivalHandler _survivalHandler;
     private int _lastTeamId;
 
+    private float[] _rowPositions;
+
     public SurvivalCoOpSpawnHandler(
         SurvivalHandler survivalHandler,
         GameManager gameManager, 
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
-        NoHitManager noHitManager
+        NoHitManager noHitManager,
+        float[] rowPositions
         )
     {
         _survivalHandler = survivalHandler;
@@ -23,7 +26,7 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
         _noHitManager = noHitManager;
-
+        _rowPositions = rowPositions;
         _lastTeamId = -1;
     }
 
@@ -63,11 +66,11 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         switch (rando)
         {
             case 1:
-                _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, nodeColors);
+                _spawnHit(HitTypeEnum.Hit1, teamId, nodeColors);
                 _survivalHandler.PotentialMaxScore += 10;
                 break;
             case 2:
-                _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, nodeColors);
+                _spawnHit(HitTypeEnum.Hit2, teamId, nodeColors);
                 _survivalHandler.PotentialMaxScore += 10;
                 break;
             case 3:
@@ -79,11 +82,31 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
                 break;
             default:
                 teamId = -1;
-                _noHitManager.SpawnNoHit();
+                _spawnNoHit();
                 break;
         }
 
         _lastTeamId = teamId;
+    }
+
+    private Vector3 _getRandomSpawnPosition()
+    {
+        //0 to Number of Rows - 1
+        int i = Random.Range(0, _rowPositions.Length);
+
+        return new Vector3(GameManager.RightX + 5, _rowPositions[i], 0);
+    }
+
+    private void _spawnHit(HitTypeEnum hitType, int teamId, PlayerNodeColors nodeColors)
+    {
+        Vector3 pos = _getRandomSpawnPosition();
+        _hitManager.SpawnHit(hitType, teamId, nodeColors, pos);
+    }
+
+    private void _spawnNoHit()
+    {
+        Vector3 pos = _getRandomSpawnPosition();
+        _noHitManager.SpawnNoHit(pos);
     }
 
     private void _spawnBothHits(int firstTeamId, PlayerNodeColors firstNodeColors)
@@ -108,10 +131,7 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         }
 
         //add all potential positions
-        List<float> availablePositions = new List<float>();
-        availablePositions.Add(GameManager.TopLaneY);
-        availablePositions.Add(GameManager.MidLaneY);
-        availablePositions.Add(GameManager.BotLaneY);
+        List<float> availablePositions = new List<float>(_rowPositions);
 
         //0 to length - 1
         int rando = Random.Range(0, availablePositions.Count);
@@ -158,13 +178,16 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
             secondHitType = _getRandomHitType();
         }
 
+        Vector3 pos = _getRandomSpawnPosition();
+
         _hitSplitManager.SpawnHitSplit(
                    hitSplitFirstType: firstHitType,
                    hitSplitSecondType: secondHitType,
                    firstHitTeamId: firstTeamId,
                    secondHitTeamId: secondTeamId,
                    firstHitNodeColors: firstHitNodeColors,
-                   secondHitNodeColors: secondHitNodeColors
+                   secondHitNodeColors: secondHitNodeColors,
+                   spawnPosition: pos
                    );
 
         _survivalHandler.PotentialMaxScore += 20;

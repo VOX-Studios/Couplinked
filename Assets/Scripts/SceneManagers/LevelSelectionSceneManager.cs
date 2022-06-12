@@ -88,11 +88,11 @@ namespace Assets.Scripts.SceneManagers
                 switch (_gameManager.TheLevelSelectionMode)
                 {
                     case LevelTypeEnum.LevelEditor:
-                        _gameManager.LoadScene("LevelEditorSelection");
+                        _gameManager.LoadScene(SceneNames.LevelEditorSelection);
                         break;
                     case LevelTypeEnum.Campaign:
                     case LevelTypeEnum.Custom:
-                        _gameManager.LoadScene("Difficulty Selection");
+                        _gameManager.LoadScene(SceneNames.DifficultySelection);
                         break;
                 }
             }
@@ -147,10 +147,10 @@ namespace Assets.Scripts.SceneManagers
 
                         LevelInfo levelInfoComponent = levelInfo.GetComponent<LevelInfo>();
                         levelInfoComponent.Id = levelIDsList[i + _gameManager.LevelsDisplayingStart];
-                        levelInfoComponent.name = levelNamesList[i];
+                        levelInfoComponent.Name = levelNamesList[i];
                         levelInfoComponent.levelType = LevelInfo.LevelTypes.Custom;
 
-                        levelInfo.GetComponentInChildren<Text>().text = levelInfoComponent.name;
+                        levelInfo.GetComponentInChildren<Text>().text = levelInfoComponent.Name;
 
                         //custom levels are never locked
                         levelInfoComponent.IsLocked = false;
@@ -188,10 +188,10 @@ namespace Assets.Scripts.SceneManagers
 
                         LevelInfo levelInfoComponent = levelInfo.GetComponent<LevelInfo>();
                         levelInfoComponent.Id = "";
-                        levelInfoComponent.name = _campaignLevelData[i].name;
+                        levelInfoComponent.Name = _campaignLevelData[i].name;
                         levelInfoComponent.levelType = LevelInfo.LevelTypes.Campaign;
 
-                        levelInfo.GetComponentInChildren<Text>().text = levelInfoComponent.name;
+                        levelInfo.GetComponentInChildren<Text>().text = levelInfoComponent.Name;
 
                         bool isLevelLocked = _gameManager.DataManager.IsCampaignLevelLocked(i, _gameManager.GameDifficultyManager.GameDifficulty);
 
@@ -279,8 +279,8 @@ namespace Assets.Scripts.SceneManagers
             //don't load locked level
             if (levelInfo.IsLocked)
             {
-                int levelNumber = System.Convert.ToInt16(levelInfo.name.Substring(6, 2));
-                int tensPlace = System.Convert.ToInt16(levelInfo.name.Substring(6, 1));
+                int levelNumber = System.Convert.ToInt16(levelInfo.Name.Substring(6, 2));
+                int tensPlace = System.Convert.ToInt16(levelInfo.Name.Substring(6, 1));
 
                 //if they selected a level in a future tier
                 if (levelNumber > 10 && levelNumber > (highestLevelTierUnlocked + 1) * 10)
@@ -310,7 +310,7 @@ namespace Assets.Scripts.SceneManagers
             else //campaign
             {
                 _gameManager.CurrentLevel = new Level();
-                _gameManager.CurrentLevel.LoadFromTextFile("CampaignLevelData/" + levelInfo.name);
+                _gameManager.CurrentLevel.LoadFromTextFile("CampaignLevelData/" + levelInfo.Name);
             }
 
 

@@ -67,10 +67,6 @@ public class GameManager : MonoBehaviour
 		LeftX = Cam.ViewportToWorldPoint(Vector3.zero).x;
 		RightX = Cam.ViewportToWorldPoint(new Vector3(1, 0, 0)).x;
 
-		float borderPadding = 2.5f; //TODO: share this with clamp
-		TopLaneY = TopY - borderPadding;
-		MidLaneY = (TopY + BotY) / 2f;
-		BotLaneY = BotY + borderPadding;
 		WorldWidth = RightX - LeftX;
 
 		LocalHighScore = DataManager.GetSurvivalHighScore();
@@ -421,7 +417,6 @@ public class GameManager : MonoBehaviour
 
 	public static float TopY;
 	public static float BotY;
-	public static float TopLaneY, MidLaneY, BotLaneY;
 
 	public static float LeftX;
 	public static float RightX;

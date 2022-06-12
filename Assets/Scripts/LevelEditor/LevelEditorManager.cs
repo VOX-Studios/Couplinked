@@ -70,6 +70,8 @@ public class LevelEditorManager : MonoBehaviour
 	private bool _selectStarted;
 	private bool _objectWasSpawned;
 
+	private float[] _rowPositions;
+
 	public void Initialize(List<Transform> placeholderPositions)
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -93,22 +95,13 @@ public class LevelEditorManager : MonoBehaviour
 		_rightIndex = -1;
 		_cam = Camera.main;
 
+		_rowPositions = _calculateRowPositions();
+
 		PlacingRow[] rows = FindObjectsOfType<PlacingRow>();
 
 		for(int i = 0; i < rows.Length; i++)
 		{
-			switch(rows[i].Row)
-			{
-				case ObjectRowEnum.Top:
-					rows[i].transform.position = new Vector3(rows[i].transform.position.x, GameManager.TopLaneY, rows[i].transform.position.z);
-					break;
-				case ObjectRowEnum.Middle:
-					rows[i].transform.position = new Vector3(rows[i].transform.position.x, GameManager.MidLaneY, rows[i].transform.position.z);
-					break;
-				case ObjectRowEnum.Bottom:
-					rows[i].transform.position = new Vector3(rows[i].transform.position.x, GameManager.BotLaneY, rows[i].transform.position.z);
-					break;
-			}
+			rows[i].transform.position = new Vector3(rows[i].transform.position.x, _rowPositions[rows[i].Row], rows[i].transform.position.z);
 		}
 
 		_timeAtLeftScreen = 0f;
@@ -152,6 +145,25 @@ public class LevelEditorManager : MonoBehaviour
 
 		_setupDragArea();
 		_setupInteractions();
+	}
+
+	private float[] _calculateRowPositions()
+	{
+		float borderPadding = 2.5f; //TODO: share this with clamp
+
+		float[] rowPositions = new float[_gameManager.CurrentLevel.NumberOfRows];
+		rowPositions[0] = GameManager.TopY - borderPadding;
+		rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
+
+		//take top and bot and divide by remaining positions
+		float spacing = (rowPositions[0] + rowPositions[rowPositions.Length - 1]) / (_gameManager.CurrentLevel.NumberOfRows - 1);
+
+		for (int i = 1; i < _gameManager.CurrentLevel.NumberOfRows - 1; i++)
+		{
+			rowPositions[i] = spacing * i;
+		}
+
+		return rowPositions;
 	}
 
 	private void _computeNumberOfTimeMarkers()

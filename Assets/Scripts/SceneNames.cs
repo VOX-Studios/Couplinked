@@ -18,6 +18,8 @@
         public const string Levels = "Levels";
         public const string LevelEditor = "Level Editor";
 
+        public const string DifficultySelection= "Difficulty Selection";
+
         public const string Game = "Game";
 
         public const string Graphics = "Graphics";

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class PlacingRow : MonoBehaviour 
 {
 	List<GameObject> placeableObjectsTouching;
-	public ObjectRowEnum Row;
+	public byte Row;
 
 	Color startColor;
 

@@ -66,31 +66,6 @@ public class HitManager : MonoBehaviour
 		_spawnHit(hitType, teamId, nodeColors, position);
 	}
 
-	public void SpawnHit(HitTypeEnum hitType, int teamId, PlayerNodeColors nodeColors)
-	{
-		float frustrumPositionRightX = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, 0)).x;
-
-		float y = 0;
-
-		//1-3
-		int rando = Random.Range(1, 4);
-
-		switch (rando)
-		{
-			case 1:
-				y = GameManager.TopLaneY;
-				break;
-			case 2:
-				y = GameManager.MidLaneY;
-				break;
-			case 3:
-				y = GameManager.BotLaneY;
-				break;
-		}
-
-		_spawnHit(hitType, teamId, nodeColors, new Vector3(frustrumPositionRightX + 5, y, 0));
-	}
-
 	private void _spawnHit(HitTypeEnum hitType, int teamId, PlayerNodeColors nodeColors, Vector3 pos)
 	{
 		_activateHit(hitType, teamId, nodeColors, pos, _gameManager.SoundEffectManager.NextPitch());

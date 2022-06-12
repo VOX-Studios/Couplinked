@@ -3,18 +3,21 @@ using UnityEngine.UI;
 
 public class LevelInfo : MonoBehaviour
 {
-	public Sprite IncompleteTexture,
-					OneStarTexture,
-					TwoStarTexture,
-					ThreeStarTexture,
-					FourStarTexture,
-					FiveStarTexture,
-					LockedTexture;
+	public Sprite IncompleteTexture;
+	public Sprite OneStarTexture;
+	public Sprite TwoStarTexture;
+	public Sprite ThreeStarTexture;
+	public Sprite FourStarTexture;
+	public Sprite FiveStarTexture;
+	public Sprite LockedTexture;
 
 	public bool IsLocked;
-	public string name, Id;
+	public string Name;
+	public string Id;
 	public LevelTypes levelType;
-	public int MaxScore, PlayerScore, PlayerScoreRating;
+	public int MaxScore;
+	public int PlayerScore;
+	public int PlayerScoreRating;
 
 	public enum LevelTypes : byte
 	{

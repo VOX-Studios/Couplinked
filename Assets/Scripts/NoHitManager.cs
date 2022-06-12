@@ -56,30 +56,6 @@ public class NoHitManager : MonoBehaviour
 	{
 		activateNoHit(pos);
 	}
-
-	public void SpawnNoHit()
-	{		
-		float y = 0;
-
-		//1-3
-		int rando = Random.Range(1,4);
-		
-		switch(rando)
-		{
-		    case 1:
-                y = GameManager.TopLaneY;
-			    break;
-		    case 2:
-                y = GameManager.MidLaneY;
-                break;
-		    case 3:
-                y = GameManager.BotLaneY;
-			    break;
-		}
-
-		activateNoHit(new Vector3(GameManager.RightX + 5, y , 0));
-	}
-
 	
 	void activateNoHit(Vector3 spawnPosition)
 	{

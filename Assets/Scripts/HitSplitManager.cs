@@ -83,25 +83,6 @@ public class HitSplitManager : MonoBehaviour
 			);
 	}
 
-	public void SpawnHitSplit(
-		HitTypeEnum hitSplitFirstType,
-		HitTypeEnum hitSplitSecondType,
-		int firstHitTeamId,
-		int secondHitTeamId,
-		PlayerNodeColors firstHitNodeColors,
-		PlayerNodeColors secondHitNodeColors
-		)
-	{
-		_spawnHitSplit(
-			hitSplitFirstType: hitSplitFirstType,
-			hitSplitSecondType: hitSplitSecondType,
-			firstHitTeamId: firstHitTeamId,
-			secondHitTeamId: secondHitTeamId,
-			firstHitNodeColors: firstHitNodeColors,
-			secondHitNodeColors: secondHitNodeColors
-			);
-	}
-
 	private void _spawnHitSplit(
 		HitTypeEnum hitSplitFirstType,
 		HitTypeEnum hitSplitSecondType,
@@ -120,44 +101,6 @@ public class HitSplitManager : MonoBehaviour
 			firstHitNodeColors: firstHitNodeColors,
 			secondHitNodeColors: secondHitNodeColors,
 			spawnPosition: spawnPosition
-			);
-	}
-
-	private void _spawnHitSplit(
-		HitTypeEnum hitSplitFirstType,
-		HitTypeEnum hitSplitSecondType,
-		int firstHitTeamId,
-		int secondHitTeamId,
-		PlayerNodeColors firstHitNodeColors,
-		PlayerNodeColors secondHitNodeColors
-		)
-	{
-		float y = 0;
-		
-		//1-3
-		int rando = Random.Range(1,4);
-
-        switch (rando)
-        {
-            case 1:
-                y = GameManager.TopLaneY;
-                break;
-            case 2:
-                y = GameManager.MidLaneY;
-                break;
-            case 3:
-                y = GameManager.BotLaneY;
-                break;
-        }
-
-		_activateHitSplit(
-			hitSplitFirstType: hitSplitFirstType,
-			hitSplitSecondType: hitSplitSecondType,
-			firstHitTeamId: firstHitTeamId,
-			secondHitTeamId: secondHitTeamId,
-			firstHitNodeColors: firstHitNodeColors,
-			secondHitNodeColors: secondHitNodeColors,
-			spawnPosition: new Vector3(GameManager.RightX + 5, y, 0)
 			);
 	}
 	

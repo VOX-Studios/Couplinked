@@ -217,7 +217,6 @@ public class SteamStatsAndAchievements : MonoBehaviour, ISteamStatsAndAchievemen
 	private class AchievementData
 	{
 		public string AchievementApiName;
-		public bool IsWaitingResponse;
 
 		/// <summary>
 		/// Creates an Achievement. You must also mirror the data provided here in https://partner.steamgames.com/apps/achievements/1404870

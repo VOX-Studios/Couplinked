@@ -9,6 +9,8 @@ class LevelHandler : IGameModeHandler
     private bool _hasTimerStartedForEverythingInactive;
     private float _timeSinceLastActiveObject;
 
+    public float[] _rowPositions;
+
     /// <summary>
     /// How many seconds the length of the screen represents
     /// </summary>
@@ -19,8 +21,6 @@ class LevelHandler : IGameModeHandler
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
     private NoHitManager _noHitManager;
-
-    public int PotentialMaxScore;
 
     public bool IsPaused = false;
     public bool IsResuming = false;
@@ -73,6 +73,7 @@ class LevelHandler : IGameModeHandler
 
     public void Start()
     {
+        _rowPositions = _calculateRowPositions();
         _gameService.Start();
 
         _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
@@ -82,6 +83,25 @@ class LevelHandler : IGameModeHandler
 
         _gameTimeAtRightScreen = -_gameManager.GameDifficultyManager.LevelStartDelay;
         _nextSpawn = 0;
+    }
+
+    private float[] _calculateRowPositions()
+    {
+        float[] rowPositions = new float[_gameManager.CurrentLevel.NumberOfRows];
+
+        float borderPadding = 2.5f; //TODO: share this with clamp
+        rowPositions[0] = GameManager.TopY - borderPadding;
+        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
+
+        //take top and bot and divide by remaining positions
+        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
+
+        for (int i = 1; i < rowPositions.Length - 1; i++)
+        {
+            rowPositions[i] = rowPositions[0] - (spacing * i);
+        }
+
+        return rowPositions;
     }
 
 
@@ -104,18 +124,14 @@ class LevelHandler : IGameModeHandler
 
             Vector3 pos = new Vector3(x, 0, 0);
 
-            switch (objectData.ObjectRow)
+            if(objectData.ObjectRow >= _rowPositions.Length)
             {
-                case ObjectRowEnum.Top:
-                    pos.y = GameManager.TopLaneY;
-                    break;
-                case ObjectRowEnum.Middle:
-                    pos.y = GameManager.MidLaneY;
-                    break;
-                case ObjectRowEnum.Bottom:
-                    pos.y = GameManager.BotLaneY;
-                    break;
+                //TODO: error? Might not need to...can just not spawn
+                _nextSpawn++;
+                continue;
             }
+
+            pos.y = _rowPositions[objectData.ObjectRow];
 
             int teamId = 0;
 

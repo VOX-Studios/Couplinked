@@ -8,30 +8,20 @@ public class Level
 
 	public List<ObjectData> Data => LevelData.Data;
 	public int MaxScore => LevelData.MaxScore;
-
-	public Level(string name, string id, List<ObjectData> data)
-	{
-		LevelData = new LevelData();
-		LevelData.Name = name;
-		LevelData.Id = id;
-		LevelData.Data = data;
-	}
+	public byte NumberOfRows => LevelData.NumberOfRows;
 
 	public Level(string id)
 	{
 		Load(id);
 	}
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Level"/> class.
-	/// Only use no parms if the level will be loaded from a text file.
-	/// </summary>
 	public Level()
 	{
 		LevelData = new LevelData();
 		LevelData.Data = new List<ObjectData>();
 		LevelData.Name = "";
 		LevelData.Id = "";
+		LevelData.NumberOfRows = 3;
 	}
 
 	public int RateScore(int score)
@@ -93,6 +83,9 @@ public class Level
 
 		CopyFromLoad(ref strLoadData);
 		LevelData.Id = LevelData.Name;
+
+		//TODO: make this configurable
+		LevelData.NumberOfRows = 3;
 	}
 
 	private void CopyFromLoad(ref string strLoadData)
@@ -187,6 +180,7 @@ public class Level
 		levelData.Id = LevelData.Id;
 		levelData.Name = LevelData.Name;
 		levelData.Data = new List<ObjectData>();
+		levelData.NumberOfRows = LevelData.NumberOfRows;
 
 		for(int i = 0; i < Data.Count; i++)
 		{

@@ -3,10 +3,25 @@ using UnityEngine;
 
 class SurvivalHandler : IGameModeHandler
 {
-    private double _originalSpawnInterval = 1; //2 = easy; 1 = normal; .5 = hard;
+    private double _originalSpawnInterval = 1;
+
+    /// <summary>
+    /// The time remaining until the next spawn.
+    /// </summary>
     private double _spawnTimer;
+    
+    /// <summary>
+    /// The amount of time between each spawn.
+    /// </summary>
     private double _spawnInterval;
+
+    /// <summary>
+    /// The smallest amount of time allowed between each spawn (aka spawn interval can't be less than this number).
+    /// </summary>
     private double _minSpawnInterval = .5;
+
+    private byte _numberOfRows = 3;
+    private float[] _rowPositions;
 
     private GameManager _gameManager;
     private GameSceneManager _gameSceneManager;
@@ -67,8 +82,28 @@ class SurvivalHandler : IGameModeHandler
             );
     }
 
+    private float[] _calculateRowPositions()
+    {
+        float[] rowPositions = new float[_numberOfRows];
+
+        float borderPadding = 2.5f; //TODO: share this with clamp
+        rowPositions[0] = GameManager.TopY - borderPadding;
+        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
+
+        //take top and bot and divide by remaining positions
+        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
+
+        for (int i = 1; i < rowPositions.Length - 1; i++)
+        {
+            rowPositions[i] = rowPositions[0] - (spacing * i);
+        }
+
+        return rowPositions;
+    }
+
     public void Start()
     {
+        _rowPositions = _calculateRowPositions();
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
         {
             _spawnHandler = new SurvivalSpawnHandler(
@@ -76,7 +111,8 @@ class SurvivalHandler : IGameModeHandler
                 gameManager: _gameManager,
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
-                noHitManager: _noHitManager
+                noHitManager: _noHitManager,
+                rowPositions: _rowPositions
                 );
         }
         else
@@ -86,7 +122,8 @@ class SurvivalHandler : IGameModeHandler
                 gameManager: _gameManager,
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
-                noHitManager: _noHitManager
+                noHitManager: _noHitManager,
+                rowPositions: _rowPositions
                 );
         }
 

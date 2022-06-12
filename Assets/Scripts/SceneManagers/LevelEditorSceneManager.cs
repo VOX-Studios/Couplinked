@@ -89,6 +89,9 @@ namespace Assets.Scripts.SceneManagers
                 _saveName = _gameManager.CurrentLevel.LevelData.Name;
                 _levelNameText.text = _saveName;
             }
+
+            //TODO: make this configurable...it was only being used for single/multiplayer selection
+            _gameManager.GameSetupInfo.IsSinglePlayer = true;
         }
 
         void Update()
@@ -172,7 +175,7 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.CurrentLevel.Data.Count > 0)
             {
                 _gameManager.CurrentLevel.CalculateMaxScore();
-                _gameManager.LoadScene("Difficulty Selection");
+                _gameManager.LoadScene(SceneNames.DifficultySelection);
                 return;
             }
 
