@@ -12,6 +12,8 @@ public class NoHitManager : MonoBehaviour
 
 	private GameManager _gameManager;
 
+	public float Scale { get; private set; }
+
 	// Use this for initialization
 	public void Initialize() 
 	{
@@ -29,6 +31,11 @@ public class NoHitManager : MonoBehaviour
 			noHit.SetActive(false);
 			inactiveNoHits.Add(noHit);
 		}
+	}
+
+	public void SetScale(float scale)
+	{
+		Scale = scale;
 	}
 
 	public void Run(float deltaTime) 
@@ -52,17 +59,19 @@ public class NoHitManager : MonoBehaviour
 		}
 	}
 
-	public void SpawnNoHit(Vector3 pos)
+	public void SpawnNoHit(Vector3 pos, float scale)
 	{
-		activateNoHit(pos);
+		activateNoHit(pos, scale);
 	}
 	
-	void activateNoHit(Vector3 spawnPosition)
+	void activateNoHit(Vector3 spawnPosition, float scale)
 	{
 		int inactiveCount = inactiveNoHits.Count;
 		if(inactiveCount > 0)
 		{
 			GameObject noHit = inactiveNoHits[inactiveCount - 1];
+			NoHit noHitComponent = noHit.GetComponent<NoHit>();
+			noHitComponent.SetScale(scale);
 			noHit.transform.position = spawnPosition;
 
 			noHit.SetActive(true);

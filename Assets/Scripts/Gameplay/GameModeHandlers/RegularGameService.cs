@@ -8,8 +8,6 @@ class RegularGameService
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
 
-    private GameplayUtility _gameplayUtility;
-
     private GameInput[] _gameInputs;
     private NodePair[] _nodePairs;
 
@@ -17,7 +15,6 @@ class RegularGameService
 
     public RegularGameService(
         GameManager gameManager,
-        GameplayUtility gameplayUtility,
         GameSceneManager gameSceneManager,
         HitManager hitManager,
         HitSplitManager hitSplitManager,
@@ -27,7 +24,6 @@ class RegularGameService
         )
     {
         _gameManager = gameManager;
-        _gameplayUtility = gameplayUtility;
         _gameSceneManager = gameSceneManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
@@ -62,8 +58,8 @@ class RegularGameService
         _gameManager.ClampObjectIntoView(nodePair.Node1.transform, .5f, 2.5f); //.4 for node radius
         _gameManager.ClampObjectIntoView(nodePair.Node2.transform, .5f, 2.5f); //.4 for node radius
 
-        _gameManager.Grid.Logic.ApplyDirectedForce(node1Velocity.normalized * 6f * deltaTime, nodePair.Node1.transform.position, .5f);
-        _gameManager.Grid.Logic.ApplyDirectedForce(node2Velocity.normalized * 6f * deltaTime, nodePair.Node2.transform.position, .5f);
+        _gameManager.Grid.Logic.ApplyDirectedForce(node1Velocity.normalized * 6f * deltaTime * (1 + nodePair.Node1.Scale), nodePair.Node1.transform.position, .5f * nodePair.Node1.Scale);
+        _gameManager.Grid.Logic.ApplyDirectedForce(node2Velocity.normalized * 6f * deltaTime * (1 + nodePair.Node2.Scale), nodePair.Node2.transform.position, .5f * nodePair.Node2.Scale);
 
         nodePair.LightningManager?.Run(nodePair.Node1.transform.position, nodePair.Node2.transform.position);
     }
@@ -82,7 +78,7 @@ class RegularGameService
         {
             _gameManager.PlayExplosionSound(hit.ExplosionPitch);
 
-            _gameSceneManager.AddToScore(hit.transform.position, node.transform.position);
+            _gameSceneManager.AddToScore(hit.transform.position, node);
             _gameSceneManager.AddExplosion(hit.transform.position, _getExplosionColor(hit.HitType, hit.TeamId));
             _hitManager.DeactivateHit(hit.gameObject);
             _gameSceneManager.Shake();
@@ -96,11 +92,11 @@ class RegularGameService
                     _gameManager.Hit2HitCount++;
                     break;
             }
-            _gameplayUtility.AddExplosiveForceToGrid(hit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hit.Scale, hit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hit.Scale);
         }
         else //hit the wrong node
         {
-            _gameplayUtility.AddExplosiveForceToGrid(hit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hit.Scale, hit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hit.Scale);
             _endGame(ReasonForGameEndEnum.Mismatch);
         }
     }
@@ -143,17 +139,17 @@ class RegularGameService
             }
 
             hitSplit.WasHitOnce = true;
-            _gameSceneManager.AddToScore(hitSplit.transform.position, node.transform.position);
+            _gameSceneManager.AddToScore(hitSplit.transform.position, node);
             _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.HitSplitFirstType, hitSplit.FirstHitTeamId));
             _gameSceneManager.Shake();
 
-            _gameplayUtility.AddExplosiveForceToGrid(hitSplit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
 
             hitSplit.SetColors(_getHitSplitColor(hitSplit.HitSplitSecondType, hitSplit.SecondHitTeamId));
         }
         else //hit the wrong node first
         {
-            _gameplayUtility.AddExplosiveForceToGrid(hitSplit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
             _endGame(ReasonForGameEndEnum.Mismatch);
         }
     }
@@ -182,12 +178,12 @@ class RegularGameService
             }
 
             hitSplit.WasHitTwice = true;
-            _gameSceneManager.AddToScore(hitSplit.transform.position, node.transform.position);
+            _gameSceneManager.AddToScore(hitSplit.transform.position, node);
             _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.HitSplitSecondType, hitSplit.SecondHitTeamId));
             _hitSplitManager.DeactivateHitSplit(hitSplit.gameObject);
             _gameSceneManager.Shake();
 
-            _gameplayUtility.AddExplosiveForceToGrid(hitSplit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
         }
         else if(isNodeOnFirstHitTeam && node.HitType == hitSplit.HitSplitFirstType) //it's the same node as the first hit
         {
@@ -195,7 +191,7 @@ class RegularGameService
         }
         else //hit the wrong node
         {
-            _gameplayUtility.AddExplosiveForceToGrid(hitSplit.transform.position);
+            _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
             _endGame(ReasonForGameEndEnum.Mismatch);
         }
     }
@@ -203,16 +199,15 @@ class RegularGameService
     public void OnNoHitCollision(NoHit noHit, Collider2D other)
     {
         _gameManager.NoHitHitCount++;
-        _gameplayUtility.AddExplosiveForceToGrid(noHit.transform.position);
+        _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * noHit.Scale, noHit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * noHit.Scale);
 
         if (other.gameObject.tag == "Connector")
         {
-            _gameplayUtility.AddExplosiveForceToGrid(noHit.transform.position);
             _endGame(ReasonForGameEndEnum.NoHitContactWithElectricity);
         }
         else
         {
-            _gameplayUtility.AddExplosiveForceToGrid(noHit.transform.position);
+            //TODO: put another pulse on the node that hit?
             _endGame(ReasonForGameEndEnum.NoHitContactWithNode);
         }
     }

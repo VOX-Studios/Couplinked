@@ -9,7 +9,9 @@ class LevelHandler : IGameModeHandler
     private bool _hasTimerStartedForEverythingInactive;
     private float _timeSinceLastActiveObject;
 
-    public float[] _rowPositions;
+    private float[] _rowPositions;
+    private float _scale;
+
 
     /// <summary>
     /// How many seconds the length of the screen represents
@@ -28,8 +30,6 @@ class LevelHandler : IGameModeHandler
     public int Score = 0;
     public int RingsCollected = 0;
 
-    private GameplayUtility _gameplayUtility;
-
     private GameInput[] _gameInputs;
     private NodePair[] _nodePairs;
     private TeamManager _teamManager;
@@ -38,7 +38,6 @@ class LevelHandler : IGameModeHandler
 
     public LevelHandler(
         GameManager gameManager, 
-        GameplayUtility gameplayUtility, 
         GameSceneManager gameSceneManager, 
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
@@ -49,7 +48,6 @@ class LevelHandler : IGameModeHandler
         )
     {
         _gameManager = gameManager;
-        _gameplayUtility = gameplayUtility;
         _gameSceneManager = gameSceneManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
@@ -61,7 +59,6 @@ class LevelHandler : IGameModeHandler
 
         _gameService = new RegularGameService(
             gameManager: _gameManager,
-            gameplayUtility: _gameplayUtility,
             gameSceneManager: _gameSceneManager,
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
@@ -71,9 +68,10 @@ class LevelHandler : IGameModeHandler
             );
     }
 
-    public void Start()
+    public void Initialize()
     {
-        _rowPositions = _calculateRowPositions();
+        _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
+        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairs);
         _gameService.Start();
 
         _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
@@ -85,9 +83,9 @@ class LevelHandler : IGameModeHandler
         _nextSpawn = 0;
     }
 
-    private float[] _calculateRowPositions()
+    private float[] _calculateRowPositions(int numRows)
     {
-        float[] rowPositions = new float[_gameManager.CurrentLevel.NumberOfRows];
+        float[] rowPositions = new float[numRows];
 
         float borderPadding = 2.5f; //TODO: share this with clamp
         rowPositions[0] = GameManager.TopY - borderPadding;
@@ -102,6 +100,26 @@ class LevelHandler : IGameModeHandler
         }
 
         return rowPositions;
+    }
+
+    private void _handleScaling(int numRows, NodePair[] nodePairs)
+    {
+        if(numRows <= 5)
+        {
+            _scale = 1f;
+        }
+        else
+        {
+            _scale = 5f / numRows;
+        }
+
+        foreach(NodePair nodePair in nodePairs)
+        {
+            nodePair.Node1.transform.localScale = new Vector3(_scale, _scale, 1);
+            nodePair.Node2.transform.localScale = new Vector3(_scale, _scale, 1);
+
+            nodePair.LightningManager.SetScale(_scale);
+        }
     }
 
 
@@ -148,13 +166,13 @@ class LevelHandler : IGameModeHandler
             switch (objectData.ObjectType)
             {
                 case ObjectTypeEnum.NoHit:
-                    _noHitManager.SpawnNoHit(pos);
+                    _noHitManager.SpawnNoHit(pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit1:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, nodeColors, pos);
+                    _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, nodeColors, pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit2:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, nodeColors, pos);
+                    _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, nodeColors, pos, _scale);
                     break;
                 case ObjectTypeEnum.HitSplit1:
                     _hitSplitManager.SpawnHitSplit(
@@ -164,7 +182,8 @@ class LevelHandler : IGameModeHandler
                         secondHitTeamId: teamId,
                         firstHitNodeColors: nodeColors,
                         secondHitNodeColors: nodeColors,
-                        spawnPosition: pos
+                        spawnPosition: pos,
+                        scale: _scale
                         );
                     break;
                 case ObjectTypeEnum.HitSplit2:
@@ -175,7 +194,8 @@ class LevelHandler : IGameModeHandler
                        secondHitTeamId: teamId,
                        firstHitNodeColors: nodeColors,
                        secondHitNodeColors: nodeColors,
-                       spawnPosition: pos
+                       spawnPosition: pos,
+                       scale: _scale
                        );
                     break;
             }

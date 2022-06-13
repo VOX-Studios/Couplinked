@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 public class LightningGenerator
 {
-	public static void SetBolt(Vector2 source, Vector2 dest, LineRenderer lineRenderer)
+	public static void SetBolt(Vector2 source, Vector2 dest, LineRenderer lineRenderer, float scale)
 	{
 		Vector2 tangent = dest - source;
 
 		//get the perpendicular line so that the displacement is proper
 		float temp = Mathf.Atan2(tangent.y, tangent.x);
+
 		//Rotate clockwise
 		temp += -90 * Mathf.Deg2Rad;
 		Vector2 normal = new Vector2 (Mathf.Cos(temp), Mathf.Sin(temp));
@@ -30,7 +31,7 @@ public class LightningGenerator
 		for (int i = 0; i < positions.Count; i++)
 		{
 			float pos = positions[i];
-			float displacement = Random.Range(-.5f, .5f);//<-TEMP
+			float displacement = Random.Range(-.5f * scale, .5f * scale);
 
 			Vector2 point = source + pos * tangent + displacement * normal;
 			lineRenderer.SetPosition(i + 1, point);

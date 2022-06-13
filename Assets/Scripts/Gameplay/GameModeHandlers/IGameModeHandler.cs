@@ -4,7 +4,7 @@ using UnityEngine;
 
 interface IGameModeHandler
 {
-    void Start();
+    void Initialize();
 
     void Run(float deltaTime);
 

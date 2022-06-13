@@ -24,6 +24,8 @@ public class HitSplit : BaseObject
 	public bool WasHitOnce = false;
 	public bool WasHitTwice = false;
 
+	public float Scale { get; private set; }
+
 	private MaterialPropertyBlock _propertyBlock;
 
 	// Use this for initialization
@@ -39,6 +41,12 @@ public class HitSplit : BaseObject
     {
 		_insideSpriteRenderer.enabled = true;
 		_blurInsideSpriteRenderer.enabled = true;
+	}
+
+	public void SetScale(float scale)
+	{
+		Scale = scale;
+		transform.localScale = new Vector3(scale, scale, 1);
 	}
 
 	public void SetColors(Color insideColor, Color outsideColor)

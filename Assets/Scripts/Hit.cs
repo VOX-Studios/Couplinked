@@ -6,6 +6,7 @@ public class Hit : BaseObject
 
 	public HitTypeEnum HitType;
 	public int TeamId;
+	public float Scale;
 
 	[SerializeField]
 	private SpriteRenderer _spriteRenderer;
@@ -21,6 +22,12 @@ public class Hit : BaseObject
 		_hitCollisionHandler = hitCollisionHandler;
 		_propertyBlock = new MaterialPropertyBlock();
 		Speed = _GameManager.GameDifficultyManager.ObjectSpeed;
+	}
+
+	public void SetScale(float scale)
+	{
+		Scale = scale;
+		transform.localScale = new Vector3(scale, scale, 1);
 	}
 
 	public void SetColor(Color color)

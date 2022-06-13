@@ -20,8 +20,9 @@ class SurvivalHandler : IGameModeHandler
     /// </summary>
     private double _minSpawnInterval = .5;
 
-    private byte _numberOfRows = 3;
+    private byte _numberOfRows = 5;
     private float[] _rowPositions;
+    private float _scale;
 
     private GameManager _gameManager;
     private GameSceneManager _gameSceneManager;
@@ -37,30 +38,28 @@ class SurvivalHandler : IGameModeHandler
     public int Score = 0;
     public int RingsCollected = 0;
 
-    private GameplayUtility _gameplayUtility;
-
     private GameInput[] _gameInputs;
     private NodePair[] _nodePairs;
     private TeamManager _teamManager;
+    private ExplosionManager _explosionManager;
 
     private RegularGameService _gameService;
 
     private ISurvivalSpawnHandler _spawnHandler;
 
     public SurvivalHandler(
-        GameManager gameManager, 
-        GameplayUtility gameplayUtility, 
+        GameManager gameManager,
         GameSceneManager gameSceneManager, 
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
         GameInput[] gameInputs,
         NodePair[] nodePairs,
-        TeamManager teamManager
+        TeamManager teamManager,
+        ExplosionManager explosionManager
         )
     {
         _gameManager = gameManager;
-        _gameplayUtility = gameplayUtility;
         _gameSceneManager = gameSceneManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
@@ -69,10 +68,10 @@ class SurvivalHandler : IGameModeHandler
         _gameInputs = gameInputs;
         _nodePairs = nodePairs;
         _teamManager = teamManager;
+        _explosionManager = explosionManager;
 
         _gameService = new RegularGameService(
             gameManager: _gameManager,
-            gameplayUtility: _gameplayUtility,
             gameSceneManager: _gameSceneManager,
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
@@ -82,9 +81,9 @@ class SurvivalHandler : IGameModeHandler
             );
     }
 
-    private float[] _calculateRowPositions()
+    private float[] _calculateRowPositions(int numRows)
     {
-        float[] rowPositions = new float[_numberOfRows];
+        float[] rowPositions = new float[numRows];
 
         float borderPadding = 2.5f; //TODO: share this with clamp
         rowPositions[0] = GameManager.TopY - borderPadding;
@@ -101,9 +100,30 @@ class SurvivalHandler : IGameModeHandler
         return rowPositions;
     }
 
-    public void Start()
+    private void _handleScaling(int numRows, NodePair[] nodePairs, ExplosionManager explosionManager)
     {
-        _rowPositions = _calculateRowPositions();
+        if (numRows <= 5)
+        {
+            _scale = 1f;
+        }
+        else
+        {
+            _scale = 5f / numRows;
+        }
+
+        foreach (NodePair nodePair in nodePairs)
+        {
+            nodePair.SetScale(_scale);
+        }
+
+        explosionManager.SetScale(_scale);
+    }
+
+    public void Initialize()
+    {
+        _rowPositions = _calculateRowPositions(_numberOfRows);
+        _handleScaling(_numberOfRows, _nodePairs, _explosionManager);
+
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
         {
             _spawnHandler = new SurvivalSpawnHandler(
@@ -112,7 +132,8 @@ class SurvivalHandler : IGameModeHandler
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
-                rowPositions: _rowPositions
+                rowPositions: _rowPositions,
+                scale: _scale
                 );
         }
         else
@@ -123,7 +144,8 @@ class SurvivalHandler : IGameModeHandler
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
-                rowPositions: _rowPositions
+                rowPositions: _rowPositions,
+                scale: _scale
                 );
         }
 

@@ -22,19 +22,19 @@ namespace Assets.Scripts.SceneManagers
         private CameraShake _cameraShake;
 
         [SerializeField]
-        NoHitManager noHitManager;
+        private NoHitManager _noHitManager;
 
         [SerializeField]
-        HitManager hitManager;
+        private HitManager _hitManager;
 
         [SerializeField]
-        HitSplitManager hitSplitManager;
+        private HitSplitManager _hitSplitManager;
 
         [SerializeField]
-        ExplosionManager explosionManager;
+        private ExplosionManager _explosionManager;
 
         [SerializeField]
-        ScoreJuiceManager scoreJuiceManager;
+        private ScoreJuiceManager _scoreJuiceManager;
 
         //------------------------------------------
         private SurvivalHandler _survivalHandler;
@@ -62,17 +62,21 @@ namespace Assets.Scripts.SceneManagers
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
             if (_gameManager.GameSetupInfo.IsSinglePlayer)
+            {
                 _setupSinglePlayer();
+            }
             else
+            {
                 _setupMultiplayer();
+            }
 
             _cameraShake = new CameraShake();
 
-            hitManager.Initialize();
-            noHitManager.Initialize();
-            hitSplitManager.Initialize();
-            explosionManager.Initialize(_gameManager.DataManager);
-            scoreJuiceManager.start();
+            _hitManager.Initialize();
+            _noHitManager.Initialize();
+            _hitSplitManager.Initialize();
+            _explosionManager.Initialize(_gameManager.DataManager);
+            _scoreJuiceManager.Initialize();
 
             _gameManager.isPaused = false;
             _gameManager.isResuming = false;
@@ -86,33 +90,32 @@ namespace Assets.Scripts.SceneManagers
             {
                 _survivalHandler = new SurvivalHandler(
                     gameManager: _gameManager,
-                    gameplayUtility: new GameplayUtility(_gameManager.Grid.Logic),
                     gameSceneManager: this,
-                    hitManager: hitManager,
-                    hitSplitManager: hitSplitManager,
-                    noHitManager: noHitManager,
+                    hitManager: _hitManager,
+                    hitSplitManager: _hitSplitManager,
+                    noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
                     nodePairs: _nodePairs,
-                    teamManager: _teamManager
+                    teamManager: _teamManager,
+                    explosionManager: _explosionManager
                     );
 
-                _survivalHandler.Start();
+                _survivalHandler.Initialize();
             }
             else
             {
                 _levelHandler = new LevelHandler(
                     gameManager: _gameManager,
-                    gameplayUtility: new GameplayUtility(_gameManager.Grid.Logic),
                     gameSceneManager: this,
-                    hitManager: hitManager,
-                    hitSplitManager: hitSplitManager,
-                    noHitManager: noHitManager,
+                    hitManager: _hitManager,
+                    hitSplitManager: _hitSplitManager,
+                    noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
                     nodePairs: _nodePairs,
                     teamManager: _teamManager
                     );
 
-                _levelHandler.Start();
+                _levelHandler.Initialize();
             }
 
             _startGame();
@@ -273,10 +276,7 @@ namespace Assets.Scripts.SceneManagers
                     nodePair.Node2.ParticleSystem.Play();
                 }
 
-                for (int i = 0; i < explosionManager.ActiveExplosions.Count; i++)
-                {
-                    explosionManager.ActiveExplosions[i].GetComponent<ParticleSystem>().Play();
-                }
+                _explosionManager.Play();
             }
 
             if(_gameManager.isPaused)
@@ -326,8 +326,6 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            
-
             //if we've got a level loaded (not survival)
             if (_gameManager.CurrentLevel != null)
             {
@@ -338,18 +336,20 @@ namespace Assets.Scripts.SceneManagers
                 _survivalHandler.Run(Time.deltaTime);
             }
 
-            noHitManager.Run(Time.deltaTime);
-            hitManager.Run(Time.deltaTime);
-            hitSplitManager.Run(Time.deltaTime);
-            explosionManager.Run();
-            scoreJuiceManager.Run(Time.deltaTime);
+            _noHitManager.Run(Time.deltaTime);
+            _hitManager.Run(Time.deltaTime);
+            _hitSplitManager.Run(Time.deltaTime);
+            _explosionManager.Run();
+            _scoreJuiceManager.Run(Time.deltaTime);
 
             _cameraShake.Run(Time.deltaTime);
 
             _scoreText.text = _gameManager.score.ToString();
 
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.GameState == GameStateEnum.Game)
+            {
                 EndGame(_gameManager.ReasonForGameEnd);
+            }
         }
 
         private void _setupNodeTrail(ParticleSystem particleSystem)
@@ -379,7 +379,6 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager.ReasonForGameEnd = ReasonForGameEndEnum.Quit;
             _gameManager.SoundEffectManager.PlayBack();
-            HandleExitMidGame();
             _clearGame();
 
             _gameManager.isPaused = false;
@@ -433,35 +432,11 @@ namespace Assets.Scripts.SceneManagers
                 nodePair.Node2.ParticleSystem.Pause();
             }
 
-            for (int i = 0; i < explosionManager.ActiveExplosions.Count; i++)
-            {
-                explosionManager.ActiveExplosions[i].GetComponent<ParticleSystem>().Pause();
-            }
+            _explosionManager.Pause();
 
             _resumeCountText.fontSize = (int)Mathf.Ceil(_gameManager.resumeCountNormalFontSize / 2f);
             _resumeCountText.text = "PAUSED";
             _resumeCountText.gameObject.SetActive(true);
-        }
-
-        void HandleExitMidGame()
-        {
-            
-        }
-
-        void OnApplicationQuit()
-        {
-            if (_gameManager.GameState == GameStateEnum.Game)
-            {
-                HandleExitMidGame();
-            }
-        }
-
-        void OnApplicationPause(bool paused)
-        {
-            if (paused)
-            {
-                HandleExitMidGame();
-            }
         }
 
         private void _startGame()
@@ -496,29 +471,26 @@ namespace Assets.Scripts.SceneManagers
                     break;
             }
 
-            for (int i = hitManager.activeHits.Count - 1; i >= 0; i--)
+            for (int i = _hitManager.activeHits.Count - 1; i >= 0; i--)
             {
-                hitManager.DeactivateHit(i);
+                _hitManager.DeactivateHit(i);
             }
 
-            for (int i = noHitManager.activeNoHits.Count - 1; i >= 0; i--)
+            for (int i = _noHitManager.activeNoHits.Count - 1; i >= 0; i--)
             {
-                noHitManager.deactivateNoHit(i);
+                _noHitManager.deactivateNoHit(i);
             }
 
-            for (int i = hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)
+            for (int i = _hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)
             {
-                hitSplitManager.DeactivateHitSplit(i);
+                _hitSplitManager.DeactivateHitSplit(i);
             }
 
-            for (int i = explosionManager.ActiveExplosions.Count - 1; i >= 0; i--)
-            {
-                explosionManager.DeactivateExplosion(i);
-            }
+            _explosionManager.DeactiveExplosions();
 
-            for (int i = scoreJuiceManager.activeScoreJuices.Count - 1; i >= 0; i--)
+            for (int i = _scoreJuiceManager.activeScoreJuices.Count - 1; i >= 0; i--)
             {
-                scoreJuiceManager.deactivateScoreJuice(i);
+                _scoreJuiceManager.deactivateScoreJuice(i);
             }
 
             _gameManager.SetStatistics();
@@ -630,7 +602,7 @@ namespace Assets.Scripts.SceneManagers
             return true;
         }
 
-        public void AddToScore(Vector3 position, Vector3 nodePosition)
+        public void AddToScore(Vector3 position, Node node)
         {
             _gameManager.ringsCollected++;
 
@@ -640,7 +612,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.score += points; //TODO: multiply by time so score becomes exponential?
             string unlockMessage = "";
 
-            if (points == 1 && position.x < nodePosition.x)
+            if (points == 1 && position.x < node.transform.position.x)
             {
                 if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_AlmostMissedOne, out unlockMessage))
                     _gameManager.NotificationManager.QueueNotification(unlockMessage);
@@ -652,16 +624,17 @@ namespace Assets.Scripts.SceneManagers
             }
 
             //TODO: Have direction also include speed of node...or add one-tenth weighted random skew
-            scoreJuiceManager.SpawnScoreJuice(
+            _scoreJuiceManager.SpawnScoreJuice(
                 pos: position, 
                 score: points,
-                direction: (position - nodePosition).normalized
+                direction: (position - node.transform.position).normalized,
+                scale: node.Scale
                 );
         }
 
         public void AddExplosion(Vector3 position, Color color)
         {
-            explosionManager.ActivateExplosion(position, color);
+            _explosionManager.ActivateExplosion(position, color);
         }
     }
 }

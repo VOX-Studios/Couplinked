@@ -138,13 +138,10 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
         private Color _lightningColor;
         private Color _gridColor;
 
-        private GameplayUtility _gameplayUtility;
-
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
             _state = ColorSelectionSceneManagerStateEnum.Menu;
-            _gameplayUtility = new GameplayUtility(_gameManager.Grid.Logic);
 
             EventSystem.current.SetSelectedGameObject(_node1InsideButton.gameObject);
 
@@ -313,14 +310,14 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             if (hit == _hit1)
             {
                 _explosionManager.ActivateExplosion(_hit1.transform.position, _node1ParticlesColor);
-                _gameplayUtility.AddExplosiveForceToGrid(_hit1.transform.position);
+                _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE + _hit1.Scale, _hit1.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * _hit1.Scale);
                 _hit1.gameObject.SetActive(false);
                 _hit1RespawnTimer = _hitRespawnInterval;
             }
             else if (hit == _hit2)
             {
                 _explosionManager.ActivateExplosion(_hit2.transform.position, _node2ParticlesColor);
-                _gameplayUtility.AddExplosiveForceToGrid(_hit2.transform.position);
+                _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * _hit2.Scale, _hit2.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * _hit2.Scale);
                 _hit2.gameObject.SetActive(false);
                 _hit2RespawnTimer = _hitRespawnInterval;
             }
@@ -614,10 +611,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                 hitSplitManager.DeactivateHitSplit(i);
             }
 
-            for (int i = _explosionManager.ActiveExplosions.Count - 1; i >= 0; i--)
-            {
-                _explosionManager.DeactivateExplosion(i);
-            }
+            _explosionManager.DeactiveExplosions();
         }
     }
 }

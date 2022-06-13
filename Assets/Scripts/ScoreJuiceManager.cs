@@ -11,12 +11,11 @@ public class ScoreJuiceManager : MonoBehaviour
 	public List<GameObject> inactiveScoreJuices;
 	private int maxScoreJuices = 10;
 
-	GameManager gameManager;
+	private GameManager _gameManager;
 
-	// Use this for initialization
-	public void start () 
+	public void Initialize () 
 	{
-		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
 		activeScoreJuices = new List<GameObject>();
 		inactiveScoreJuices = new List<GameObject>();
@@ -46,20 +45,21 @@ public class ScoreJuiceManager : MonoBehaviour
 		}
 	}
 
-	public void SpawnScoreJuice(Vector3 pos, int score, Vector3 direction)
+	public void SpawnScoreJuice(Vector3 pos, int score, Vector3 direction, float scale)
 	{		
 		//TODO: Handle colors and such?
 
-		activateScoreJuice(pos, score, direction);
+		_activateScoreJuice(pos, score, direction, scale);
 	}
 
 	
-	void activateScoreJuice(Vector3 spawnPosition, int score, Vector3 direction)
+	private void _activateScoreJuice(Vector3 spawnPosition, int score, Vector3 direction, float scale)
 	{
 		int inactiveCount = inactiveScoreJuices.Count;
 		if(inactiveCount > 0)
 		{
 			GameObject scoreJuice = inactiveScoreJuices[inactiveCount - 1];
+			scoreJuice.transform.localScale = new Vector3(scale, scale, 1);
 			scoreJuice.GetComponent<ScoreJuice>().Setup(spawnPosition, direction);
 			scoreJuice.GetComponent<Text>().text = score.ToString();
 			scoreJuice.SetActive(true);

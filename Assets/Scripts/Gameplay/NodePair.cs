@@ -1,4 +1,6 @@
-﻿public class NodePair
+﻿using UnityEngine;
+
+public class NodePair
 {
     public Node Node1;
 
@@ -11,5 +13,13 @@
         Node1 = node1;
         Node2 = node2;
         LightningManager = lightningManager;
+    }
+
+    public void SetScale(float scale)
+    {
+        Node1.SetScale(scale);
+        Node2.SetScale(scale);
+
+        LightningManager.SetScale(scale);
     }
 }

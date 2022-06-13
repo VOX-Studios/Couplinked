@@ -18,6 +18,8 @@ public class LightningManager : MonoBehaviour
 
     private Color _lightningColor;
 
+    private float _scale = 1;
+
     public void Initialize(Transform parent, Color lightningColor)
     {
         transform.SetParent(parent, false);
@@ -39,6 +41,26 @@ public class LightningManager : MonoBehaviour
         _connectorLine.tag = "Connector";
     }
 
+    /// <summary>
+    /// This should only be called once after initialize.
+    /// </summary>
+    /// <param name="scale"></param>
+    public void SetScale(float scale)
+    {
+        _scale = scale;
+
+        _connectorLine.startWidth *= scale;
+        _connectorLine.endWidth *= scale;
+
+        _collider.size = new Vector2(_collider.size.x, _collider.size.y * scale);
+
+        foreach (LineRenderer bolt in _inactiveBolts)
+        {
+            bolt.startWidth *= scale;
+            bolt.endWidth *= scale;
+        }
+    }    
+
     public void SetLightningColor(Color color)
     {
         _lightningColor = color;
@@ -54,7 +76,7 @@ public class LightningManager : MonoBehaviour
         //The difference between our start and end points
         Vector2 distance = pos2 - pos1;
 
-        _collider.size = new Vector2(distance.magnitude, .04f); //.04f should match width in LineRenderer
+        _collider.size = new Vector2(distance.magnitude, .04f * _scale); //y should match width in LineRenderer
         _collider.transform.position = (pos1 + pos2) / 2;
 
         //The angle between our start and end points
@@ -68,7 +90,7 @@ public class LightningManager : MonoBehaviour
         if (bolt == null)
             return;
 
-        LightningGenerator.SetBolt(pos1, pos2, bolt);
+        LightningGenerator.SetBolt(pos1, pos2, bolt, _scale);
 
         bolt.startColor = _lightningColor;
         bolt.endColor = _lightningColor;

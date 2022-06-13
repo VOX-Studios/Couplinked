@@ -7,12 +7,26 @@ public class Node : MonoBehaviour
     public SpriteRenderer BlurSpriteRenderer;
     public HitTypeEnum HitType;
     public int TeamId;
+    public float Scale { get; set; } 
 
     private MaterialPropertyBlock _propertyBlock;
 
     private void Awake()
     {
         _propertyBlock = new MaterialPropertyBlock();
+    }
+
+    public void SetScale(float scale)
+    {
+        Scale = scale;
+        transform.localScale = new Vector3(scale, scale, 1);
+
+        ParticleSystem.MainModule particleMain = ParticleSystem.main;
+        particleMain.startSize = new ParticleSystem.MinMaxCurve(particleMain.startSize.constant * scale);
+        //particleMain.startSpeed = new ParticleSystem.MinMaxCurve(particleMain.startSpeed.constant * scale);
+
+        ParticleSystem.ShapeModule particleShape = ParticleSystem.shape;
+        particleShape.radius *= scale;
     }
 
     public void SetColors(Color insideColor, Color outsideColor)
