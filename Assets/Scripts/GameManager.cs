@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.InputSystem;
 
-public class GameManager : MonoBehaviour 
+public class GameManager : MonoBehaviour
 {
 	public InputActionAsset InputActions;
 	public InputActionAsset DefaultInputActions;
@@ -34,6 +34,20 @@ public class GameManager : MonoBehaviour
 	public Level CurrentLevel;
 	public GameSetupInfo GameSetupInfo;
 
+	public static float TopY;
+	public static float BotY;
+	public static float ClampYOffset;
+	public static float TopYWithClamp;
+	public static float BotYWithClamp;
+
+	public static float LeftX;
+	public static float RightX;
+	public static float ClampXOffset;
+	public static float LeftXWithClamp;
+	public static float RightXWithClamp;
+
+	public static float WorldWidth;
+
 	// Use this for initialization
 	void Awake()
 	{
@@ -48,7 +62,7 @@ public class GameManager : MonoBehaviour
 		NumberOfLevels = Resources.LoadAll<TextAsset>("CampaignLevelData").Length;
 
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
-		
+
 		Hit1HitCount = PlayerPrefs.GetInt("Hit1HitCount");
 		Hit2HitCount = PlayerPrefs.GetInt("Hit2HitCount");
 		HitSplit1HitCount = PlayerPrefs.GetInt("HitSplit1HitCount");
@@ -62,10 +76,18 @@ public class GameManager : MonoBehaviour
 
 		CurrentLevel = new Level();
 
+		ClampXOffset = .5f;
+		ClampYOffset = 2.5f;
+
 		TopY = Cam.ViewportToWorldPoint(new Vector3(0, 1, 0)).y;
 		BotY = Cam.ViewportToWorldPoint(Vector3.zero).y;
 		LeftX = Cam.ViewportToWorldPoint(Vector3.zero).x;
 		RightX = Cam.ViewportToWorldPoint(new Vector3(1, 0, 0)).x;
+
+		TopYWithClamp = TopY - ClampYOffset;
+		BotYWithClamp = BotY + ClampYOffset;
+		LeftXWithClamp = LeftX + ClampXOffset;
+		RightXWithClamp = RightX + ClampXOffset;
 
 		WorldWidth = RightX - LeftX;
 
@@ -82,6 +104,7 @@ public class GameManager : MonoBehaviour
 			SetDefaultDataValues_2_1();
 			SetDefaultDataValues_2_2();
 			SetDefaultDataValues_2_3();
+			SetDefaultDataValues_2_7();
 
 			DataManager.IsThisTheInitialSetup.Set("false");
 		}
@@ -106,6 +129,11 @@ public class GameManager : MonoBehaviour
 			{
 				SetDefaultDataValues_2_3();
 			}
+
+			if (!DataManager.IsInitialSetupComplete_2_7.Get())
+			{
+				SetDefaultDataValues_2_7();
+			}
 		}
 
 		MusicOn = DataManager.GetMusicPreference();
@@ -127,7 +155,7 @@ public class GameManager : MonoBehaviour
 	}
 
 	private void SetDefaultDataValues_1_9()
-    {
+	{
 		DataManager.GridDensity.Set(QualitySettingEnum.High);
 		DataManager.ExplosionParticleQuality.Set(QualitySettingEnum.High);
 		DataManager.TrailParticleQuality.Set(QualitySettingEnum.High);
@@ -146,19 +174,30 @@ public class GameManager : MonoBehaviour
 		//set default colors for players 1 and 2
 		for (int i = 0; i < 2; i++)
 		{
-            PlayerNodeColors defaultColors = ColorManager.NodeColors[i];
-			DataManager.PlayerColors[i].Node1InsideColor.Set(defaultColors.InsideColor1);
-			DataManager.PlayerColors[i].Node1OutsideColor.Set(defaultColors.OutsideColor1);
-			DataManager.PlayerColors[i].Node1ParticlesColor.Set(defaultColors.ParticleColor1);
-			DataManager.PlayerColors[i].Node2InsideColor.Set(defaultColors.InsideColor2);
-			DataManager.PlayerColors[i].Node2OutsideColor.Set(defaultColors.OutsideColor2);
-			DataManager.PlayerColors[i].Node2ParticlesColor.Set(defaultColors.ParticleColor2);
+			DefaultPlayerColors defaultColors = ColorManager.DefaultPlayerColors[i];
+
+			ColorData node1InsideColor = new ColorData($"P{i} Node {1} Inside Color");
+			ColorData node1OutsideColor = new ColorData($"P{i} Node {1} Outside Color");
+			ColorData node1ParticlesColor = new ColorData($"P{i} Node {1} Particles Color");
+
+			ColorData node2InsideColor = new ColorData($"P{i} Node {2} Inside Color");
+			ColorData node2OutsideColor = new ColorData($"P{i} Node {2} Outside Color");
+			ColorData node2ParticlesColor = new ColorData($"P{i} Node {2} Particles Color");
+
+			node1InsideColor.Set(defaultColors.NodeColors[0].InsideColor);
+			node1OutsideColor.Set(defaultColors.NodeColors[0].OutsideColor);
+			node1ParticlesColor.Set(defaultColors.NodeColors[0].ParticleColor);
+			node2InsideColor.Set(defaultColors.NodeColors[1].InsideColor);
+			node2OutsideColor.Set(defaultColors.NodeColors[1].OutsideColor);
+			node2ParticlesColor.Set(defaultColors.NodeColors[1].ParticleColor);
+
 			DataManager.PlayerColors[i].LightningColor.Set(Color.white);
 		}
 
 		//delete old lightning key
 		PlayerPrefs.DeleteKey("Color Selected");
 		PlayerPrefs.Save();
+
 		DataManager.IsInitialSetupComplete_2_2.Set(true);
 	}
 
@@ -170,8 +209,72 @@ public class GameManager : MonoBehaviour
 			DataManager.PlayerColors[i].GridColor.Set(ColorManager.DefaultGridColor);
 		}
 
-		PlayerPrefs.Save();
 		DataManager.IsInitialSetupComplete_2_3.Set(true);
+	}
+
+	private void SetDefaultDataValues_2_7()
+	{
+		//for players 1 and 2
+		for (int i = 0; i < 2; i++)
+		{
+			ColorData newNode1InsideColor = new ColorData($"P{i} Node {0} Inside Color");
+			ColorData newNode1OutsideColor = new ColorData($"P{i} Node {0} Outside Color");
+			ColorData newNode1ParticlesColor = new ColorData($"P{i} Node {0} Particles Color");
+
+			ColorData newNode2InsideColor = new ColorData($"P{i} Node {1} Inside Color");
+			ColorData newNode2OutsideColor = new ColorData($"P{i} Node {1} Outside Color");
+			ColorData newNode2ParticlesColor = new ColorData($"P{i} Node {1} Particles Color");
+
+			ColorData oldNode1InsideColor = new ColorData($"P{i} Node {1} Inside Color");
+			ColorData oldNode1OutsideColor = new ColorData($"P{i} Node {1} Outside Color");
+			ColorData oldNode1ParticlesColor = new ColorData($"P{i} Node {1} Particles Color");
+
+			ColorData oldNode2InsideColor = new ColorData($"P{i} Node {2} Inside Color");
+			ColorData oldNode2OutsideColor = new ColorData($"P{i} Node {2} Outside Color");
+			ColorData oldNode2ParticlesColor = new ColorData($"P{i} Node {2} Particles Color");
+
+			//set first node colors
+			//old node 1 uses same data key as new node 2, so we're shifting this one first
+			newNode1InsideColor.Set(oldNode1InsideColor.Get());
+			newNode1OutsideColor.Set(oldNode1OutsideColor.Get());
+			newNode1ParticlesColor.Set(oldNode1ParticlesColor.Get());
+
+			//set second node colors
+			newNode2InsideColor.Set(oldNode2InsideColor.Get());
+			newNode2OutsideColor.Set(oldNode2OutsideColor.Get());
+			newNode2ParticlesColor.Set(oldNode2ParticlesColor.Get());
+
+			PlayerPrefs.DeleteKey(oldNode2InsideColor.PlayerPreferenceKey);
+			PlayerPrefs.DeleteKey(oldNode2OutsideColor.PlayerPreferenceKey);
+			PlayerPrefs.DeleteKey(oldNode2ParticlesColor.PlayerPreferenceKey);
+			PlayerPrefs.Save();
+		}
+
+		//add player 3 and 4 colors
+		for(int i = 2; i < 4; i++)
+        {
+			DefaultPlayerColors defaultColors = ColorManager.DefaultPlayerColors[i];
+
+			ColorData node1InsideColor = new ColorData($"P{i} Node {0} Inside Color");
+			ColorData node1OutsideColor = new ColorData($"P{i} Node {0} Outside Color");
+			ColorData node1ParticlesColor = new ColorData($"P{i} Node {0} Particles Color");
+
+			ColorData node2InsideColor = new ColorData($"P{i} Node {1} Inside Color");
+			ColorData node2OutsideColor = new ColorData($"P{i} Node {1} Outside Color");
+			ColorData node2ParticlesColor = new ColorData($"P{i} Node {1} Particles Color");
+
+			node1InsideColor.Set(defaultColors.NodeColors[0].InsideColor);
+			node1OutsideColor.Set(defaultColors.NodeColors[0].OutsideColor);
+			node1ParticlesColor.Set(defaultColors.NodeColors[0].ParticleColor);
+			node2InsideColor.Set(defaultColors.NodeColors[1].InsideColor);
+			node2OutsideColor.Set(defaultColors.NodeColors[1].OutsideColor);
+			node2ParticlesColor.Set(defaultColors.NodeColors[1].ParticleColor);
+
+			DataManager.PlayerColors[i].LightningColor.Set(Color.white);
+		}
+
+
+		DataManager.IsInitialSetupComplete_2_7.Set(true);
 	}
 
 	/// <summary>
@@ -181,30 +284,30 @@ public class GameManager : MonoBehaviour
 	public string HandleUnlockingLevels()
 	{
 		string unlockMessage = "";
-		int levelNumber = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(6,2));
+		int levelNumber = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(6, 2));
 
 		//get ones place
-		int onesPlace = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(7,1));
+		int onesPlace = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(7, 1));
 
 		//get tens place
-		int tensPlace = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(6,1));
+		int tensPlace = Convert.ToInt16(CurrentLevel.LevelData.Name.Substring(6, 1));
 
 		int highestLevelUnlocked = DataManager.GetHighestCampaignLevelUnlocked(GameDifficultyManager.GameDifficulty);
-		int highestLevelTierUnlocked = DataManager.GetHighestCampaignLevelTierUnlocked(GameDifficultyManager.GameDifficulty); 
+		int highestLevelTierUnlocked = DataManager.GetHighestCampaignLevelTierUnlocked(GameDifficultyManager.GameDifficulty);
 
 		//if we're on the last level
 		if (levelNumber == NumberOfLevels)
 		{
 			bool perfectionist = true;
-			
+
 			//check all of the levels for appropriate ratings
-			for(int i = 0; i < levelNumber; i++)
+			for (int i = 0; i < levelNumber; i++)
 			{
 				//check if we don't have a rating that's high enough for perfectionist
 				if (DataManager.GetCampaignLevelPlayerScoreRating(i, GameDifficultyManager.GameDifficulty) < 5)
 				{
 					//can't unlock
-					perfectionist = false; 
+					perfectionist = false;
 					break;
 				}
 			}
@@ -220,18 +323,18 @@ public class GameManager : MonoBehaviour
 			{
 				NotificationManager.QueueNotification(message);
 			}
-			
-			if(Challenges.HandleUnlockingChallenge(Challenges.ID_Smile, out message))
+
+			if (Challenges.HandleUnlockingChallenge(Challenges.ID_Smile, out message))
 			{
 				NotificationManager.QueueNotification(message);
 			}
 		}
-		else if(onesPlace > 0) //if we're not about to go to the next tier of levels
+		else if (onesPlace > 0) //if we're not about to go to the next tier of levels
 		{
 			//just unlock the next level if we haven't already
 			string levelToUnlock = (levelNumber + 1).ToString("00");
-			
-			if(DataManager.IsCampaignLevelLocked(levelNumber, GameDifficultyManager.GameDifficulty))
+
+			if (DataManager.IsCampaignLevelLocked(levelNumber, GameDifficultyManager.GameDifficulty))
 			{
 				DataManager.UnlockCampaignLevel(levelNumber, GameDifficultyManager.GameDifficulty);
 				unlockMessage = "Level " + levelToUnlock + " unlocked!";
@@ -245,28 +348,28 @@ public class GameManager : MonoBehaviour
 			string ChallengeID = "";
 			switch (levelNumber)
 			{
-			case 10:
-				ChallengeID = Challenges.ID_SportsmanshipAward;
-				break;
-			case 20:
-				ChallengeID = Challenges.ID_20Levels;
-				break;
-			case 30:
-				ChallengeID = Challenges.ID_30Levels;
-				break;
-			case 40:
-				ChallengeID = Challenges.ID_40Levels;
-				break;
-			case 50:
-				ChallengeID = Challenges.ID_50Levels;
-				break;
+				case 10:
+					ChallengeID = Challenges.ID_SportsmanshipAward;
+					break;
+				case 20:
+					ChallengeID = Challenges.ID_20Levels;
+					break;
+				case 30:
+					ChallengeID = Challenges.ID_30Levels;
+					break;
+				case 40:
+					ChallengeID = Challenges.ID_40Levels;
+					break;
+				case 50:
+					ChallengeID = Challenges.ID_50Levels;
+					break;
 			}
 			Challenges.Clear();
 
-			if(ChallengeID.Length > 0)
+			if (ChallengeID.Length > 0)
 			{
 				string message = "";
-				if(Challenges.HandleUnlockingChallenge(ChallengeID, out message))
+				if (Challenges.HandleUnlockingChallenge(ChallengeID, out message))
 				{
 					NotificationManager.QueueNotification(message);
 				}
@@ -276,10 +379,10 @@ public class GameManager : MonoBehaviour
 			bool canUnlockNextTier = true;
 
 			//check all of the previous/current levels for appropriate ratings
-			for(int i = 0; i < levelNumber; i++)
+			for (int i = 0; i < levelNumber; i++)
 			{
 				//if rating is less than tensPlace, we can't unlock next tier
-				if(DataManager.GetCampaignLevelPlayerScoreRating(i, GameDifficultyManager.GameDifficulty) < tensPlace)
+				if (DataManager.GetCampaignLevelPlayerScoreRating(i, GameDifficultyManager.GameDifficulty) < tensPlace)
 				{
 					//can't unlock
 					canUnlockNextTier = false;
@@ -287,10 +390,10 @@ public class GameManager : MonoBehaviour
 				}
 			}
 
-			if(canUnlockNextTier)
+			if (canUnlockNextTier)
 			{
 				//unlock the next level
-				if(DataManager.IsCampaignLevelLocked(levelNumber, GameDifficultyManager.GameDifficulty))
+				if (DataManager.IsCampaignLevelLocked(levelNumber, GameDifficultyManager.GameDifficulty))
 				{
 					DataManager.UnlockCampaignLevel(levelNumber, GameDifficultyManager.GameDifficulty);
 					unlockMessage = "Tier " + tensPlace.ToString("00") + " unlocked!";
@@ -300,7 +403,7 @@ public class GameManager : MonoBehaviour
 			}
 			else
 			{
-				unlockMessage = "You need a " + GetWordFromNumber(tensPlace) + " star rating\non every previous level \nto unlock Tier " + tensPlace.ToString("00") + "."; 
+				unlockMessage = "You need a " + GetWordFromNumber(tensPlace) + " star rating\non every previous level \nto unlock Tier " + tensPlace.ToString("00") + ".";
 			}
 		}
 
@@ -309,28 +412,28 @@ public class GameManager : MonoBehaviour
 
 		//if our highest level unlocked is on the edge of a tier
 		//if current level isn't the highest level unlocked
-		if(highestLevelUnlocked % 10 == 0 && highestLevelUnlocked != levelNumber)
+		if (highestLevelUnlocked % 10 == 0 && highestLevelUnlocked != levelNumber)
 		{
 			bool canUnlock = true;
 
 			int highestLevelTier = Mathf.FloorToInt(highestLevelUnlocked / 10f);
 			//check all of the previous/current levels for appropriate ratings
-			for(int i = 0; i < highestLevelUnlocked; i++)
+			for (int i = 0; i < highestLevelUnlocked; i++)
 			{
 				//if rating is less than highest level tier, can't unlock level
-				if(DataManager.GetCampaignLevelPlayerScoreRating(i, GameDifficultyManager.GameDifficulty) < highestLevelTier)
+				if (DataManager.GetCampaignLevelPlayerScoreRating(i, GameDifficultyManager.GameDifficulty) < highestLevelTier)
 				{
 					//can't unlock
-					canUnlock = false; 
+					canUnlock = false;
 					break;
 				}
 			}
 
-			if(canUnlock)
+			if (canUnlock)
 			{
 				//unlock the next level
 				string levelToUnlock = (highestLevelUnlocked + 1).ToString("00");
-				if(DataManager.IsCampaignLevelLocked(highestLevelUnlocked, GameDifficultyManager.GameDifficulty))
+				if (DataManager.IsCampaignLevelLocked(highestLevelUnlocked, GameDifficultyManager.GameDifficulty))
 				{
 					DataManager.UnlockCampaignLevel(highestLevelUnlocked, GameDifficultyManager.GameDifficulty);
 					NotificationManager.QueueNotification("You unlocked Tier " + highestLevelTier.ToString("00") + "!");
@@ -349,22 +452,22 @@ public class GameManager : MonoBehaviour
 		string number = "";
 		switch (oneToFive)
 		{
-	    	case 1:
-                number = "one";
-                break;
-		    case 2:
-                number = "two";
-                break;
-		    case 3:
-                number = "three";
-                break;
-		    case 4:
-                number = "four";
-                break;
-		    case 5:
-		    default:
-                number = "five";
-                break;
+			case 1:
+				number = "one";
+				break;
+			case 2:
+				number = "two";
+				break;
+			case 3:
+				number = "three";
+				break;
+			case 4:
+				number = "four";
+				break;
+			case 5:
+			default:
+				number = "five";
+				break;
 		}
 
 		return number;
@@ -374,21 +477,21 @@ public class GameManager : MonoBehaviour
 
 	public string MapReasonsForLossToString(ReasonForGameEndEnum reasonForGameEnd)
 	{
-		switch(reasonForGameEnd)
+		switch (reasonForGameEnd)
 		{
-		case ReasonForGameEndEnum.HitOffScreen:
-		case ReasonForGameEndEnum.HitSplitOffScreen:
-			return "You let a ring go off the screen.";
-		case ReasonForGameEndEnum.NoHitContactWithNode:
-			return "You let one of your nodes hit a red node";
-		case ReasonForGameEndEnum.NoHitContactWithElectricity:
-			return "You let your electricity hit a red node";
-		case ReasonForGameEndEnum.Mismatch:
-			return "You matched the wrong color node.";
-		case ReasonForGameEndEnum.Win:
-			return "You won!";
-		default:
-			return "";
+			case ReasonForGameEndEnum.HitOffScreen:
+			case ReasonForGameEndEnum.HitSplitOffScreen:
+				return "You let a ring go off the screen.";
+			case ReasonForGameEndEnum.NoHitContactWithNode:
+				return "You let one of your nodes hit a red node";
+			case ReasonForGameEndEnum.NoHitContactWithElectricity:
+				return "You let your electricity hit a red node";
+			case ReasonForGameEndEnum.Mismatch:
+				return "You matched the wrong color node.";
+			case ReasonForGameEndEnum.Win:
+				return "You won!";
+			default:
+				return "";
 		}
 	}
 
@@ -414,19 +517,10 @@ public class GameManager : MonoBehaviour
 
 	public GameObject MenuBackButtonPrefab;
 
-
-	public static float TopY;
-	public static float BotY;
-
-	public static float LeftX;
-	public static float RightX;
-
-	public static float WorldWidth;
-
 	public int LocalHighScore = 0;
 
-    
-	
+
+
 	public GameObject ColorSelectionSwabPrefab;
 
 	public GameObject LevelInfoPrefab;
@@ -438,17 +532,17 @@ public class GameManager : MonoBehaviour
 	public float TimePlayedMilliseconds;
 	public int GamesPlayed;
 
-    //Sound Screen
-    public bool MusicOn = true;
-    public bool SfxOn = true;
+	//Sound Screen
+	public bool MusicOn = true;
+	public bool SfxOn = true;
 
-    //TODO: move these?
+	//TODO: move these?
 	public int LevelsPerPage = 5;
-    public int LevelsDisplayingStart = -1;
-    public int LevelsDisplayingEnd = -1;
+	public int LevelsDisplayingStart = -1;
+	public int LevelsDisplayingEnd = -1;
 
 	// Update is called once per frame
-	void Update() 
+	void Update()
 	{
 		if (!isPaused)
 		{
@@ -457,9 +551,9 @@ public class GameManager : MonoBehaviour
 
 		AudioManager.Run(Time.deltaTime);
 
-		if(NotificationManager.IsActive) //TODO: move this into its own thing
+		if (NotificationManager.IsActive) //TODO: move this into its own thing
 		{
-			if(NotificationManager.IsOpening || NotificationManager.IsClosing)
+			if (NotificationManager.IsOpening || NotificationManager.IsClosing)
 			{
 				NotificationManager.Run(Time.deltaTime);
 			}
@@ -468,7 +562,7 @@ public class GameManager : MonoBehaviour
 				if (InputActions.FindActionMap("Notification Manager").FindAction("Accept").triggered || InputActions.FindActionMap("Notification Manager").FindAction("Back").triggered)
 				{
 					SoundEffectManager.PlaySelect();
-					NotificationManager.Close(); 
+					NotificationManager.Close();
 					return;
 				}
 			}
@@ -485,8 +579,8 @@ public class GameManager : MonoBehaviour
 
 	void HandleLoading()
 	{
-		if(HandleBack())
-            Application.Quit();
+		if (HandleBack())
+			Application.Quit();
 
 		LoadScene("Start");
 	}
@@ -494,67 +588,71 @@ public class GameManager : MonoBehaviour
 	public void LoadScene(string sceneToLoad)
 	{
 		GameState = GameStateEnum.InBetweenScenes;
-        SceneManager.LoadScene(sceneToLoad);
+		SceneManager.LoadScene(sceneToLoad);
 	}
 
 	void OnLevelWasLoaded(int level)
 	{
 		Cam = Camera.main;
 
-		switch(SceneManager.GetActiveScene().name)
-		{			
-		    case "Start":
-                    GameState = GameStateEnum.StartScreen;
-			    break;
-		    case "GameModeSelection":
-		    	    GameState = GameStateEnum.GameModeSelection;
-			    break;
-		    case "Level Editor":
-			        GameState = GameStateEnum.LevelEditor;
-			    break;
-		    case "Levels":
-			        GameState = GameStateEnum.LevelSelection;
-			    break;
-		    case "LevelEditorSelection":
-			        GameState = GameStateEnum.LevelEditorSelectionScreen;
+		//TODO: wtf do we do with default?
+		switch (SceneManager.GetActiveScene().name)
+		{
+			case "Start":
+				GameState = GameStateEnum.StartScreen;
 				break;
-		    case "Instructions":
-    			    GameState = GameStateEnum.InstructionsScreen;
-			    break;
-		    case "Options":
-			        GameState = GameStateEnum.OptionsScreen;
-			    break;
-		    case "Achievements":
-			        GameState = GameStateEnum.AchievementsScreen;
-			    break;
-		    case "Graphics":
-                    GameState = GameStateEnum.GraphicsScreen;
-			    break;
-		    case "Sound":
-			        GameState = GameStateEnum.SoundScreen;
-			    break;
-		    case "Account":
-			        GameState = GameStateEnum.AccountScreen;
-			    break;
-            case "Color Selection":
-                    GameState = GameStateEnum.ColorSelectionScreen;
-			    break;
-		    case "Statistics":
-                    GameState = GameStateEnum.StatisticsScreen;
-			    break;
-		    case "Local Statistics":
-			        GameState = GameStateEnum.LocalStatisticsScreen;
-			    break;
-		    case "Game":
-			        GameState = GameStateEnum.Game;
+			case "GameModeSelection":
+				GameState = GameStateEnum.GameModeSelection;
 				break;
-		    case "End":
-			        GameState = GameStateEnum.EndScreen;
-			    break;
+			case "Level Editor":
+				GameState = GameStateEnum.LevelEditor;
+				break;
+			case "Levels":
+				GameState = GameStateEnum.LevelSelection;
+				break;
+			case "LevelEditorSelection":
+				GameState = GameStateEnum.LevelEditorSelectionScreen;
+				break;
+			case "Multiplayer Controller Selection":
+				GameState = GameStateEnum.MultiplayerControllerSelection;
+				break;
+			case "Instructions":
+				GameState = GameStateEnum.InstructionsScreen;
+				break;
+			case "Options":
+				GameState = GameStateEnum.OptionsScreen;
+				break;
+			case "Achievements":
+				GameState = GameStateEnum.AchievementsScreen;
+				break;
+			case "Graphics":
+				GameState = GameStateEnum.GraphicsScreen;
+				break;
+			case "Sound":
+				GameState = GameStateEnum.SoundScreen;
+				break;
+			case "Account":
+				GameState = GameStateEnum.AccountScreen;
+				break;
+			case "Color Selection":
+				GameState = GameStateEnum.ColorSelectionScreen;
+				break;
+			case "Statistics":
+				GameState = GameStateEnum.StatisticsScreen;
+				break;
+			case "Local Statistics":
+				GameState = GameStateEnum.LocalStatisticsScreen;
+				break;
+			case "Game":
+				GameState = GameStateEnum.Game;
+				break;
+			case "End":
+				GameState = GameStateEnum.EndScreen;
+				break;
 		}
 
 		switch (GameState)
-        {
+		{
 			default:
 				Cursor.visible = true;
 				break;
@@ -563,16 +661,21 @@ public class GameManager : MonoBehaviour
 				break;
 		}
 
-		bool shouldKeepMenuBackground = true;
-		switch (GameState)
-        {
-			case GameStateEnum.Game:
-			case GameStateEnum.LevelEditor:
-				shouldKeepMenuBackground = false;
-				break;
-        }
+		bool shouldKeepMenuBackgroundNodes = true;
+		bool shouldKeepMenuBackgroundSparkleParticles = true;
 
-		MenuBackgroundManager.gameObject.SetActive(shouldKeepMenuBackground);
+		if (GameState == GameStateEnum.Game || GameState == GameStateEnum.LevelEditor)
+		{
+			shouldKeepMenuBackgroundSparkleParticles = false;
+			shouldKeepMenuBackgroundNodes = false;
+		}
+		else if (GameState == GameStateEnum.MultiplayerControllerSelection)
+		{
+			shouldKeepMenuBackgroundNodes = false;
+		}
+
+		MenuBackgroundManager.SetNodesActive(shouldKeepMenuBackgroundNodes);
+		MenuBackgroundManager.SetSparkleParticlesActive(shouldKeepMenuBackgroundSparkleParticles);
 
 		if (MusicOn)
 		{
@@ -581,7 +684,7 @@ public class GameManager : MonoBehaviour
 				AudioManager.SwitchToGameMusic();
 			}
 			else
-            {
+			{
 				AudioManager.SwitchToMenuMusic();
 			}
 
@@ -589,19 +692,19 @@ public class GameManager : MonoBehaviour
 		}
 
 		InputManager.ToggleInputs(GameState, NotificationManager.IsActive);
-		
-		if(NotificationManager.IsRequested)
-            NotificationManager.Activate();
+
+		if (NotificationManager.IsRequested)
+			NotificationManager.Activate();
 	}
 
 
 
 	public void ResetLevelDisplayNumbers()
 	{
-		if(TheLevelSelectionMode == LevelTypeEnum.Campaign)
-            LevelsPerPage = 5;
+		if (TheLevelSelectionMode == LevelTypeEnum.Campaign)
+			LevelsPerPage = 5;
 		else
-            LevelsPerPage = 3;
+			LevelsPerPage = 3;
 
 		LevelsDisplayingStart = 0;
 		LevelsDisplayingEnd = LevelsPerPage;
@@ -621,14 +724,14 @@ public class GameManager : MonoBehaviour
 	public static Vector3 ConvertStringToVector3(string strV3)
 	{
 		tempSplit = strV3.Substring(1).Replace(")", "").Split(',');
-		
+
 		return new Vector3(Convert.ToSingle(tempSplit[0]),
-		                   Convert.ToSingle(tempSplit[1]),
-		                   Convert.ToSingle(tempSplit[2]));
+						   Convert.ToSingle(tempSplit[1]),
+						   Convert.ToSingle(tempSplit[2]));
 	}
 
 	public int PotentialMaxSurvivalScore;
-	
+
 	public void SetStatistics()
 	{
 		PlayerPrefs.SetInt("Hit1HitCount", Hit1HitCount);
@@ -643,22 +746,27 @@ public class GameManager : MonoBehaviour
 		PlayerPrefs.SetInt("GamesPlayed", GamesPlayed);
 
 		string unlockMessage = "";
-		if(HitSplit1HitCount + HitSplit2HitCount >= 500)
+		if (HitSplit1HitCount + HitSplit2HitCount >= 500)
 		{
-			if(Challenges.HandleUnlockingChallenge(Challenges.ID_Gymnast, out unlockMessage))
-                NotificationManager.QueueNotification(unlockMessage);
+			if (Challenges.HandleUnlockingChallenge(Challenges.ID_Gymnast, out unlockMessage))
+				NotificationManager.QueueNotification(unlockMessage);
 		}
 
 		unlockMessage = "";
-		if(TimePlayedHours >= 2)
+		if (TimePlayedHours >= 2)
 		{
-			if(Challenges.HandleUnlockingChallenge(Challenges.ID_MarathonMan, out unlockMessage))
-                NotificationManager.QueueNotification(unlockMessage);
+			if (Challenges.HandleUnlockingChallenge(Challenges.ID_MarathonMan, out unlockMessage))
+				NotificationManager.QueueNotification(unlockMessage);
 		}
 	}
-		
+
+	public void ClampObjectIntoView(Transform t)
+    {
+		_clampObjectIntoView(t, ClampXOffset, ClampYOffset);
+	}
+
 	// Clamp object into view, requires a transform and an offset
-	public void ClampObjectIntoView(Transform t, float clampBorderXOffset, float clampBorderYOffset) 
+	private void _clampObjectIntoView(Transform t, float clampBorderXOffset, float clampBorderYOffset) 
 	{	
 		// Set limits within the frustrum of the camera
 		Vector3 objectPosition = t.position;

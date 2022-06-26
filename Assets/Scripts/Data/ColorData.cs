@@ -3,19 +3,19 @@ using UnityEngine;
 
 public class ColorData
 {
-	private readonly string _playerPreferenceKey;
+	public readonly string PlayerPreferenceKey;
 
 	public ColorData(string playerPreferenceKey)
     {
-		_playerPreferenceKey = playerPreferenceKey;
+		PlayerPreferenceKey = playerPreferenceKey;
 	}
 
     public Color Get()
     {
 		Color color = Color.white;
-		if (PlayerPrefs.GetString(_playerPreferenceKey).Length > 0)
+		if (PlayerPrefs.GetString(PlayerPreferenceKey).Length > 0)
 		{
-			string[] colorSplit = PlayerPrefs.GetString(_playerPreferenceKey).Split(',');
+			string[] colorSplit = PlayerPrefs.GetString(PlayerPreferenceKey).Split(',');
 
 			color = new Color(
 				r: Convert.ToSingle(colorSplit[0]),
@@ -29,7 +29,7 @@ public class ColorData
 
 	public void Set(Color value)
 	{
-		PlayerPrefs.SetString(_playerPreferenceKey, $"{value.r},{value.g} ,{value.b}");
+		PlayerPrefs.SetString(PlayerPreferenceKey, $"{value.r},{value.g} ,{value.b}");
 		PlayerPrefs.Save();
 	}
 }

@@ -16,6 +16,7 @@ public class DataManager
 	public readonly BoolData IsInitialSetupComplete_2_1 = new BoolData("v2.1 Initial Set Up");
 	public readonly BoolData IsInitialSetupComplete_2_2 = new BoolData("v2.2 Initial Set Up");
 	public readonly BoolData IsInitialSetupComplete_2_3 = new BoolData("v2.3 Initial Set Up");
+	public readonly BoolData IsInitialSetupComplete_2_7 = new BoolData("v2.7 Initial Set Up");
 
 	private const string pp_CustomLevelIDs = "Custom Level IDs";
 
@@ -29,7 +30,7 @@ public class DataManager
 
 	private const string pp_LevelNameAddOn = "name";
 
-	public readonly PlayerColorData[] PlayerColors;
+	public readonly CustomPlayerColorData[] PlayerColors;
 
 	public readonly EnumData<QualitySettingEnum> GridDensity = new EnumData<QualitySettingEnum>("Grid Density");
 	public readonly EnumData<QualitySettingEnum> ExplosionParticleQuality = new EnumData<QualitySettingEnum>("Explosion Particle Quality");
@@ -38,11 +39,12 @@ public class DataManager
 
 	public DataManager()
     {
-		PlayerColors = new PlayerColorData[PlayerManager.MAX_PLAYERS];
+		PlayerColors = new CustomPlayerColorData[PlayerManager.MAX_PLAYERS];
 
 		for(int i = 0; i < PlayerColors.Length; i++)
         {
-			PlayerColors[i] = new PlayerColorData(i);
+			//two is the number of node colors we're allowed to save per player
+			PlayerColors[i] = new CustomPlayerColorData(i, 2);
         }
 	}
 

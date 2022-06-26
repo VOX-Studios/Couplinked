@@ -4,6 +4,7 @@
 	InBetweenScenes, //TODO: what is this?
 	StartScreen,
 	GameModeSelection,
+	MultiplayerControllerSelection,
 
 	LevelEditor,
 	LevelSelection,

@@ -1,5 +1,5 @@
 ﻿public enum HitTypeEnum
 {
-    Hit1,
-    Hit2
+    Hit1 = 0,
+    Hit2 = 1
 }

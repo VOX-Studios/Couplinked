@@ -39,7 +39,6 @@ public class PlaceableObjectSpawner : MonoBehaviour
 	public void Initialize() 
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-		InputActionMap levelEditorInputActionMap = _gameManager.InputActions.FindActionMap("Level Editor");
 
 		_levelEditorManager = GameObject.Find("LevelEditorManager").GetComponent<LevelEditorManager>();
 

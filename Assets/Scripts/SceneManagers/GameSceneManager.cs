@@ -36,7 +36,6 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private ScoreJuiceManager _scoreJuiceManager;
 
-        //------------------------------------------
         private SurvivalHandler _survivalHandler;
         private LevelHandler _levelHandler;
 
@@ -52,16 +51,15 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private Transform _foreground;
 
-        private NodePair[] _nodePairs;
-        private GameInput[] _gameInputs;
-        private TeamManager _teamManager;
-        //------------------------------------------
+        private NodePairing[] _nodePairs;
+        private GameInput[][] _gameInputs;
 
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            if (_gameManager.GameSetupInfo.IsSinglePlayer)
+            //if there's only 1 team and 1 player
+            if (_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 1)
             {
                 _setupSinglePlayer();
             }
@@ -96,7 +94,6 @@ namespace Assets.Scripts.SceneManagers
                     noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
                     nodePairs: _nodePairs,
-                    teamManager: _teamManager,
                     explosionManager: _explosionManager
                     );
 
@@ -111,8 +108,7 @@ namespace Assets.Scripts.SceneManagers
                     hitSplitManager: _hitSplitManager,
                     noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
-                    nodePairs: _nodePairs,
-                    teamManager: _teamManager
+                    nodePairs: _nodePairs
                     );
 
                 _levelHandler.Initialize();
@@ -123,97 +119,139 @@ namespace Assets.Scripts.SceneManagers
 
         private void _setupSinglePlayer()
         {
-            int playerIndex = 0; //TODO: change this
-            Team team = new Team(playerIndex);
-            _teamManager = new TeamManager()
-            {
-                Teams = team
-            };
+            int teamIndex = 0;
 
-            _nodePairs = new NodePair[1];
-            NodePair nodePair = _makeNodePair(playerIndex);
+            _nodePairs = new NodePairing[1];
+            NodePairing nodePair = _makeNodePair(teamIndex, 2);
+            _setNodeColors(nodePair, 0);
             _nodePairs[0] = nodePair;
 
-            _gameInputs = new GameInput[1];
+            //TODO: pass player input
+
+            _gameInputs = new GameInput[1][];
             InputActionMap gameInputActionMap = _gameManager.InputActions.FindActionMap("Game");
             GameInput gameInput = new GameInput(gameInputActionMap);
-            _gameInputs[0] = gameInput;
+            _gameInputs[0] = new GameInput[]
+            {
+                gameInput
+            };
         }
 
         private void _setupMultiplayer()
         {
-            Team coOpTeam = new Team(-1, new List<Team>());
-            _nodePairs = new NodePair[_gameManager.PlayerManager.Players.Count];
-            _gameInputs = new GameInput[_gameManager.PlayerManager.Players.Count];
+            List<Team> teams = new List<Team>();
+            _nodePairs = new NodePairing[_gameManager.GameSetupInfo.Teams.Count];
+            _gameInputs = new GameInput[_gameManager.GameSetupInfo.Teams.Count][];
 
-            for (int i = 0; i < _gameManager.PlayerManager.Players.Count; i++)
+            for (int i = 0; i < _gameManager.GameSetupInfo.Teams.Count; i++)
             {
-                PlayerInput playerInput = _gameManager.PlayerManager.Players[i];
+                List<PlayerInput> playerInputs = _gameManager.GameSetupInfo.Teams[i].PlayerInputs;
 
-                playerInput.Lobby.Disable();
-                playerInput.Game.Enable();
+                _gameInputs[i] = new GameInput[playerInputs.Count];
 
-                NodePair nodePair = _makeNodePair(i);
+                for (int j = 0; j < playerInputs.Count; j++)
+                {
+                    PlayerInput playerInput = playerInputs[j];
+
+                    playerInput.Lobby.Disable();
+                    playerInput.Game.Enable();
+
+                    _gameInputs[i][j] = playerInput.Game;
+                }
+                int numberOfNodes = playerInputs.Count == 1 ? 2 : playerInputs.Count;
+                NodePairing nodePair = _makeNodePair(i, numberOfNodes);
+                _setNodeColors(nodePair, playerInputs);
                 _nodePairs[i] = nodePair;
-                _gameInputs[i] = playerInput.Game;
-
-                coOpTeam.SubTeams.Add(new Team(i));
             }
-
-            _teamManager = new TeamManager()
-            {
-                Teams = coOpTeam
-            };
         }
 
-        private NodePair _makeNodePair(int playerIndex)
+        private NodePairing _makeNodePair(int teamIndex, int numberOfNodes)
         {
-            GameObject node1GameObject = GameObject.Instantiate(_nodePrefab);
-            GameObject node2GameObject = GameObject.Instantiate(_nodePrefab);
+            List<Node> nodes = new List<Node>();
 
-            node1GameObject.name = "Node1";
-            node2GameObject.name = "Node2";
+            for (int i = 0; i < numberOfNodes; i++)
+            {
+                GameObject nodeGameObject = GameObject.Instantiate(_nodePrefab);
+                nodeGameObject.name = $"Node {i + 1}";
 
-            node1GameObject.transform.SetParent(_foreground, false);
-            node2GameObject.transform.SetParent(_foreground, false);
+                nodeGameObject.transform.SetParent(_foreground, false);
 
-            Node node1 = node1GameObject.GetComponent<Node>();
-            Node node2 = node2GameObject.GetComponent<Node>();
+                Node node = nodeGameObject.GetComponent<Node>();
 
-            node1.TeamId = playerIndex;
-            node2.TeamId = playerIndex;
-            node1.HitType = HitTypeEnum.Hit1;
-            node2.HitType = HitTypeEnum.Hit2;
+                node.TeamId = teamIndex;
+                node.HitType = (HitTypeEnum)i; //TODO: this won't work past i = 1
 
-            PlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
+                _setupNodeTrail(node.ParticleSystem);
 
-            node1.SetColors(playerColorData.Node1InsideColor.Get(), playerColorData.Node1OutsideColor.Get());
-            node2.SetColors(playerColorData.Node2InsideColor.Get(), playerColorData.Node2OutsideColor.Get());
+                _gameManager.Grid.Logic.ApplyExplosiveForce(20f, node.transform.position, 1f);
 
-            node1.SetParticleColor(playerColorData.Node1ParticlesColor.Get());
-            node2.SetParticleColor(playerColorData.Node2ParticlesColor.Get());
+                nodes.Add(node);
+            }
 
             //disable lightning manager for very easy mode
-            LightningManager lightningManager = null;
+            LightningManager lightningManager = null; //TODO: add more lightning managers
 
             if (_gameManager.GameDifficultyManager.GameDifficulty != GameDifficultyEnum.VeryEasy)
             {
-
                 GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
                 lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
 
-                lightningManager.Initialize(_midground, playerColorData.LightningColor.Get());
+                lightningManager.Initialize(_midground);
             }
 
-            NodePair nodePair = new NodePair(node1, node2, lightningManager);
-
-            _gameManager.Grid.Logic.ApplyExplosiveForce(20f, node1.transform.position, 1f);
-            _gameManager.Grid.Logic.ApplyExplosiveForce(20f, node2.transform.position, 1f);
-
-            _setupNodeTrail(node1.ParticleSystem);
-            _setupNodeTrail(node2.ParticleSystem);
+            NodePairing nodePair = new NodePairing(nodes, lightningManager);
 
             return nodePair;
+        }
+
+        /// <summary>
+        /// Set colors for singleplayer.
+        /// </summary>
+        /// <param name="nodePairing"></param>
+        /// <param name="playerIndex"></param>
+        private void _setNodeColors(NodePairing nodePairing, int playerIndex)
+        {
+            CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
+            for (int i = 0; i < nodePairing.Nodes.Count; i++)
+            {
+                NodeColorData nodeColors = playerColorData.NodeColors[i];
+                Node node = nodePairing.Nodes[i];
+                node.SetColors(nodeColors.InsideColor.Get(), nodeColors.OutsideColor.Get());
+                node.SetParticleColor(nodeColors.ParticleColor.Get());
+            }
+
+            nodePairing.LightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+        }
+
+        /// <summary>
+        /// Set colors for multiplayer.
+        /// </summary>
+        /// <param name="nodePairing"></param>
+        /// <param name="playerInputs"></param>
+        private void _setNodeColors(NodePairing nodePairing, List<PlayerInput> playerInputs)
+        {
+            if(playerInputs.Count == 1)
+            {
+                for (int i = 0; i < nodePairing.Nodes.Count; i++)
+                {
+                    DefaultNodeColors nodeColors = _gameManager.ColorManager.DefaultPlayerColors[playerInputs[0].PlayerSlot].NodeColors[i];
+
+                    Node node = nodePairing.Nodes[i];
+                    node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
+                    node.SetParticleColor(nodeColors.ParticleColor);
+                }
+
+                return;
+            }
+
+            for(int i = 0; i < nodePairing.Nodes.Count; i++)
+            {
+                DefaultNodeColors nodeColors = _gameManager.ColorManager.DefaultPlayerColors[playerInputs[i].PlayerSlot].NodeColors[0];
+
+                Node node = nodePairing.Nodes[i];
+                node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
+                node.SetParticleColor(nodeColors.ParticleColor);
+            }
         }
 
         public void OnHitCollision(Hit hit, Collider2D other)
@@ -269,11 +307,12 @@ namespace Assets.Scripts.SceneManagers
                 _gameManager.isResuming = false;
                 _gameManager.isPaused = false;
 
-                for(int i = 0; i < _nodePairs.Length; i++)
+                foreach(NodePairing nodePair in _nodePairs)
                 {
-                    NodePair nodePair = _nodePairs[i];
-                    nodePair.Node1.ParticleSystem.Play();
-                    nodePair.Node2.ParticleSystem.Play();
+                    foreach(Node node in nodePair.Nodes)
+                    {
+                        node.ParticleSystem.Play();
+                    }
                 }
 
                 _explosionManager.Play();
@@ -281,12 +320,12 @@ namespace Assets.Scripts.SceneManagers
 
             if(_gameManager.isPaused)
             {
-                if (_gameInputs.Any(input => input.UnpauseInput))
+                if (_gameInputs.Any(inputs => inputs.Any(input => input.UnpauseInput)))
                 {
                     _startResume();
                     return;
                 }
-                else if(_gameInputs.Any(input => input.ExitInput))
+                else if (_gameInputs.Any(inputs => inputs.Any(input => input.ExitInput)))
                 {
                     _exit();
                     return;
@@ -294,7 +333,7 @@ namespace Assets.Scripts.SceneManagers
             }
             else
             {
-                if (_gameInputs.Any(input => input.PauseInput))
+                if (_gameInputs.Any(inputs => inputs.Any(input => input.PauseInput)))
                 {
                     _pause();
                     return;
@@ -384,7 +423,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.isPaused = false;
 
             string unlockMessage = "";
-            if (!_gameManager.GameSetupInfo.IsSinglePlayer)
+            if (_gameManager.GameSetupInfo.Teams.Count > 1)
             {
                 _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
             }
@@ -424,12 +463,12 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager.isPaused = true;
 
-
-            for (int i = 0; i < _nodePairs.Length; i++)
+            foreach (NodePairing nodePair in _nodePairs)
             {
-                NodePair nodePair = _nodePairs[i];
-                nodePair.Node1.ParticleSystem.Pause();
-                nodePair.Node2.ParticleSystem.Pause();
+                foreach (Node node in nodePair.Nodes)
+                {
+                    node.ParticleSystem.Pause();
+                }
             }
 
             _explosionManager.Pause();

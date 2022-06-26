@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.SceneManagers;
+using System.Linq;
 using UnityEngine;
 
 class LevelHandler : IGameModeHandler
@@ -30,11 +31,12 @@ class LevelHandler : IGameModeHandler
     public int Score = 0;
     public int RingsCollected = 0;
 
-    private GameInput[] _gameInputs;
-    private NodePair[] _nodePairs;
-    private TeamManager _teamManager;
+    private GameInput[][] _gameInputs;
+    private NodePairing[] _nodePairs;
 
     private RegularGameService _gameService;
+
+    private PlayerColors[] _playerColors;
 
     public LevelHandler(
         GameManager gameManager, 
@@ -42,9 +44,8 @@ class LevelHandler : IGameModeHandler
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
-        GameInput[] gameInputs,
-        NodePair[] nodePairs,
-        TeamManager teamManager
+        GameInput[][] gameInputs,
+        NodePairing[] nodePairs
         )
     {
         _gameManager = gameManager;
@@ -55,7 +56,6 @@ class LevelHandler : IGameModeHandler
 
         _gameInputs = gameInputs;
         _nodePairs = nodePairs;
-        _teamManager = teamManager;
 
         _gameService = new RegularGameService(
             gameManager: _gameManager,
@@ -63,13 +63,22 @@ class LevelHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairs,
-            teamManager: _teamManager
+            nodePairs: _nodePairs
             );
     }
 
     public void Initialize()
     {
+        //if multiplayer
+        if(_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+        {
+            _playerColors = _gameManager.ColorManager.DefaultPlayerColors.Select(defaultPlayerColors => new PlayerColors(defaultPlayerColors)).ToArray();
+        }
+        else
+        {
+            _playerColors = _gameManager.DataManager.PlayerColors.Select(customPlayerColors => new PlayerColors(customPlayerColors)).ToArray();
+        }
+
         _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
         _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairs);
         _gameService.Start();
@@ -102,7 +111,7 @@ class LevelHandler : IGameModeHandler
         return rowPositions;
     }
 
-    private void _handleScaling(int numRows, NodePair[] nodePairs)
+    private void _handleScaling(int numRows, NodePairing[] nodePairs)
     {
         if(numRows <= 5)
         {
@@ -113,10 +122,12 @@ class LevelHandler : IGameModeHandler
             _scale = 5f / numRows;
         }
 
-        foreach(NodePair nodePair in nodePairs)
+        foreach(NodePairing nodePair in nodePairs)
         {
-            nodePair.Node1.transform.localScale = new Vector3(_scale, _scale, 1);
-            nodePair.Node2.transform.localScale = new Vector3(_scale, _scale, 1);
+            foreach(Node node in nodePair.Nodes)
+            {
+                node.transform.localScale = new Vector3(_scale, _scale, 1);
+            }
 
             nodePair.LightningManager.SetScale(_scale);
         }
@@ -153,15 +164,7 @@ class LevelHandler : IGameModeHandler
 
             int teamId = 0;
 
-            //TODO: fix color bullshit, include particle and lightning shit
-            PlayerNodeColors nodeColors = _gameManager.ColorManager.NodeColors[teamId];
-            PlayerColorData colorData = _gameManager.DataManager.PlayerColors[teamId];
-            nodeColors.InsideColor1 = colorData.Node1InsideColor.Get();
-            nodeColors.OutsideColor1 = colorData.Node1OutsideColor.Get();
-            nodeColors.ParticleColor1 = colorData.Node1ParticlesColor.Get();
-            nodeColors.InsideColor2 = colorData.Node2InsideColor.Get();
-            nodeColors.OutsideColor2 = colorData.Node2OutsideColor.Get();
-            nodeColors.ParticleColor2 = colorData.Node2ParticlesColor.Get();
+            PlayerColors playerColors = _playerColors[teamId];
 
             switch (objectData.ObjectType)
             {
@@ -169,10 +172,10 @@ class LevelHandler : IGameModeHandler
                     _noHitManager.SpawnNoHit(pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit1:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, nodeColors, pos, _scale);
+                    _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, playerColors, pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit2:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, nodeColors, pos, _scale);
+                    _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, playerColors, pos, _scale);
                     break;
                 case ObjectTypeEnum.HitSplit1:
                     _hitSplitManager.SpawnHitSplit(
@@ -180,8 +183,8 @@ class LevelHandler : IGameModeHandler
                         hitSplitSecondType: HitTypeEnum.Hit2,
                         firstHitTeamId: teamId,
                         secondHitTeamId: teamId,
-                        firstHitNodeColors: nodeColors,
-                        secondHitNodeColors: nodeColors,
+                        firstHitPlayerColors: playerColors,
+                        secondHitPlayerColors: playerColors,
                         spawnPosition: pos,
                         scale: _scale
                         );
@@ -192,8 +195,8 @@ class LevelHandler : IGameModeHandler
                        hitSplitSecondType: HitTypeEnum.Hit1,
                        firstHitTeamId: teamId,
                        secondHitTeamId: teamId,
-                       firstHitNodeColors: nodeColors,
-                       secondHitNodeColors: nodeColors,
+                       firstHitPlayerColors: playerColors,
+                       secondHitPlayerColors: playerColors,
                        spawnPosition: pos,
                        scale: _scale
                        );

@@ -12,9 +12,12 @@ public class MenuBackgroundNodeParticle : MonoBehaviour
     private float _minBound = 0f;
     private float _maxBound = 1f;
 
+    public bool IsActive { get; private set; }
+
     void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        IsActive = true;
     }
 
     public void Initialize(Vector2 position, Vector2 velocity, float bounds)
@@ -26,9 +29,19 @@ public class MenuBackgroundNodeParticle : MonoBehaviour
         _maxBound = 1 - bounds;
     }
 
-    
+    public void SetNodeActive(bool isActive)
+    {
+        IsActive = isActive;
+        Particles.gameObject.SetActive(isActive);
+    }
+
     public void Run(float deltaTime)
     {
+        if(!IsActive)
+        {
+            return;
+        }
+
         if (_position.x >= _maxBound)
         {
             _position.x = _maxBound;

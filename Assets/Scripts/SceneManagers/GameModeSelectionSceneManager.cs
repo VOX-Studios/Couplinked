@@ -28,7 +28,16 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.HandleBack())
             {
                 _gameManager.SoundEffectManager.PlayBack();
-                _gameManager.LoadScene(SceneNames.PlayerModeSelection);
+
+                //if we were setting up a multiplayer game
+                if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+                {
+                    _gameManager.LoadScene(SceneNames.MultiplayerControllerSelection);
+                }
+                else //we were setting up a singleplayer game
+                {
+                    _gameManager.LoadScene(SceneNames.PlayerModeSelection);
+                }
             }
         }
 
@@ -39,7 +48,7 @@ namespace Assets.Scripts.SceneManagers
 
             _gameManager.TheLevelSelectionMode = LevelTypeEnum.Campaign;
 
-            _gameManager.LoadScene("Difficulty Selection");
+            _gameManager.LoadScene(SceneNames.DifficultySelection);
             
             //_gameManager.ResetLevelDisplayNumbers();
             //_gameManager.LoadScene("Levels");

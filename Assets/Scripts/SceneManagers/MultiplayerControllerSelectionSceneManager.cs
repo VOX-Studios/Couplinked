@@ -1,15 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers
 {
     class MultiplayerControllerSelectionSceneManager : MonoBehaviour
     {
-        private readonly int _numPlayersRequired = 2;
+        [SerializeField]
+        private GameObject _nodePrefab;
 
         [SerializeField]
-        private GameObject _controllerSelectionPanelPrefab;
+        private GameObject _lightningManagerPrefab;
+
+        [SerializeField]
+        private GameObject _controllerSelectionTeamPanelPrefab;
 
         [SerializeField]
         private RectTransform _panelsContainer;
@@ -18,92 +23,225 @@ namespace Assets.Scripts.SceneManagers
 
         private Dictionary<PlayerInput, ControllerSelectionState> _playerStates;
 
-        private ControllerSelectionState[] _controllerSelectionStates;
+        [SerializeField]
+        private Transform _nodeMidground;
 
-        private float _delayUpdate = .05f;
+        [SerializeField]
+        private Transform _nodeForeground;
+
+        private List<GameObject> _teamSelectionPanels;
 
         void Awake()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            _controllerSelectionStates = new ControllerSelectionState[_numPlayersRequired];
+            _playerStates = new Dictionary<PlayerInput, ControllerSelectionState>();
+            _teamSelectionPanels = new List<GameObject>();
 
-            for (int i = 0; i < _numPlayersRequired; i++)
+            //create the panels
+            for (int i = 0; i < PlayerManager.MAX_PLAYERS; i++)
             {
-                GameObject controllerSelectionPanel = GameObject.Instantiate(_controllerSelectionPanelPrefab);
-                controllerSelectionPanel.transform.SetParent(_panelsContainer.transform, false);
+                GameObject teamSelectionPanel = GameObject.Instantiate(_controllerSelectionTeamPanelPrefab);
+                teamSelectionPanel.transform.SetParent(_panelsContainer.transform, false);
+                _teamSelectionPanels.Add(teamSelectionPanel);
+            }
+            
+            //force the panels to update
+            HorizontalLayoutGroup teamPanelsLayoutGroup = _panelsContainer.GetComponent<HorizontalLayoutGroup>();
+            teamPanelsLayoutGroup.CalculateLayoutInputHorizontal();
+            teamPanelsLayoutGroup.CalculateLayoutInputVertical();
+            teamPanelsLayoutGroup.SetLayoutHorizontal();
+            teamPanelsLayoutGroup.SetLayoutVertical();
 
-                ControllerSelectionState controllerSelectionState = controllerSelectionPanel.GetComponent<ControllerSelectionState>();
-                _controllerSelectionStates[i] = controllerSelectionState;
+            //if we already had teams from a previous game
+            if (_gameManager.GameSetupInfo.Teams != null)
+            {
+                foreach(Team team in _gameManager.GameSetupInfo.Teams)
+                {
+                    foreach (PlayerInput playerInput in team.PlayerInputs)
+                    {
+                        _setupNewPlayer(playerInput, team.TeamSlot);
+                    }
+                }
             }
 
-            _playerStates = new Dictionary<PlayerInput, ControllerSelectionState>();
+            //hook into player added event
+            _gameManager.PlayerManager.OnPlayerAdded += _onPlayerAdded;
 
-            for (int i = 0; i < _gameManager.PlayerManager.Players.Count; i++)
+            //if we're not at max number of players
+            if (_gameManager.PlayerManager.Players.Count < PlayerManager.MAX_PLAYERS)
             {
-                PlayerInput player = _gameManager.PlayerManager.Players[i];
-                player.Lobby.Enable();
-                player.Game.Disable();
-
-                //set state to joined and ready if we already have players in the player manager (this means we backed out of a multiplayer game where we already had players)
-                ControllerSelectionState controllerSelectionState = _getFirstAvailableControllerSelectionState(_controllerSelectionStates);
-                controllerSelectionState.SetIsJoined(true);
-                controllerSelectionState.SetIsReady(true);
-
-                _playerStates[player] = controllerSelectionState;
+                //allow joining    
+                _gameManager.PlayerManager.BeginJoining();
             }
         }
 
         private void _onPlayerAdded(object sender, PlayerAddedEventArgs e)
         {
-            e.PlayerAdded.Lobby.Enable();
-            e.PlayerAdded.Game.Disable();
+            _setupNewPlayer(e.PlayerAdded);
 
-            ControllerSelectionState controllerSelectionState = _getFirstAvailableControllerSelectionState(_controllerSelectionStates);
-            controllerSelectionState.WasJustAdded = true;
-            controllerSelectionState.SetIsJoined(true);
-
-            _playerStates[e.PlayerAdded] = controllerSelectionState;
-
-            if(_gameManager.PlayerManager.Players.Count == PlayerManager.MAX_PLAYERS)
+            //once we hit max players, disable joining
+            if (_gameManager.PlayerManager.Players.Count == PlayerManager.MAX_PLAYERS)
             {
                 _gameManager.PlayerManager.EndJoining();
             }
         }
 
-        private ControllerSelectionState _getFirstAvailableControllerSelectionState(ControllerSelectionState[] controllerSelectionStates)
+        private void _setupNewPlayer(PlayerInput playerInput, int teamSlot = -1)
         {
-            for (int i = 0; i < controllerSelectionStates.Length; i++)
-            {
-                ControllerSelectionState controllerSelectionState = controllerSelectionStates[i];
+            //enable lobby controls and disable game controls
+            playerInput.Lobby.Enable();
+            playerInput.Game.Disable();
 
-                //if not in the joined state, return this one
-                if(!controllerSelectionState.IsJoined)
-                {
-                    return controllerSelectionState;
-                }
+            NodePairing nodePairing = _makeNodePair(2, playerInput.PlayerSlot);
+
+            //second node won't be used yet so just put it off to the side
+            nodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
+
+            ControllerSelectionState selectionState = new ControllerSelectionState()
+            {
+                WasJustAdded = true,
+                NodePairing = nodePairing,
+                TeamSlot = teamSlot
+            };
+
+            if(teamSlot != -1)
+            {
+                selectionState.SetIsReady(true);
             }
 
-            return null;
+            _playerStates[playerInput] = selectionState;
+
+            _updateNodePositions(selectionState, -1);
+        }
+
+        private NodePairing _makeNodePair(int numberOfNodes, int playerSlot)
+        {
+            List<Node> nodes = new List<Node>();
+
+            DefaultPlayerColors playerColors = _gameManager.ColorManager.DefaultPlayerColors[playerSlot];
+
+            for (int i = 0; i < numberOfNodes; i++)
+            {
+                GameObject nodeGameObject = GameObject.Instantiate(_nodePrefab);
+                nodeGameObject.name = $"Node {i+1}";
+
+                nodeGameObject.transform.SetParent(_nodeForeground, false);
+
+                DefaultNodeColors nodeColors = playerColors.NodeColors[i];
+
+                Node node = nodeGameObject.GetComponent<Node>();
+                node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
+                node.SetParticleColor(nodeColors.ParticleColor);
+
+                //turn off the particle system
+                node.ParticleSystem.Pause();
+
+                nodes.Add(node);
+            }
+
+            GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+            LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+
+            lightningManager.Initialize(_nodeMidground);
+
+            return new NodePairing(nodes, lightningManager);
+        }
+
+        private void _updateNodePositions(ControllerSelectionState changedState, int previousTeam)
+        {
+            //TODO: add explosion when we move?
+
+            //teamSelection will only be -1 if the nodes have just been created
+            if (changedState.TeamSlot == -1)
+            {
+                changedState.NodePairing.Nodes[0].transform.position = GetTeamPanelsCenterWorldPoint();
+                return;
+            }
+
+            //TODO: adjust the -1 positions?
+            if (previousTeam != -1)
+            {
+                ControllerSelectionState[] previousTeamStates = _playerStates.Values.Where(state => state.TeamSlot == previousTeam).ToArray();
+                _updateTeamNodePositions(previousTeamStates);
+            }
+
+            ControllerSelectionState[] currentTeamStates = _playerStates.Values.Where(state => state.TeamSlot == changedState.TeamSlot).ToArray();
+            _updateTeamNodePositions(currentTeamStates);
+        }
+
+        private void _updateTeamNodePositions(ControllerSelectionState[] teamStates)
+        {
+            if (teamStates.Length == 1)
+            {
+                _updateSoloTeamNodePositions(teamStates[0]);
+            }
+            else if (teamStates.Length > 1)
+            {
+                _updateMultiTeamNodePositions(teamStates);
+            }
+        }
+
+        private void _updateSoloTeamNodePositions(ControllerSelectionState playerState)
+        {
+            Vector3[] corners = new Vector3[4];
+            _teamSelectionPanels[playerState.TeamSlot].GetComponent<RectTransform>().GetWorldCorners(corners);
+            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+
+            List<Node> nodes = playerState.NodePairing.Nodes;
+
+            float panelWidth = topRight.x - bottomLeft.x;
+            float spacing = panelWidth / (nodes.Count + 1);
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodes[i].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
+            }
+        }
+
+        private void _updateMultiTeamNodePositions(ControllerSelectionState[] teamStates)
+        {
+            Vector3[] corners = new Vector3[4];
+            _teamSelectionPanels[teamStates[0].TeamSlot].GetComponent<RectTransform>().GetWorldCorners(corners);
+            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+
+            float panelWidth = topRight.x - bottomLeft.x;
+            float spacing = panelWidth / (teamStates.Length + 1);
+
+            for (int i = 0; i < teamStates.Length; i++)
+            {
+                teamStates[i].NodePairing.Nodes[0].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
+
+                //TODO: have this handle more than two nodes?
+                teamStates[i].NodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
+            }
+        }
+
+        private Vector3 GetTeamPanelsCenterWorldPoint()
+        {
+            Vector3[] corners = new Vector3[4];
+            int centerLeftPanelIndex = Mathf.FloorToInt((PlayerManager.MAX_PLAYERS - 1) / 2f);
+            int centerRightPanelIndex = Mathf.CeilToInt((PlayerManager.MAX_PLAYERS - 1) / 2f);
+
+            _teamSelectionPanels[centerLeftPanelIndex].GetComponent<RectTransform>().GetWorldCorners(corners);
+            Vector3 bottomLeft = corners[0];
+
+            _teamSelectionPanels[centerRightPanelIndex].GetComponent<RectTransform>().GetWorldCorners(corners);
+
+            Vector3 topRight = corners[2];
+
+            Vector3 screenPoint = new Vector3((bottomLeft.x + topRight.x) / 2f, (bottomLeft.y + topRight.y) / 2f);
+            Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPoint);
+
+            return new Vector3(worldPoint.x, worldPoint.y, 0);
         }
 
         void Update()
         {
-            //delaying initial update processing because otherwise players join on enter
-            if(_delayUpdate > 0)
-            {
-                _delayUpdate -= Time.deltaTime;
-
-                if(_delayUpdate <= 0)
-                {
-                    _gameManager.PlayerManager.OnPlayerAdded += _onPlayerAdded;
-                    _gameManager.PlayerManager.BeginJoining();
-                }
-                return;
-            }
-
-            //if the back button is pressed and none of the joined players are currently pressing the back input (this is to prevent accidental exits)
-            if (_gameManager.HandleBack() && !_gameManager.PlayerManager.Players.Any(player => player.Lobby.BackInput))
+            //if the back button is pressed and there are no players (this is to prevent accidental exits)
+            if (_gameManager.HandleBack() && _gameManager.PlayerManager.Players.Count == 0)
             {
                 _onExitScene();
                 for (int i = _gameManager.PlayerManager.Players.Count - 1; i >= 0; i--)
@@ -119,55 +257,92 @@ namespace Assets.Scripts.SceneManagers
 
             for(int i = _gameManager.PlayerManager.Players.Count - 1; i >= 0; i--)
             {
-                PlayerInput player = _gameManager.PlayerManager.Players[i];
+                PlayerInput playerInput = _gameManager.PlayerManager.Players[i];
 
-                if(player.Lobby.SelectInput && _playerStates[player].WasJustAdded)
+                if (_playerStates[playerInput].WasJustAdded)
                 {
-                    _playerStates[player].WasJustAdded = false;
+                    //prevent "double tap"
+                    _playerStates[playerInput].WasJustAdded = false;
                     continue;
                 }
 
-                //if a player hits the ready button
-                if (player.Lobby.SelectInput)
+                if (playerInput.Lobby.ChangeTeamInputTriggered && !_playerStates[playerInput].IsReady)
                 {
-                    //if they're already ready + everyone else is ready
-                    if (_playerStates[player].IsReady && _shouldStartGame())
+                    ControllerSelectionState playerState = _playerStates[playerInput];
+
+                    int previousTeam = playerState.TeamSlot;
+                    if(playerState.TeamSlot == -1)
                     {
-                        _startGame();
-                        return;
+                        if(playerInput.Lobby.ChangeTeamInputValue < 0)
+                        {
+                            playerState.TeamSlot = Mathf.FloorToInt((PlayerManager.MAX_PLAYERS - 1) / 2f);
+                        }
+                        else
+                        {
+                            playerState.TeamSlot = Mathf.CeilToInt((PlayerManager.MAX_PLAYERS - 1) / 2f); ;
+                        }
                     }
                     else
                     {
-                        //set ready state to true
-                        _playerStates[player].SetIsReady(true);
+                        playerState.TeamSlot += playerInput.Lobby.ChangeTeamInputValue > 0 ? 1 : -1;
+                        playerState.TeamSlot = (playerState.TeamSlot + (PlayerManager.MAX_PLAYERS * 2)) % PlayerManager.MAX_PLAYERS;
+                    }
+
+                    _updateNodePositions(playerState, previousTeam);
+                }
+
+                //if a player hits the ready button
+                if (playerInput.Lobby.SelectInput)
+                {
+                    if(_playerStates[playerInput].TeamSlot != -1)
+                    {
+                        //if they're already ready + everyone else is ready
+                        if (_playerStates[playerInput].IsReady && _shouldStartGame())
+                        {
+                            _startGame();
+                            return;
+                        }
+                        else
+                        {
+                            //set ready state to true
+                            _playerStates[playerInput].SetIsReady(true);
+                        }
                     }
                 }
 
                 //if a player hits the back button
-                if (player.Lobby.BackInput)
+                if (playerInput.Lobby.BackInput)
                 {
                     //if the player is ready
-                    if (_playerStates[player].IsReady)
+                    if (_playerStates[playerInput].IsReady)
                     {
                         //set ready state to false
-                        _playerStates[player].SetIsReady(false);
+                        _playerStates[playerInput].SetIsReady(false);
                     }
                     else //player was not ready so drop
                     {
-                        _removePlayer(player);
-                        
+                        _removePlayer(playerInput);
+
                         //being joining again if we had stopped previously
-                        if(!_gameManager.PlayerManager.IsJoining)
+                        if (!_gameManager.PlayerManager.IsJoining)
+                        {
                             _gameManager.PlayerManager.BeginJoining();
+                        }
                     }
                 }
             }
         }
-
         private void _removePlayer(PlayerInput player)
         {
             ControllerSelectionState controllerSelectionState = _playerStates[player];
-            controllerSelectionState.SetIsJoined(false);
+
+            foreach(Node node in controllerSelectionState.NodePairing.Nodes)
+            {
+                Destroy(node.gameObject);
+            }
+
+            controllerSelectionState.NodePairing.LightningManager.DeactivateAllBolts();
+            Destroy(controllerSelectionState.NodePairing.LightningManager.gameObject);
             
             _playerStates.Remove(player);
             _gameManager.PlayerManager.RemovePlayer(player);
@@ -175,7 +350,7 @@ namespace Assets.Scripts.SceneManagers
 
         private bool _shouldStartGame()
         {
-            if (_playerStates.Count < _numPlayersRequired)
+            if (_playerStates.Count < 2)
                 return false;
 
             bool shouldStartGame = true;
@@ -204,7 +379,22 @@ namespace Assets.Scripts.SceneManagers
 
             _gameManager.SoundEffectManager.PlaySelect();
 
-            _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
+            _gameManager.GameSetupInfo.Teams = _playerStates.GroupBy(kvp => kvp.Value.TeamSlot)
+                .Select(group => new Team(group.Key)
+                {
+                    PlayerInputs = group.Select(kvp => kvp.Key).ToList()
+                })
+                .ToList();
+
+            //if there's one team and only two players
+            if(_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 2)
+            {
+                _gameManager.LoadScene(SceneNames.GameModeSelection);
+            }
+            else
+            {
+                _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
+            }
         }
     }
 }

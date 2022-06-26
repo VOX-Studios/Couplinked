@@ -8,6 +8,8 @@ public class MenuBackgroundManager : MonoBehaviour
     [SerializeField]
     private MenuBackgroundNodeParticle _nodeParticles2;
 
+    [SerializeField]
+    private ParticleSystem _sparkleParticles;
     void Start()
     {
         _nodeParticles1.Initialize(
@@ -27,5 +29,16 @@ public class MenuBackgroundManager : MonoBehaviour
     {
         _nodeParticles1.Run(Time.deltaTime);
         _nodeParticles2.Run(Time.deltaTime);
+    }
+
+    public void SetNodesActive(bool isActive)
+    {
+        _nodeParticles1.SetNodeActive(isActive);
+        _nodeParticles2.SetNodeActive(isActive);
+    }
+
+    public void SetSparkleParticlesActive(bool isActive)
+    {
+        _sparkleParticles.gameObject.SetActive(isActive);
     }
 }

@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers
@@ -34,14 +36,27 @@ namespace Assets.Scripts.SceneManagers
 
         private void _handleSinglePlayerButton()
         {
-            _gameManager.GameSetupInfo.IsSinglePlayer = true;
+            _gameManager.GameSetupInfo.Teams = new List<Team>()
+            {
+                new Team(0)
+                {
+                    PlayerInputs = new List<PlayerInput>()
+                    {
+                        new PlayerInput(
+                            inputActionAsset: _gameManager.InputActions,
+                            inputUser: InputUser.CreateUserWithoutPairedDevices(),
+                            playerSlot: 0
+                            )
+                    }
+                }
+            };
             _gameManager.SoundEffectManager.PlaySelect();
             _gameManager.LoadScene(SceneNames.GameModeSelection);
         }
 
         private void _handleMultiplayerButton()
         {
-            _gameManager.GameSetupInfo.IsSinglePlayer = false;
+            _gameManager.GameSetupInfo.Teams = null;
             _gameManager.SoundEffectManager.PlaySelect();
             _gameManager.LoadScene(SceneNames.MultiplayerControllerSelection);
         }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -50,7 +51,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
         [SerializeField]
         private Transform _hit2StartingPosition;
 
-        private NodePair _nodePair;
+        private NodePairing _nodePair;
         private Hit _hit1;
         private Hit _hit2;
 
@@ -169,13 +170,13 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             */
             _explosionManager.Initialize(_gameManager.DataManager);
 
-            PlayerColorData playerColors = _gameManager.DataManager.PlayerColors[_playerIndex];
-            _node1InsideColor = playerColors.Node1InsideColor.Get();
-            _node1OutsideColor = playerColors.Node1OutsideColor.Get();
-            _node1ParticlesColor = playerColors.Node1ParticlesColor.Get();
-            _node2InsideColor = playerColors.Node2InsideColor.Get();
-            _node2OutsideColor = playerColors.Node2OutsideColor.Get();
-            _node2ParticlesColor = playerColors.Node2ParticlesColor.Get();
+            CustomPlayerColorData playerColors = _gameManager.DataManager.PlayerColors[_playerIndex];
+            _node1InsideColor = playerColors.NodeColors[0].InsideColor.Get();
+            _node1OutsideColor = playerColors.NodeColors[0].OutsideColor.Get();
+            _node1ParticlesColor = playerColors.NodeColors[0].ParticleColor.Get();
+            _node2InsideColor = playerColors.NodeColors[1].InsideColor.Get();
+            _node2OutsideColor = playerColors.NodeColors[1].OutsideColor.Get();
+            _node2ParticlesColor = playerColors.NodeColors[1].ParticleColor.Get();
             _lightningColor = playerColors.LightningColor.Get();
             _gridColor = playerColors.GridColor.Get();
 
@@ -250,29 +251,29 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             {
                 case ColorSettingEnum.Node1Inside:
                     _node1InsideColor = _currentColor;
-                    _nodePair.Node1.SetColors(_node1InsideColor, _node1OutsideColor);
+                    _nodePair.Nodes[0].SetColors(_node1InsideColor, _node1OutsideColor);
                     break;
                 case ColorSettingEnum.Node1Outside:
                     _node1OutsideColor = _currentColor;
-                    _nodePair.Node1.SetColors(_node1InsideColor, _node1OutsideColor);
+                    _nodePair.Nodes[0].SetColors(_node1InsideColor, _node1OutsideColor);
                     _hit1.SetColor(_node1OutsideColor);
                     break;
                 case ColorSettingEnum.Node1Particles:
                     _node1ParticlesColor = _currentColor;
-                    _nodePair.Node1.SetParticleColor(_node1ParticlesColor);
+                    _nodePair.Nodes[0].SetParticleColor(_node1ParticlesColor);
                     break;
                 case ColorSettingEnum.Node2Inside:
                     _node2InsideColor = _currentColor;
-                    _nodePair.Node2.SetColors(_node2InsideColor, _node2OutsideColor);
+                    _nodePair.Nodes[1].SetColors(_node2InsideColor, _node2OutsideColor);
                     break;
                 case ColorSettingEnum.Node2Outside:
                     _node2OutsideColor = _currentColor;
-                    _nodePair.Node2.SetColors(_node2InsideColor, _node2OutsideColor);
+                    _nodePair.Nodes[1].SetColors(_node2InsideColor, _node2OutsideColor);
                     _hit2.SetColor(_node2OutsideColor);
                     break;
                 case ColorSettingEnum.Node2Particles:
                     _node2ParticlesColor = _currentColor;
-                    _nodePair.Node2.SetParticleColor(_node2ParticlesColor);
+                    _nodePair.Nodes[1].SetParticleColor(_node2ParticlesColor);
                     break;
                 case ColorSettingEnum.Lightning:
                     _lightningColor = _currentColor;
@@ -289,8 +290,8 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
         {
             _nodePair = _makeNodePair(playerIndex);
             
-            _nodePair.Node1.transform.position = _convertFromPlaceholderPosition(_node1StartingPosition.position);
-            _nodePair.Node2.transform.position = _convertFromPlaceholderPosition(_node2StartingPosition.position);
+            _nodePair.Nodes[0].transform.position = _convertFromPlaceholderPosition(_node1StartingPosition.position);
+            _nodePair.Nodes[1].transform.position = _convertFromPlaceholderPosition(_node2StartingPosition.position);
 
             _hit1 = _makeHit(playerIndex, HitTypeEnum.Hit1);
             _hit1.transform.position = _convertFromPlaceholderPosition(_hit1StartingPosition.position);
@@ -331,17 +332,14 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             Hit hitComponent = hitGameObject.GetComponent<Hit>();
             hitComponent.Initialize(this);
 
-            PlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[_playerIndex];
-            
-            if (hitType == HitTypeEnum.Hit1)
-                hitComponent.SetColor(playerColorData.Node1OutsideColor.Get());
-            else
-                hitComponent.SetColor(playerColorData.Node2OutsideColor.Get());
+            CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
+
+            hitComponent.SetColor(playerColorData.NodeColors[(int)hitType].OutsideColor.Get());
 
             return hitComponent;
         }
 
-        private NodePair _makeNodePair(int playerIndex)
+        private NodePairing _makeNodePair(int playerIndex)
         {
             GameObject node1GameObject = GameObject.Instantiate(_nodePrefab);
             GameObject node2GameObject = GameObject.Instantiate(_nodePrefab);
@@ -360,20 +358,21 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             node1.HitType = HitTypeEnum.Hit1;
             node2.HitType = HitTypeEnum.Hit2;
 
-            PlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[_playerIndex];
+            CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
            
-            node1.SetColors(playerColorData.Node1InsideColor.Get(), playerColorData.Node1OutsideColor.Get());
-            node2.SetColors(playerColorData.Node2InsideColor.Get(), playerColorData.Node2OutsideColor.Get());
+            node1.SetColors(playerColorData.NodeColors[0].InsideColor.Get(), playerColorData.NodeColors[0].OutsideColor.Get());
+            node2.SetColors(playerColorData.NodeColors[1].InsideColor.Get(), playerColorData.NodeColors[1].OutsideColor.Get());
 
-            node1.SetParticleColor(playerColorData.Node1ParticlesColor.Get());
-            node2.SetParticleColor(playerColorData.Node2ParticlesColor.Get());
+            node1.SetParticleColor(playerColorData.NodeColors[0].ParticleColor.Get());
+            node2.SetParticleColor(playerColorData.NodeColors[1].ParticleColor.Get());
 
             GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
             LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
 
-            lightningManager.Initialize(_midground, playerColorData.LightningColor.Get());
+            lightningManager.Initialize(_midground);
+            lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
 
-            NodePair nodePair = new NodePair(node1, node2, lightningManager);
+            NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, lightningManager);
 
             _setupNodeTrail(node1.ParticleSystem);
             _setupNodeTrail(node2.ParticleSystem);
@@ -394,7 +393,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             hitSplitManager.Run(Time.deltaTime);
             _explosionManager.Run();
 
-            _nodePair.LightningManager.Run(_nodePair.Node1.transform.position, _nodePair.Node2.transform.position);
+            _nodePair.LightningManager.Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
 
             _handleParticles(Time.deltaTime);
         }
@@ -405,12 +404,12 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             if (_state == ColorSelectionSceneManagerStateEnum.ColorSelection && _currentColorSetting == ColorSettingEnum.Node1Particles && _hit1.gameObject.activeInHierarchy)
             {
                 //move towards hit 1
-                _nodePair.Node1.transform.position = Vector3.Lerp(_nodePair.Node1.transform.position, _hit1.transform.position, deltaTime * 5);
+                _nodePair.Nodes[0].transform.position = Vector3.Lerp(_nodePair.Nodes[0].transform.position, _hit1.transform.position, deltaTime * 5);
             }
             else
             {
                 //move towards starting position
-                _nodePair.Node1.transform.position = Vector3.Lerp(_nodePair.Node1.transform.position, _convertFromPlaceholderPosition(_node1StartingPosition.position), deltaTime * 5);
+                _nodePair.Nodes[0].transform.position = Vector3.Lerp(_nodePair.Nodes[0].transform.position, _convertFromPlaceholderPosition(_node1StartingPosition.position), deltaTime * 5);
                 _hit1RespawnTimer -= deltaTime;
 
                 if (_hit1RespawnTimer <= 0)
@@ -422,12 +421,12 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             if (_state == ColorSelectionSceneManagerStateEnum.ColorSelection && _currentColorSetting == ColorSettingEnum.Node2Particles && _hit2.gameObject.activeInHierarchy)
             {
                 //move towards hit 1
-                _nodePair.Node2.transform.position = Vector3.Lerp(_nodePair.Node2.transform.position, _hit2.transform.position, deltaTime * 5);
+                _nodePair.Nodes[1].transform.position = Vector3.Lerp(_nodePair.Nodes[1].transform.position, _hit2.transform.position, deltaTime * 5);
             }
             else
             {
                 //move towards starting position
-                _nodePair.Node2.transform.position = Vector3.Lerp(_nodePair.Node2.transform.position, _convertFromPlaceholderPosition(_node2StartingPosition.position), deltaTime * 5);
+                _nodePair.Nodes[1].transform.position = Vector3.Lerp(_nodePair.Nodes[1].transform.position, _convertFromPlaceholderPosition(_node2StartingPosition.position), deltaTime * 5);
                 _hit2RespawnTimer -= deltaTime;
 
                 if (_hit2RespawnTimer <= 0)
@@ -545,22 +544,22 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             {
                 default:
                 case ColorSettingEnum.Node1Inside:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node1InsideColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[0].InsideColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Node1Outside:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node1OutsideColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[0].OutsideColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Node1Particles:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node1ParticlesColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[0].ParticleColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Node2Inside:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node2InsideColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[1].InsideColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Node2Outside:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node2OutsideColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[1].OutsideColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Node2Particles:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].Node2ParticlesColor.Set(_currentColor);
+                    _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[1].ParticleColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Lightning:
                     _gameManager.DataManager.PlayerColors[_playerIndex].LightningColor.Set(_currentColor);

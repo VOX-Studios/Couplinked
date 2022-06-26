@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers
@@ -90,8 +91,21 @@ namespace Assets.Scripts.SceneManagers
                 _levelNameText.text = _saveName;
             }
 
-            //TODO: make this configurable...it was only being used for single/multiplayer selection
-            _gameManager.GameSetupInfo.IsSinglePlayer = true;
+            //TODO: make this configurable...it was only being used for team selection...this doesn't allow multiplayer maps
+            _gameManager.GameSetupInfo.Teams = new List<Team>
+            {
+                new Team(0)
+                {
+                    PlayerInputs = new List<PlayerInput>()
+                    {
+                        new PlayerInput(
+                            inputActionAsset: _gameManager.InputActions,
+                            inputUser: InputUser.CreateUserWithoutPairedDevices(), 
+                            playerSlot: 0
+                            )
+                    }
+                }
+            };
         }
 
         void Update()

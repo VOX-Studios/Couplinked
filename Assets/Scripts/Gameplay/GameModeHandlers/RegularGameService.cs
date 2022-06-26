@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.SceneManagers;
+﻿using Assets.Scripts.PlayerInputs;
+using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
 class RegularGameService
@@ -8,19 +9,17 @@ class RegularGameService
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
 
-    private GameInput[] _gameInputs;
-    private NodePair[] _nodePairs;
+    private GameInput[][] _gameInputs;
+    private NodePairing[] _nodePairs;
 
-    private TeamManager _teamManager;
 
     public RegularGameService(
         GameManager gameManager,
         GameSceneManager gameSceneManager,
         HitManager hitManager,
         HitSplitManager hitSplitManager,
-        GameInput[] gameInputs,
-        NodePair[] nodePairs,
-        TeamManager teamManager
+        GameInput[][] gameInputs,
+        NodePairing[] nodePairs
         )
     {
         _gameManager = gameManager;
@@ -30,8 +29,6 @@ class RegularGameService
 
         _gameInputs = gameInputs;
         _nodePairs = nodePairs;
-
-        _teamManager = teamManager;
     }
 
     public void Start()
@@ -47,21 +44,47 @@ class RegularGameService
         }
     }
 
-    private void _runInput(GameInput gameInput, NodePair nodePair, float deltaTime)
+    private void _runInput(GameInput[] gameInputs, NodePairing nodePair, float deltaTime)
     {
-        Vector2 node1Velocity = gameInput.Move1Input;
-        Vector2 node2Velocity = gameInput.Move2Input;
+        //one input is 1 player for node pairing
+        if (gameInputs.Length == 1)
+        {
+            GameInput gameInput = gameInputs[0];
 
-        nodePair.Node1.transform.position += _gameManager.GameDifficultyManager.NodeSpeed * new Vector3(node1Velocity.x, node1Velocity.y, 0) * Time.deltaTime;
-        nodePair.Node2.transform.position += _gameManager.GameDifficultyManager.NodeSpeed * new Vector3(node2Velocity.x, node2Velocity.y, 0) * Time.deltaTime;
+            for (int i = 0; i < nodePair.Nodes.Count; i++)
+            {
+                Vector2 nodeVelocity = gameInput.MoveInput(i);
 
-        _gameManager.ClampObjectIntoView(nodePair.Node1.transform, .5f, 2.5f); //.4 for node radius
-        _gameManager.ClampObjectIntoView(nodePair.Node2.transform, .5f, 2.5f); //.4 for node radius
+                _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
 
-        _gameManager.Grid.Logic.ApplyDirectedForce(node1Velocity.normalized * 6f * deltaTime * (1 + nodePair.Node1.Scale), nodePair.Node1.transform.position, .5f * nodePair.Node1.Scale);
-        _gameManager.Grid.Logic.ApplyDirectedForce(node2Velocity.normalized * 6f * deltaTime * (1 + nodePair.Node2.Scale), nodePair.Node2.transform.position, .5f * nodePair.Node2.Scale);
+                int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count;
+                //TODO: need an array of lightning managers
+                nodePair.LightningManager?.Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[nextNodeInLoop].transform.position);
+            }
+        }
+        else
+        {
+            for(int i = 0; i < gameInputs.Length; i++)
+            {
+                GameInput gameInput = gameInputs[i];
+                Vector2 nodeVelocity = gameInput.MoveInput((int)MoveInputEnum.MoveInputCombined);
 
-        nodePair.LightningManager?.Run(nodePair.Node1.transform.position, nodePair.Node2.transform.position);
+                _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
+
+                int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count;
+                //TODO: need an array of lightning managers
+                nodePair.LightningManager?.Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[nextNodeInLoop].transform.position);
+            }
+        }
+    }
+
+    private void _updateNode(Vector2 nodeVelocity, Node node, float deltaTime)
+    {
+        node.transform.position += _gameManager.GameDifficultyManager.NodeSpeed * new Vector3(nodeVelocity.x, nodeVelocity.y, 0) * Time.deltaTime;
+
+        _gameManager.ClampObjectIntoView(node.transform);
+
+        _gameManager.Grid.Logic.ApplyDirectedForce(nodeVelocity.normalized * 6f * deltaTime * (1 + node.Scale), node.transform.position, .5f * node.Scale);
     }
 
     public void OnHitCollision(Hit hit, Collider2D other)
@@ -71,10 +94,8 @@ class RegularGameService
 
         Node node = other.GetComponent<Node>();
 
-        bool isOnTeam = _teamManager.IsOnTeam(hit.TeamId, node.TeamId);
-
         //if the appropriate node was hit
-        if (isOnTeam && node.HitType == hit.HitType)
+        if (hit.TeamId == node.TeamId && node.HitType == hit.HitType)
         {
             _gameManager.PlayExplosionSound(hit.ExplosionPitch);
 
@@ -121,10 +142,8 @@ class RegularGameService
 
     private void _onHitSplitFirstHit(HitSplit hitSplit, Node node)
     {
-        bool isOnTeam = _teamManager.IsOnTeam(hitSplit.FirstHitTeamId, node.TeamId);
-
         //if the appropriate node was hit
-        if (isOnTeam && node.HitType == hitSplit.HitSplitFirstType)
+        if (hitSplit.FirstHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitFirstType)
         {
             _gameManager.PlayExplosionSound(hitSplit.ExplosionPitch);
 
@@ -156,11 +175,8 @@ class RegularGameService
 
     private void _onHitSplitSecondHit(HitSplit hitSplit, Node node)
     {
-        bool isOnTeam = _teamManager.IsOnTeam(hitSplit.SecondHitTeamId, node.TeamId);
-        bool isNodeOnFirstHitTeam = _teamManager.IsOnTeam(hitSplit.FirstHitTeamId, node.TeamId);
-
         //if the appropriate second node was hit
-        if (isOnTeam && node.HitType == hitSplit.HitSplitSecondType)
+        if (hitSplit.SecondHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitSecondType)
         {
             _gameManager.PlayExplosionSound(hitSplit.ExplosionPitch);
             switch (hitSplit.HitSplitFirstType)
@@ -185,7 +201,7 @@ class RegularGameService
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
         }
-        else if(isNodeOnFirstHitTeam && node.HitType == hitSplit.HitSplitFirstType) //it's the same node as the first hit
+        else if(hitSplit.FirstHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitFirstType) //it's the same node as the first hit
         {
             //DO NOTHING
         }
@@ -219,35 +235,33 @@ class RegularGameService
 
     private void _setNodeStartPositions()
     {
+        float width = (GameManager.RightXWithClamp - GameManager.LeftXWithClamp);
+        float height = (GameManager.TopYWithClamp - GameManager.BotYWithClamp);
+
+        float ySpacing = height / (_nodePairs.Length + 1);
+
         for (int i = 0; i < _nodePairs.Length; i++)
         {
-            NodePair nodePair = _nodePairs[i];
-            nodePair.Node1.transform.position = new Vector3(-3, 0, 0);
-            nodePair.Node2.transform.position = new Vector3(3, 0, 0);
+            NodePairing nodePair = _nodePairs[i];
+
+            for(int j = 0; j < nodePair.Nodes.Count; j++)
+            {
+                float xSpacing = width / (nodePair.Nodes.Count + 1);
+
+                nodePair.Nodes[j].transform.position = new Vector3(GameManager.LeftXWithClamp + (xSpacing * (j + 1)), GameManager.BotYWithClamp + (ySpacing * (i + 1)), 0);
+            }
         }
     }
 
     private Color _getHitSplitColor(HitTypeEnum hitType, int teamId)
     {
-        switch (hitType)
-        {
-            default:
-            case HitTypeEnum.Hit1:
-                return _gameManager.DataManager.PlayerColors[teamId].Node1OutsideColor.Get(); //TODO: don't do this per spawn
-            case HitTypeEnum.Hit2:
-                return _gameManager.DataManager.PlayerColors[teamId].Node2OutsideColor.Get(); //TODO: don't do this per spawn
-        }
+        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[(int)hitType].OutsideColor.Get(); //TODO: don't do this per spawn
     }
 
     private Color _getExplosionColor(HitTypeEnum hitType, int teamId)
     {
-        switch (hitType)
-        {
-            default:
-            case HitTypeEnum.Hit1:
-                return _gameManager.ColorManager.NodeColors[teamId].ParticleColor1; //TODO: update this to use DataManager
-            case HitTypeEnum.Hit2:
-                return _gameManager.ColorManager.NodeColors[teamId].ParticleColor2; //TODO: update this to use DataManager
-        }
+        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[(int)hitType].ParticleColor.Get(); //TODO: don't do this per explosion
     }
+
+
 }

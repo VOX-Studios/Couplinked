@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 class SurvivalSpawnHandler : ISurvivalSpawnHandler
@@ -11,6 +12,8 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
 
     private float[] _rowPositions;
     private float _scale;
+
+    private PlayerColors[] _playerColors;
 
     public SurvivalSpawnHandler(
         SurvivalHandler survivalHandler,
@@ -38,29 +41,31 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         int rando = Random.Range(1, 10);
 
         int teamId = 0;
-        
-        //TODO: fix color bullshit, include particle and lightning shit
-        PlayerNodeColors nodeColors = _gameManager.ColorManager.NodeColors[teamId];
-        PlayerColorData colorData = _gameManager.DataManager.PlayerColors[teamId];
-        nodeColors.InsideColor1 = colorData.Node1InsideColor.Get();
-        nodeColors.OutsideColor1 = colorData.Node1OutsideColor.Get();
-        nodeColors.ParticleColor1 = colorData.Node1ParticlesColor.Get();
-        nodeColors.InsideColor2 = colorData.Node2InsideColor.Get();
-        nodeColors.OutsideColor2 = colorData.Node2OutsideColor.Get();
-        nodeColors.ParticleColor2 = colorData.Node2ParticlesColor.Get();
+
+        //if multiplayer
+        if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+        {
+            _playerColors = _gameManager.ColorManager.DefaultPlayerColors.Select(defaultPlayerColors => new PlayerColors(defaultPlayerColors)).ToArray();
+        }
+        else
+        {
+            _playerColors = _gameManager.DataManager.PlayerColors.Select(customPlayerColors => new PlayerColors(customPlayerColors)).ToArray();
+        }
+
+        PlayerColors playerColors = _playerColors[teamId];
 
         switch (rando)
         {
             case 1:
-                _spawnHit(HitTypeEnum.Hit1, teamId, nodeColors);
+                _spawnHit(HitTypeEnum.Hit1, teamId, playerColors);
                 _survivalHandler.PotentialMaxScore += 10;
                 break;
             case 2:
-                _spawnHit(HitTypeEnum.Hit2, teamId, nodeColors);
+                _spawnHit(HitTypeEnum.Hit2, teamId, playerColors);
                 _survivalHandler.PotentialMaxScore += 10;
                 break;
             case 3:
-                _spawnBothHits(teamId, nodeColors);
+                _spawnBothHits(teamId, playerColors);
                 break;
             case 4:
                 _hitSplitManager.SpawnHitSplit(
@@ -68,8 +73,8 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
                     hitSplitSecondType: HitTypeEnum.Hit2,
                     firstHitTeamId: teamId,
                     secondHitTeamId: teamId,
-                    firstHitNodeColors: nodeColors,
-                    secondHitNodeColors: nodeColors,
+                    firstHitPlayerColors: playerColors,
+                    secondHitPlayerColors: playerColors,
                     spawnPosition: _getRandomSpawnPosition(),
                     scale: _scale
                     );
@@ -81,8 +86,8 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
                    hitSplitSecondType: HitTypeEnum.Hit1,
                    firstHitTeamId: teamId,
                    secondHitTeamId: teamId,
-                   firstHitNodeColors: nodeColors,
-                   secondHitNodeColors: nodeColors,
+                   firstHitPlayerColors: playerColors,
+                   secondHitPlayerColors: playerColors,
                    spawnPosition: _getRandomSpawnPosition(),
                    scale: _scale
                    );
@@ -102,10 +107,10 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         return new Vector3(GameManager.RightX + 5, _rowPositions[i], 0);
     }
 
-    private void _spawnHit(HitTypeEnum hitType, int teamId, PlayerNodeColors nodeColors)
+    private void _spawnHit(HitTypeEnum hitType, int teamId, PlayerColors playerColors)
     {
         Vector3 pos = _getRandomSpawnPosition();
-        _hitManager.SpawnHit(hitType, teamId, nodeColors, pos, _scale);
+        _hitManager.SpawnHit(hitType, teamId, playerColors, pos, _scale);
     }
 
     private void _spawnNoHit()
@@ -114,7 +119,7 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         _noHitManager.SpawnNoHit(pos, _scale);
     }
 
-    private void _spawnBothHits(int teamId, PlayerNodeColors nodeColors)
+    private void _spawnBothHits(int teamId, PlayerColors playerColors)
     {
         //add all potential positions
         List<float> availablePositions = new List<float>(_rowPositions);
@@ -127,7 +132,7 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         availablePositions.RemoveAt(rando);
 
         //spawn Hit1
-        _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, nodeColors, new Vector3(GameManager.RightX + 5, y, 0), _scale);
+        _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, playerColors, new Vector3(GameManager.RightX + 5, y, 0), _scale);
         _survivalHandler.PotentialMaxScore += 20;
 
         //0 to length-1
@@ -137,7 +142,7 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         availablePositions.RemoveAt(rando);
 
         //spawn Hit2
-        _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, nodeColors, new Vector3(GameManager.RightX + 5, y, 0), _scale);
+        _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, playerColors, new Vector3(GameManager.RightX + 5, y, 0), _scale);
         _survivalHandler.PotentialMaxScore += 20;
 
         availablePositions.Clear();

@@ -328,7 +328,7 @@ namespace Assets.Scripts.SceneManagers
                     else
                     {
                         _gameManager.IsNewLevel = false;
-                        _gameManager.LoadScene("Level Editor");
+                        _gameManager.LoadScene(SceneNames.LevelEditor);
                     }
                     break;
                 case LevelTypeEnum.Campaign:
@@ -344,7 +344,7 @@ namespace Assets.Scripts.SceneManagers
                             return;
                         }
                     }
-                    _gameManager.LoadScene("Game");
+                    _gameManager.LoadScene(SceneNames.Game);
                     break;
                 case LevelTypeEnum.Custom:
                     if (_garbageBinButton.GetComponent<GarbageBin>().DeleteIsActive)
@@ -357,7 +357,7 @@ namespace Assets.Scripts.SceneManagers
                     }
                     else
                     {
-                        _gameManager.LoadScene("Game");
+                        _gameManager.LoadScene(SceneNames.Game);
                     }
                     break;
             }

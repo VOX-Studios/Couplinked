@@ -1,5 +1,7 @@
-﻿public class GameSetupInfo
+﻿using System.Collections.Generic;
+
+public class GameSetupInfo
 {
     public GameModeEnum GameMode;
-    public bool IsSinglePlayer;
+    public List<Team> Teams;
 }

@@ -38,9 +38,8 @@ class SurvivalHandler : IGameModeHandler
     public int Score = 0;
     public int RingsCollected = 0;
 
-    private GameInput[] _gameInputs;
-    private NodePair[] _nodePairs;
-    private TeamManager _teamManager;
+    private GameInput[][] _gameInputs;
+    private NodePairing[] _nodePairs;
     private ExplosionManager _explosionManager;
 
     private RegularGameService _gameService;
@@ -53,9 +52,8 @@ class SurvivalHandler : IGameModeHandler
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
-        GameInput[] gameInputs,
-        NodePair[] nodePairs,
-        TeamManager teamManager,
+        GameInput[][] gameInputs,
+        NodePairing[] nodePairs,
         ExplosionManager explosionManager
         )
     {
@@ -67,7 +65,6 @@ class SurvivalHandler : IGameModeHandler
 
         _gameInputs = gameInputs;
         _nodePairs = nodePairs;
-        _teamManager = teamManager;
         _explosionManager = explosionManager;
 
         _gameService = new RegularGameService(
@@ -76,8 +73,7 @@ class SurvivalHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairs,
-            teamManager: _teamManager
+            nodePairs: _nodePairs
             );
     }
 
@@ -100,7 +96,7 @@ class SurvivalHandler : IGameModeHandler
         return rowPositions;
     }
 
-    private void _handleScaling(int numRows, NodePair[] nodePairs, ExplosionManager explosionManager)
+    private void _handleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
     {
         if (numRows <= 5)
         {
@@ -111,7 +107,7 @@ class SurvivalHandler : IGameModeHandler
             _scale = 5f / numRows;
         }
 
-        foreach (NodePair nodePair in nodePairs)
+        foreach (NodePairing nodePair in nodePairs)
         {
             nodePair.SetScale(_scale);
         }

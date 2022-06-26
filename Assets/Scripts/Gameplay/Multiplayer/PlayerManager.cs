@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Gameplay.Multiplayer;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,24 +9,23 @@ using UnityEngine.InputSystem.Users;
 
 public class PlayerManager : MonoBehaviour
 {
-    public const int MAX_PLAYERS = 2;
+    public const byte MAX_PLAYERS = 4;
 
     [SerializeField]
-    private InputActionAsset _player1Actions;
+    private InputActionAsset _playerActionsPrefab;
 
-    [SerializeField]
-    private InputActionAsset _player2Actions;
+    private PlayerSlotsManager _playerSlotsManager;
 
     public List<PlayerInput> Players;
 
-    private HashSet<InputActionAsset> _pairedActions;
+    //TODO: playerSlotIndex: an bag of available indices to indentify where we're placing the player as if there was a physical equivalent
 
     public bool IsJoining { get; private set; }
 
     void Awake()
     {
         Players = new List<PlayerInput>();
-        _pairedActions = new HashSet<InputActionAsset>();
+        _playerSlotsManager = new PlayerSlotsManager(MAX_PLAYERS);
     }
 
     public event EventHandler<PlayerAddedEventArgs> OnPlayerAdded;
@@ -36,14 +36,7 @@ public class PlayerManager : MonoBehaviour
         if (Players.Count == MAX_PLAYERS || !(control is ButtonControl) || control.device.displayName == "Mouse")
             return;
 
-        InputActionAsset actions;
-
-        if (!_pairedActions.Contains(_player1Actions))
-            actions = _player1Actions;
-        else if (!_pairedActions.Contains(_player2Actions))
-            actions = _player2Actions;
-        else //we've run out of actions to pair
-            return;
+        InputActionAsset actions = Instantiate(_playerActionsPrefab);
 
         InputAction temp = actions.FindActionMap("Lobby").FindAction("Back");
 
@@ -57,15 +50,16 @@ public class PlayerManager : MonoBehaviour
                 return;
         }
 
-        _pairedActions.Add(actions);
-
         //get a new InputUser, now paired with the device
         InputUser inputUser = InputUser.PerformPairingWithDevice(control.device);
 
         //lock down the input to the specific device
-        inputUser.AssociateActionsWithUser(actions); 
+        inputUser.AssociateActionsWithUser(actions);
 
-        PlayerInput player = new PlayerInput(actions, inputUser);
+        //assign a "slot" to the player
+        int playerSlot = _playerSlotsManager.TakeSlot();
+
+        PlayerInput player = new PlayerInput(actions, inputUser, playerSlot);
         Players.Add(player);
 
         _onPlayerAdded(player);
@@ -98,8 +92,8 @@ public class PlayerManager : MonoBehaviour
 
     public void RemovePlayer(PlayerInput player)
     {
-        _pairedActions.Remove(player.InputActionAsset);
         player.InputUser.UnpairDevicesAndRemoveUser();
         Players.Remove(player);
+        _playerSlotsManager.ReturnSlot(player.PlayerSlot);
     }
 }

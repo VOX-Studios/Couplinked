@@ -67,8 +67,8 @@ public class HitSplitManager : MonoBehaviour
 		HitTypeEnum hitSplitSecondType,
 		int firstHitTeamId,
 		int secondHitTeamId,
-		PlayerNodeColors firstHitNodeColors,
-		PlayerNodeColors secondHitNodeColors,
+		PlayerColors firstHitPlayerColors,
+		PlayerColors secondHitPlayerColors,
 		Vector3 spawnPosition,
 		float scale
 		)
@@ -78,8 +78,8 @@ public class HitSplitManager : MonoBehaviour
 			hitSplitSecondType: hitSplitSecondType,
 			firstHitTeamId: firstHitTeamId,
 			secondHitTeamId: secondHitTeamId,
-			firstHitNodeColors: firstHitNodeColors,
-			secondHitNodeColors: secondHitNodeColors,
+			firstHitPlayerColors: firstHitPlayerColors,
+			secondHitPlayerColors: secondHitPlayerColors,
 			spawnPosition: spawnPosition,
 			scale: scale
 			);
@@ -90,8 +90,8 @@ public class HitSplitManager : MonoBehaviour
 		HitTypeEnum hitSplitSecondType,
 		int firstHitTeamId,
 		int secondHitTeamId,
-		PlayerNodeColors firstHitNodeColors,
-		PlayerNodeColors secondHitNodeColors,
+		PlayerColors firstHitPlayerColors,
+		PlayerColors secondHitPlayerColors,
 		Vector3 spawnPosition,
 		float scale
 		)
@@ -108,8 +108,8 @@ public class HitSplitManager : MonoBehaviour
 			hitSplitComponent.HitSplitFirstType = hitSplitFirstType;
 			hitSplitComponent.HitSplitSecondType = hitSplitSecondType;
 
-			Color firstHitColor = _getColor(firstHitNodeColors, hitSplitFirstType);
-			Color secondHitColor = _getColor(secondHitNodeColors, hitSplitSecondType);
+			Color firstHitColor = firstHitPlayerColors.NodeColors[(int)hitSplitFirstType].OutsideColor;
+			Color secondHitColor = secondHitPlayerColors.NodeColors[(int)hitSplitSecondType].OutsideColor;
 
 			hitSplitComponent.SetColors(secondHitColor, firstHitColor);
 			hitSplitComponent.FirstHitTeamId = firstHitTeamId;
@@ -123,23 +123,6 @@ public class HitSplitManager : MonoBehaviour
 			inactiveHitSplits.RemoveAt(inactiveCount - 1);
 			activeHitSplits.Add(hitSplit);
 		}
-	}
-
-	private Color _getColor(PlayerNodeColors nodeColors, HitTypeEnum hitType)
-    {
-		Color color;
-		switch (hitType)
-		{
-			default:
-			case HitTypeEnum.Hit1:
-				color = nodeColors.OutsideColor1;
-				break;
-			case HitTypeEnum.Hit2:
-				color = nodeColors.OutsideColor2;
-				break;
-		}
-
-		return color;
 	}
 
 	public void DeactivateHitSplit(int index)

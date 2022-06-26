@@ -16,14 +16,13 @@ public class LightningManager : MonoBehaviour
     private List<LineRenderer> _inactiveBolts;
     private int _maxBolts = 10;
 
-    private Color _lightningColor;
+    private Color _lightningColor = ColorManager.DefaultLightningColor;
 
     private float _scale = 1;
 
-    public void Initialize(Transform parent, Color lightningColor)
+    public void Initialize(Transform parent)
     {
         transform.SetParent(parent, false);
-        SetLightningColor(lightningColor);
 
         _activeBolts = new List<LineRenderer>();
         _inactiveBolts = new List<LineRenderer>();

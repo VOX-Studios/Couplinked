@@ -54,12 +54,13 @@ namespace Assets.Scripts.SceneManagers
 
             Transform containerTransform = GameObject.Find("Page 2").transform.Find("Graphics").transform.Find("Container");
 
-            PlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[0];
+            CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[0];
 
             GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
             _lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
 
-            _lightningManager.Initialize(_lightningHolder, playerColorData.LightningColor.Get());
+            _lightningManager.Initialize(_lightningHolder);
+            _lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
             _lastInstructionsPageNum = _instructionsPages.transform.childCount;
 
             for (int i = 1; i < _lastInstructionsPageNum; i++)
