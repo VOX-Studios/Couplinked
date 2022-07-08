@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Node : MonoBehaviour
 {
@@ -7,7 +8,14 @@ public class Node : MonoBehaviour
     public SpriteRenderer BlurSpriteRenderer;
     public int NodeId;
     public int TeamId;
-    public float Scale { get; private set; } 
+    public float Scale { get; private set; }
+
+    [NonSerialized]
+    public int LightIndex = -1;
+
+    public Color InsideColor;
+    public Color OutsideColor;
+    public Color ParticleColor;
 
     private MaterialPropertyBlock _propertyBlock;
 
@@ -32,14 +40,17 @@ public class Node : MonoBehaviour
 
     public void SetColors(Color insideColor, Color outsideColor)
     {
+        InsideColor = insideColor;
+        OutsideColor = outsideColor;
         _setSpriteColors(insideColor, outsideColor);
         _setBlurColor(outsideColor);
     }
 
     public void SetParticleColor(Color color)
     {
-        ParticleSystem.MainModule particleSystemMain = ParticleSystem.main;
+        ParticleColor = color;
 
+        ParticleSystem.MainModule particleSystemMain = ParticleSystem.main;
         particleSystemMain.startColor = color;
     }
 

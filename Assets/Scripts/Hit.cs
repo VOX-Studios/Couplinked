@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Hit : BaseObject 
 {
@@ -16,6 +17,11 @@ public class Hit : BaseObject
 
 	private MaterialPropertyBlock _propertyBlock;
 
+	[NonSerialized]
+	public int LightIndex = -1;
+
+	public Color Color;
+
 	// Use this for initialization
 	public void Initialize(IHitCollisionHandler hitCollisionHandler) 
 	{
@@ -32,6 +38,7 @@ public class Hit : BaseObject
 
 	public void SetColor(Color color)
     {
+		Color = color;
 		_setColor(_spriteRenderer, color);
 		_setColor(_blurSpriteRenderer, color);
 	}
@@ -52,8 +59,16 @@ public class Hit : BaseObject
 		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
 		//_GameManager.Grid.Logic.ApplyDirectedForce(new Vector3(-Speed * Scale, 0, 0).normalized * 3f * time * (1 + Scale), transform.position, .5f * Scale);
 		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);
+
+		_GameManager.Grid.ColorManager.SetLightPosition(LightIndex, transform.position);
 	}
-	
+
+	public void ReleaseLightIndex()
+	{
+		_GameManager.Grid.ColorManager.ReleaseLightIndex(LightIndex);
+		LightIndex = -1;
+	}
+
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (!gameObject.activeSelf)

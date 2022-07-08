@@ -17,8 +17,11 @@ public class Grid : MonoBehaviour
 	private LineRenderer[] _lineRenderersVertical;
 	private LineRenderer[] _lineRenderersHorizontal;
 
+	public GridColorManager ColorManager;
+
 	public void Initialize(GameManager gameManager)
 	{
+		ColorManager = new GridColorManager(_gridMaterial);
 		_gameManager = gameManager;
 
 		Create();
@@ -77,32 +80,8 @@ public class Grid : MonoBehaviour
 
 		//pulling first player grid color since we don't support different color grids
 		Color gridColor = _gameManager.DataManager.PlayerColors[0].GridColor.Get();
-		SetColor(gridColor);
-	}
 
-	public void SetColor(Color color)
-    {
-		_gridMaterial.SetColor("_Color", color);
-	}
-
-	public void SetLightPosition(Vector2 worldPosition, Vector2 worldPosition2, Color color, Color color2)
-    {
-        Vector3 screenPosition = Camera.main.WorldToViewportPoint(worldPosition);
-		Vector3 screenPosition2 = Camera.main.WorldToViewportPoint(worldPosition2);
-		Texture2D texture2D = new Texture2D(2, 1);
-		texture2D.filterMode = FilterMode.Point;
-		texture2D.SetPixel(0, 0, new Color(screenPosition.x, screenPosition.y, 0)); //TODO: handle H > W
-		texture2D.SetPixel(1, 0, new Color(screenPosition2.x, screenPosition2.y, 0)); //TODO: handle H > W
-		texture2D.Apply();
-
-		Texture2D colorTexture2D = new Texture2D(2, 1);
-		colorTexture2D.filterMode = FilterMode.Point;
-		colorTexture2D.SetPixel(0, 0, color);
-		colorTexture2D.SetPixel(1, 0, color2);
-		colorTexture2D.Apply();
-
-		_gridMaterial.SetTexture("_Positions", texture2D);
-		_gridMaterial.SetTexture("_Colors", colorTexture2D);
+		ColorManager.SetColor(gridColor);
 	}
 
 	private void _clear()
@@ -123,8 +102,6 @@ public class Grid : MonoBehaviour
 			}
 		}
 	}
-
-
 	public void Run()
 	{
         Logic.Update();

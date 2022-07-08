@@ -79,6 +79,7 @@ Material:
     - Vector1_95E713EA: 0.25
     - _AlphaClip: 0
     - _Blend: 0
+    - _Brightness: 4
     - _BumpScale: 1
     - _Cull: 2
     - _Cutoff: 0.5
@@ -87,11 +88,16 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Light_Focus_Factor: 0.15
+    - _Light_Aperture: 0.15
+    - _Light_Brightness: 5
+    - _Light_Focus_Factor: 0.4
+    - _Light_Punch_Out: 0.02
+    - _Light_Range: 0.25
     - _Light_Sharpness: 0.05
-    - _Light_Shrink_Factor: 4
-    - _Light_Size: 2.5
+    - _Light_Shrink_Factor: 0.5
+    - _Light_Size: 0.5
     - _Metallic: 0
+    - _Number_Of_Data_Points: 188
     - _OcclusionStrength: 1
     - _QueueControl: 1
     - _QueueOffset: 0
@@ -101,6 +107,8 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
+    - _Texel_Size: 2
+    - _Texture_Data_Width: 188
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:

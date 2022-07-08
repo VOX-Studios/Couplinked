@@ -68,6 +68,15 @@ namespace Assets.Scripts.SceneManagers
                 _setupMultiplayer();
             }
 
+            foreach(NodePairing nodePairing in _nodePairs)
+            {
+                foreach(Node node in nodePairing.Nodes)
+                {
+                    node.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
+                    _gameManager.Grid.ColorManager.SetLightColor(node.LightIndex, node.OutsideColor);
+                }
+            }
+
             CameraShake = new CameraShake();
 
             _hitManager.Initialize();
@@ -344,12 +353,13 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.isPaused)
                 return;
 
-            _gameManager.Grid.SetLightPosition(
-                _nodePairs[0].Nodes[0].transform.position, 
-                _nodePairs[0].Nodes[1].transform.position,
-                _gameManager.ColorManager.DefaultPlayerColors[0].NodeColors[0].OutsideColor,
-                _gameManager.ColorManager.DefaultPlayerColors[0].NodeColors[1].OutsideColor
-                );
+            foreach (NodePairing nodePairing in _nodePairs)
+            {
+                foreach (Node node in nodePairing.Nodes)
+                {
+                    _gameManager.Grid.ColorManager.SetLightPosition(node.LightIndex, node.transform.position);
+                }
+            }
 
             _gameManager.TimePlayedMilliseconds += Time.deltaTime * 1000;
 
@@ -524,7 +534,7 @@ namespace Assets.Scripts.SceneManagers
 
             for (int i = _noHitManager.activeNoHits.Count - 1; i >= 0; i--)
             {
-                _noHitManager.deactivateNoHit(i);
+                _noHitManager.DeactivateNoHit(i);
             }
 
             for (int i = _hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)
@@ -536,11 +546,20 @@ namespace Assets.Scripts.SceneManagers
 
             for (int i = _scoreJuiceManager.activeScoreJuices.Count - 1; i >= 0; i--)
             {
-                _scoreJuiceManager.deactivateScoreJuice(i);
+                _scoreJuiceManager.DeactivateScoreJuice(i);
             }
 
             _gameManager.SetStatistics();
             CameraShake.ClearShake();
+
+            foreach (NodePairing nodePairing in _nodePairs)
+            {
+                foreach (Node node in nodePairing.Nodes)
+                {
+                    _gameManager.Grid.ColorManager.ReleaseLightIndex(node.LightIndex);
+                    node.LightIndex = -1;
+                }
+            }
         }
 
         /// <summary>

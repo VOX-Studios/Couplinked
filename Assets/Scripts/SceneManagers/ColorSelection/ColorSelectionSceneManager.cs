@@ -281,7 +281,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     break;
                 case ColorSettingEnum.Grid:
                     _gridColor = _currentColor;
-                    _gameManager.Grid.SetColor(_gridColor);
+                    _gameManager.Grid.ColorManager.SetColor(_gridColor);
                     break;
             }
         }
@@ -602,7 +602,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
             for (int i = noHitManager.activeNoHits.Count - 1; i >= 0; i--)
             {
-                noHitManager.deactivateNoHit(i);
+                noHitManager.DeactivateNoHit(i);
             }
 
             for (int i = hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)

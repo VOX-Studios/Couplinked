@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.SceneManagers;
+using System;
 using UnityEngine;
 
 public class HitSplit : BaseObject 
@@ -27,6 +28,9 @@ public class HitSplit : BaseObject
 	public float Scale { get; private set; }
 
 	private MaterialPropertyBlock _propertyBlock;
+
+	[NonSerialized]
+	public int LightIndex = -1;
 
 	public Color InsideColor { get; private set; }
 	public Color OutsideColor { get; private set; }
@@ -63,6 +67,14 @@ public class HitSplit : BaseObject
 		_setOutsideColor(_outsideSpriteRenderer, outsideColor);
 	}
 
+	public void SetColors(Color outsideColor)
+	{
+		SetColors(Color.clear, outsideColor);
+
+		_insideSpriteRenderer.enabled = false;
+		_blurInsideSpriteRenderer.enabled = false;
+	}
+
 	private void _setInsideColor(SpriteRenderer renderer, Color insideColor)
 	{
 		//get the current value of properties in the renderer
@@ -88,21 +100,21 @@ public class HitSplit : BaseObject
 	public void Move(float time) 
 	{
 		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
+
+		_GameManager.Grid.ColorManager.SetLightPosition(LightIndex, transform.position);
 	}
-	
+
+	public void ReleaseLightIndex()
+	{
+		_GameManager.Grid.ColorManager.ReleaseLightIndex(LightIndex);
+		LightIndex = -1;
+	}
+
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (!gameObject.activeSelf)
 			return;
 
 		_gameSceneManager.OnHitSplitCollision(this, other);
-	}
-
-	public void SetColors(Color outsideColor)
-	{
-		SetColors(Color.clear, outsideColor);
-
-		_insideSpriteRenderer.enabled = false;
-		_blurInsideSpriteRenderer.enabled = false;
 	}
 }

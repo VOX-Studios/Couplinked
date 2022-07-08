@@ -103,7 +103,7 @@ class RegularGameService
 
             _gameSceneManager.AddToScore(hit.transform.position, node);
             _gameSceneManager.AddExplosion(hit.transform.position, _getExplosionColor(hit.HitType, hit.TeamId));
-            _hitManager.DeactivateHit(hit.gameObject);
+            _hitManager.DeactivateHit(hit);
             _gameSceneManager.Shake();
 
             switch (hit.HitType)
@@ -169,6 +169,8 @@ class RegularGameService
             hitSplit.SetColors(
                 outsideColor: hitSplit.InsideColor
                 );
+
+            _gameManager.Grid.ColorManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
         }
         else //hit the wrong node first
         {
@@ -200,7 +202,7 @@ class RegularGameService
             hitSplit.WasHitTwice = true;
             _gameSceneManager.AddToScore(hitSplit.transform.position, node);
             _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.HitSplitSecondType, hitSplit.SecondHitTeamId));
-            _hitSplitManager.DeactivateHitSplit(hitSplit.gameObject);
+            _hitSplitManager.DeactivateHitSplit(hitSplit);
             _gameSceneManager.Shake();
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);

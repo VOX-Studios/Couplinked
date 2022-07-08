@@ -7,8 +7,8 @@ public class NoHitManager : MonoBehaviour
 	float spawnTimer = 0f;
 	public GameObject NoHitPrefab;
 
-	public List<GameObject> activeNoHits;
-	public List<GameObject> inactiveNoHits;
+	public List<NoHit> activeNoHits;
+	public List<NoHit> inactiveNoHits;
 
 	private GameManager _gameManager;
 
@@ -19,8 +19,8 @@ public class NoHitManager : MonoBehaviour
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-		activeNoHits = new List<GameObject>();
-		inactiveNoHits = new List<GameObject>();
+		activeNoHits = new List<NoHit>();
+		inactiveNoHits = new List<NoHit>();
 
 		Transform parent = GameObject.Find("NoHitManager").transform;
 
@@ -29,7 +29,7 @@ public class NoHitManager : MonoBehaviour
 			GameObject noHit = (GameObject)Instantiate(NoHitPrefab);
 			noHit.transform.parent = parent;
 			noHit.SetActive(false);
-			inactiveNoHits.Add(noHit);
+			inactiveNoHits.Add(noHit.GetComponent<NoHit>());
 		}
 	}
 
@@ -50,11 +50,11 @@ public class NoHitManager : MonoBehaviour
 
 		for(int i = activeNoHits.Count - 1; i >= 0; i--)
 		{
-			activeNoHits[i].GetComponent<NoHit>().Move(deltaTime);
+			activeNoHits[i].Move(deltaTime);
 
-			if(activeNoHits[i].transform.position.x < GameManager.LeftX - activeNoHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
+			if(activeNoHits[i].transform.position.x < GameManager.LeftX - activeNoHits[i].GetComponent<Renderer>().bounds.extents.x)
 			{
-				deactivateNoHit(i);
+				DeactivateNoHit(i);
 			}
 		}
 	}
@@ -69,31 +69,34 @@ public class NoHitManager : MonoBehaviour
 		int inactiveCount = inactiveNoHits.Count;
 		if(inactiveCount > 0)
 		{
-			GameObject noHit = inactiveNoHits[inactiveCount - 1];
-			NoHit noHitComponent = noHit.GetComponent<NoHit>();
-			noHitComponent.SetScale(scale);
+			NoHit noHit = inactiveNoHits[inactiveCount - 1];
+			noHit.SetScale(scale);
 			noHit.transform.position = spawnPosition;
 
-			noHit.SetActive(true);
+			noHit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
+			_gameManager.Grid.ColorManager.SetLightColor(noHit.LightIndex, Color.red);
+			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, spawnPosition);
+			noHit.gameObject.SetActive(true);
 
 			inactiveNoHits.RemoveAt(inactiveCount - 1);
 			activeNoHits.Add(noHit);
 		}
 	}
 	
-	public void deactivateNoHit(int index)
+	public void DeactivateNoHit(int index)
 	{
-		GameObject noHit = activeNoHits[index];
-		noHit.SetActive(false);
+		NoHit noHit = activeNoHits[index];
+		noHit.ReleaseLightIndex();
+		noHit.gameObject.SetActive(false);
 		activeNoHits.RemoveAt(index);
 		inactiveNoHits.Add(noHit);
 	}
 	
-	public void deactivateNoHit(GameObject noHit)
+	public void deactivateNoHit(NoHit noHit)
 	{
-		noHit.SetActive(false);
+		noHit.ReleaseLightIndex();
+		noHit.gameObject.SetActive(false);
 		activeNoHits.Remove(noHit);
 		inactiveNoHits.Add(noHit);
 	}
-
 }

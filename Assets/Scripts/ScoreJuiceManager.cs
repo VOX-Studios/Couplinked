@@ -39,7 +39,7 @@ public class ScoreJuiceManager : MonoBehaviour
 
 			if(scoreJuiceComponent.timeRemaining <= 0)
 			{
-				deactivateScoreJuice(i);
+				DeactivateScoreJuice(i);
 			}
 		}
 	}
@@ -68,19 +68,11 @@ public class ScoreJuiceManager : MonoBehaviour
 		}
 	}
 	
-	public void deactivateScoreJuice(int index)
+	public void DeactivateScoreJuice(int index)
 	{
 		GameObject scoreJuice = activeScoreJuices[index];
 		scoreJuice.SetActive(false);
 		activeScoreJuices.RemoveAt(index);
 		inactiveScoreJuices.Add(scoreJuice);
 	}
-	
-	public void deactivateScoreJuice(GameObject scoreJuice)
-	{
-		scoreJuice.SetActive(false);
-		activeScoreJuices.Remove(scoreJuice);
-		inactiveScoreJuices.Add(scoreJuice);
-	}
-
 }

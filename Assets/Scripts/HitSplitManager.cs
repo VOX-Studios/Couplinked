@@ -8,8 +8,8 @@ public class HitSplitManager : MonoBehaviour
 	float spawnTimer = 0f;
 	public GameObject HitSplitPrefab;
 
-	public List<GameObject> activeHitSplits;
-	public List<GameObject> inactiveHitSplits;
+	public List<HitSplit> activeHitSplits;
+	public List<HitSplit> inactiveHitSplits;
 
 	private GameManager _gameManager;
 
@@ -21,8 +21,8 @@ public class HitSplitManager : MonoBehaviour
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
 
-        activeHitSplits = new List<GameObject>();
-		inactiveHitSplits = new List<GameObject>();
+        activeHitSplits = new List<HitSplit>();
+		inactiveHitSplits = new List<HitSplit>();
 
 		Transform parent = GameObject.Find("HitSplitManager").transform;
 		for(int i = 0; i < Common.MaxPerObjectInGame; i++)
@@ -32,7 +32,7 @@ public class HitSplitManager : MonoBehaviour
 			hitSplitComponent.Initialize();
 			hitSplit.transform.parent = parent;
 			hitSplit.SetActive(false);
-			inactiveHitSplits.Add(hitSplit);
+			inactiveHitSplits.Add(hitSplitComponent);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class HitSplitManager : MonoBehaviour
 
 		for(int i = activeHitSplits.Count - 1; i >= 0; i--)
 		{
-			activeHitSplits[i].GetComponent<HitSplit>().Move(time);
+			activeHitSplits[i].Move(time);
 
 
 			if(activeHitSplits[i].transform.position.x < GameManager.LeftX - activeHitSplits[i].gameObject.GetComponent<Renderer>().bounds.size.x)
@@ -76,26 +76,30 @@ public class HitSplitManager : MonoBehaviour
 		int inactiveCount = inactiveHitSplits.Count;
 		if (inactiveCount > 0)
 		{
-			GameObject hitSplit = inactiveHitSplits[inactiveCount - 1];
-			HitSplit hitSplitComponent = hitSplit.GetComponent<HitSplit>();
-			hitSplitComponent.OnSpawn();
-			hitSplitComponent.SetScale(scale);
+			HitSplit hitSplit = inactiveHitSplits[inactiveCount - 1];
+			hitSplit.OnSpawn();
+			hitSplit.SetScale(scale);
 			hitSplit.transform.position = spawnPosition;
 
-			hitSplitComponent.HitSplitFirstType = hitSplitFirstType;
-			hitSplitComponent.HitSplitSecondType = hitSplitSecondType;
+			hitSplit.HitSplitFirstType = hitSplitFirstType;
+			hitSplit.HitSplitSecondType = hitSplitSecondType;
 
 			Color firstHitColor = firstHitNodeColors.OutsideColor;
 			Color secondHitColor = secondHitNodeColors.OutsideColor;
 
-			hitSplitComponent.SetColors(secondHitColor, firstHitColor);
-			hitSplitComponent.FirstHitTeamId = firstHitTeamId;
-			hitSplitComponent.SecondHitTeamId = secondHitTeamId;
-			hitSplitComponent.WasHitOnce = false;
-			hitSplitComponent.WasHitTwice = false;
-			hitSplitComponent.ExplosionPitch = _gameManager.SoundEffectManager.NextPitch();
+			hitSplit.SetColors(secondHitColor, firstHitColor);
+			hitSplit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
+			_gameManager.Grid.ColorManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
+			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, spawnPosition);
 
-			hitSplit.SetActive(true);
+
+			hitSplit.FirstHitTeamId = firstHitTeamId;
+			hitSplit.SecondHitTeamId = secondHitTeamId;
+			hitSplit.WasHitOnce = false;
+			hitSplit.WasHitTwice = false;
+			hitSplit.ExplosionPitch = _gameManager.SoundEffectManager.NextPitch();
+
+			hitSplit.gameObject.SetActive(true);
 
 			inactiveHitSplits.RemoveAt(inactiveCount - 1);
 			activeHitSplits.Add(hitSplit);
@@ -104,15 +108,17 @@ public class HitSplitManager : MonoBehaviour
 
 	public void DeactivateHitSplit(int index)
 	{
-		GameObject hitSplit = activeHitSplits[index];
-		hitSplit.SetActive(false);
+		HitSplit hitSplit = activeHitSplits[index];
+		hitSplit.ReleaseLightIndex();
+		hitSplit.gameObject.SetActive(false);
 		activeHitSplits.RemoveAt(index);
 		inactiveHitSplits.Add(hitSplit);
 	}
 	
-	public void DeactivateHitSplit(GameObject hitSplit)
+	public void DeactivateHitSplit(HitSplit hitSplit)
 	{
-		hitSplit.SetActive(false);
+		hitSplit.ReleaseLightIndex();
+		hitSplit.gameObject.SetActive(false);
 		activeHitSplits.Remove(hitSplit);
 		inactiveHitSplits.Add(hitSplit);
 	}

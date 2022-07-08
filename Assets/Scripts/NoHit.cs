@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.SceneManagers;
+using System;
 using UnityEngine;
 
 public class NoHit : BaseObject
@@ -6,6 +7,9 @@ public class NoHit : BaseObject
     private GameSceneManager _gameSceneManager;
 
 	public float Scale { get; private set; }
+
+	[NonSerialized]
+	public int LightIndex = -1;
 
     // Use this for initialization
     void Start () 
@@ -23,6 +27,13 @@ public class NoHit : BaseObject
 	public void Move(float time) 
 	{
 		transform.position -= new Vector3(Speed * Scale, 0, 0) * time;
+		_GameManager.Grid.ColorManager.SetLightPosition(LightIndex, transform.position);
+	}
+
+	public void ReleaseLightIndex()
+    {
+		_GameManager.Grid.ColorManager.ReleaseLightIndex(LightIndex);
+		LightIndex = -1;
 	}
 
 	void OnTriggerEnter2D(Collider2D other)

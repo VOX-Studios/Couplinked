@@ -8,8 +8,8 @@ public class HitManager : MonoBehaviour
 	float spawnTimer = 0f;
 	public GameObject HitPrefab;
 
-	public List<GameObject> activeHits;
-	public List<GameObject> inactiveHits;
+	public List<Hit> activeHits;
+	public List<Hit> inactiveHits;
 
 	private GameManager _gameManager;
 
@@ -21,8 +21,8 @@ public class HitManager : MonoBehaviour
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
 
-		activeHits = new List<GameObject>();
-		inactiveHits = new List<GameObject>();
+		activeHits = new List<Hit>();
+		inactiveHits = new List<Hit>();
 
 		//TODO: move them to be under bolts
 		Transform parent = GameObject.Find("HitManager").transform;
@@ -34,7 +34,7 @@ public class HitManager : MonoBehaviour
 
 			hit.transform.parent = parent;
 			hit.SetActive(false);
-			inactiveHits.Add(hit);
+			inactiveHits.Add(hitComponent);
 		}
 	}
 	
@@ -49,14 +49,16 @@ public class HitManager : MonoBehaviour
 
 		for(int i = activeHits.Count - 1; i >= 0; i--)
 		{
-			activeHits[i].GetComponent<Hit>().Move(time);
+			activeHits[i].Move(time);
 
 			if(activeHits[i].transform.position.x < GameManager.LeftX - activeHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
 			{
 				DeactivateHit(i);
 
-				if(_gameSceneManager.EndGame(ReasonForGameEndEnum.HitOffScreen))
-                    break;
+				if (_gameSceneManager.EndGame(ReasonForGameEndEnum.HitOffScreen))
+				{
+					break;
+				}
 			}
 
 		}
@@ -76,36 +78,42 @@ public class HitManager : MonoBehaviour
 		)
 	{
 		int inactiveCount = inactiveHits.Count;
-		if(inactiveCount > 0)
-		{
-			GameObject hit = inactiveHits[inactiveCount - 1];
-			Hit hitComponent = hit.GetComponent<Hit>();
-			hitComponent.SetScale(scale);
-			hit.transform.position = spawnPosition;
+		if(inactiveCount == 0)
+        {
+			return;
+        }
 
-			hitComponent.SetColor(nodeColors.OutsideColor);
+		Hit hit = inactiveHits[inactiveCount - 1];
+		hit.SetScale(scale);
+		hit.transform.position = spawnPosition;
+		hit.SetColor(nodeColors.OutsideColor);
 
-			hitComponent.TeamId = teamId;
-			hitComponent.HitType = nodeId;
-			hitComponent.ExplosionPitch = explosionPitch;
+		hit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
+		_gameManager.Grid.ColorManager.SetLightColor(hit.LightIndex, hit.Color);
+		_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, spawnPosition);
 
-			hit.SetActive(true);
-			inactiveHits.RemoveAt(inactiveCount - 1);
-			activeHits.Add(hit);
-		}
+		hit.TeamId = teamId;
+		hit.HitType = nodeId;
+		hit.ExplosionPitch = explosionPitch;
+
+		hit.gameObject.SetActive(true);
+		inactiveHits.RemoveAt(inactiveCount - 1);
+		activeHits.Add(hit);
 	}
 	
 	public void DeactivateHit(int index)
 	{
-		GameObject hit = activeHits[index];
-		hit.SetActive(false);
+		Hit hit = activeHits[index];
+		hit.ReleaseLightIndex();
+		hit.gameObject.SetActive(false);
 		activeHits.RemoveAt(index);
 		inactiveHits.Add(hit);
 	}
 
-	public void DeactivateHit(GameObject hit)
+	public void DeactivateHit(Hit hit)
 	{
-		hit.SetActive(false);
+		hit.ReleaseLightIndex();
+		hit.gameObject.SetActive(false);
 		activeHits.Remove(hit);
 		inactiveHits.Add(hit);
 	}

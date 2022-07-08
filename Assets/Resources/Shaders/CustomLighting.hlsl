@@ -30,30 +30,46 @@ void FUCK_float(UnityTexture2D Image, UnitySamplerState SS, float x, out UnityTe
     Out = Image;
 }
 
-void Shit_float(UnityTexture2D positions, float2 positionScale, UnityTexture2D colors, float2 uv, float lightShrinkFactor, float lightFocusFactor, out float4 Out)
+void Shit_float(UnityTexture2D positions, float2 positionScale, UnityTexture2D colors, float numDataPoints, float2 uv, float lightRange, float lightBrightness, float lightAperture, float lightFocusFactor, float lightPunchOut, out float4 Out)
 {
+    float maxBrightness = 10;
     float4 result = 0;
     float2 pos = 0;
-    for (int i = 0; i < 2; i++)
+    float blackout = 1;
+    for (int i = 0; i < numDataPoints; i++)
     {
-        float2 lookup = float2(i * .5, 0);
+        float2 lookup = float2((i / numDataPoints) + (1 / (numDataPoints * 2)), 0);
         float4 pos = tex2D(positions, lookup);
         float4 color = tex2D(colors, lookup);
+
+        if (color.a == 0)
+        {
+            continue;
+        }
         
-        float lightStrength = distance(uv, pos.xy * positionScale) * lightShrinkFactor;
-        lightStrength = pow(lightStrength, lightFocusFactor);
+        float lightStrength = distance(uv, pos.xy * positionScale);
+        float lightMask = step(lightStrength, lightRange);
+
+        blackout = min(blackout, 1 - step(lightStrength, lightPunchOut));
+
+        float actualBrightness = maxBrightness - lightBrightness;
+        lightStrength *= actualBrightness;
+        lightStrength = pow(lightStrength, lightAperture);
         lightStrength = clamp(lightStrength, 0, 1);
         lightStrength = 1 - lightStrength;
+
+        lightStrength = min(lightStrength, lightFocusFactor);
 
         color *= lightStrength;
         color = clamp(color, 0, 1);
 
+        color *= lightMask;
+
         result += color;
     }
 
+    result *= blackout;
     result = clamp(result, 0, 1);
     Out = result;
 }
-
-
 #endif
