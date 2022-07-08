@@ -293,10 +293,10 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             _nodePair.Nodes[0].transform.position = _convertFromPlaceholderPosition(_node1StartingPosition.position);
             _nodePair.Nodes[1].transform.position = _convertFromPlaceholderPosition(_node2StartingPosition.position);
 
-            _hit1 = _makeHit(playerIndex, HitTypeEnum.Hit1);
+            _hit1 = _makeHit(playerIndex, 0);
             _hit1.transform.position = _convertFromPlaceholderPosition(_hit1StartingPosition.position);
 
-            _hit2 = _makeHit(playerIndex, HitTypeEnum.Hit2);
+            _hit2 = _makeHit(playerIndex, 1);
             _hit2.transform.position = _convertFromPlaceholderPosition(_hit2StartingPosition.position);
         }
 
@@ -324,7 +324,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             }
         }
 
-        private Hit _makeHit(int playerIndex, HitTypeEnum hitType)
+        private Hit _makeHit(int playerIndex, int hitType)
         {
             GameObject hitGameObject = GameObject.Instantiate(_hitPrefab);
             hitGameObject.transform.SetParent(_foreground, false);
@@ -334,7 +334,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
             CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
 
-            hitComponent.SetColor(playerColorData.NodeColors[(int)hitType].OutsideColor.Get());
+            hitComponent.SetColor(playerColorData.NodeColors[hitType].OutsideColor.Get());
 
             return hitComponent;
         }
@@ -355,8 +355,8 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
             node1.TeamId = playerIndex;
             node2.TeamId = playerIndex;
-            node1.HitType = HitTypeEnum.Hit1;
-            node2.HitType = HitTypeEnum.Hit2;
+            node1.NodeId = 0;
+            node2.NodeId = 1;
 
             CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[playerIndex];
            

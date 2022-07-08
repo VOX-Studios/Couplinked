@@ -98,13 +98,13 @@ class SurvivalHandler : IGameModeHandler
 
     private void _handleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
     {
-        if (numRows <= 5)
+        if (numRows <= 3)
         {
             _scale = 1f;
         }
         else
         {
-            _scale = 5f / numRows;
+            _scale = 3f / numRows;
         }
 
         foreach (NodePairing nodePair in nodePairs)
@@ -113,6 +113,7 @@ class SurvivalHandler : IGameModeHandler
         }
 
         explosionManager.SetScale(_scale);
+        _gameSceneManager.CameraShake.Scale = _scale;
     }
 
     public void Initialize()
@@ -140,6 +141,7 @@ class SurvivalHandler : IGameModeHandler
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
+                nodePairings: _nodePairs,
                 rowPositions: _rowPositions,
                 scale: _scale
                 );

@@ -4,7 +4,7 @@ public class Hit : BaseObject
 {
 	private IHitCollisionHandler _hitCollisionHandler;
 
-	public HitTypeEnum HitType;
+	public int HitType;
 	public int TeamId;
 	public float Scale;
 
@@ -49,7 +49,9 @@ public class Hit : BaseObject
 	
 	public void Move(float time) 
 	{
-		transform.position -= new Vector3 (Speed, 0, 0) * time;
+		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
+		//_GameManager.Grid.Logic.ApplyDirectedForce(new Vector3(-Speed * Scale, 0, 0).normalized * 3f * time * (1 + Scale), transform.position, .5f * Scale);
+		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);
 	}
 	
 	void OnTriggerEnter2D(Collider2D other)

@@ -11,6 +11,9 @@ public class Grid : MonoBehaviour
 	[SerializeField]
 	private GameObject _lineRendererPrefab;
 
+	[SerializeField]
+	private Material _gridMaterial;
+
 	private LineRenderer[] _lineRenderersVertical;
 	private LineRenderer[] _lineRenderersHorizontal;
 
@@ -60,6 +63,7 @@ public class Grid : MonoBehaviour
 			lineRenderer.transform.parent = transform;
 			_lineRenderersVertical[i] = lineRenderer.GetComponent<LineRenderer>();
 			_lineRenderersVertical[i].positionCount = _ySize;
+			_lineRenderersVertical[i].material = _gridMaterial;
 		}
 
 		for (int i = 0; i < _lineRenderersHorizontal.Length; i++)
@@ -68,21 +72,37 @@ public class Grid : MonoBehaviour
 			lineRenderer.transform.parent = transform;
 			_lineRenderersHorizontal[i] = lineRenderer.GetComponent<LineRenderer>();
 			_lineRenderersHorizontal[i].positionCount = _xSize;
+			_lineRenderersHorizontal[i].material = _gridMaterial;
 		}
 
 		//pulling first player grid color since we don't support different color grids
 		Color gridColor = _gameManager.DataManager.PlayerColors[0].GridColor.Get();
 		SetColor(gridColor);
-		
 	}
 
 	public void SetColor(Color color)
     {
-		foreach(LineRenderer lineRenderer in _lineRenderersVertical)
-			lineRenderer.material.SetColor("_Color", color);
+		_gridMaterial.SetColor("_Color", color);
+	}
 
-		foreach (LineRenderer lineRenderer in _lineRenderersHorizontal)
-			lineRenderer.material.SetColor("_Color", color);
+	public void SetLightPosition(Vector2 worldPosition, Vector2 worldPosition2, Color color, Color color2)
+    {
+        Vector3 screenPosition = Camera.main.WorldToViewportPoint(worldPosition);
+		Vector3 screenPosition2 = Camera.main.WorldToViewportPoint(worldPosition2);
+		Texture2D texture2D = new Texture2D(2, 1);
+		texture2D.filterMode = FilterMode.Point;
+		texture2D.SetPixel(0, 0, new Color(screenPosition.x, screenPosition.y, 0)); //TODO: handle H > W
+		texture2D.SetPixel(1, 0, new Color(screenPosition2.x, screenPosition2.y, 0)); //TODO: handle H > W
+		texture2D.Apply();
+
+		Texture2D colorTexture2D = new Texture2D(2, 1);
+		colorTexture2D.filterMode = FilterMode.Point;
+		colorTexture2D.SetPixel(0, 0, color);
+		colorTexture2D.SetPixel(1, 0, color2);
+		colorTexture2D.Apply();
+
+		_gridMaterial.SetTexture("_Positions", texture2D);
+		_gridMaterial.SetTexture("_Colors", colorTexture2D);
 	}
 
 	private void _clear()

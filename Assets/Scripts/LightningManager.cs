@@ -49,14 +49,12 @@ public class LightningManager : MonoBehaviour
         _scale = scale;
 
         _connectorLine.startWidth *= scale;
-        _connectorLine.endWidth *= scale;
 
         _collider.size = new Vector2(_collider.size.x, _collider.size.y * scale);
 
         foreach (LineRenderer bolt in _inactiveBolts)
         {
             bolt.startWidth *= scale;
-            bolt.endWidth *= scale;
         }
     }    
 

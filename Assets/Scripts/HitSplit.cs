@@ -19,14 +19,17 @@ public class HitSplit : BaseObject
 
 	public int FirstHitTeamId;
 	public int SecondHitTeamId;
-	public HitTypeEnum HitSplitFirstType;
-	public HitTypeEnum HitSplitSecondType;
+	public int HitSplitFirstType;
+	public int HitSplitSecondType;
 	public bool WasHitOnce = false;
 	public bool WasHitTwice = false;
 
 	public float Scale { get; private set; }
 
 	private MaterialPropertyBlock _propertyBlock;
+
+	public Color InsideColor { get; private set; }
+	public Color OutsideColor { get; private set; }
 
 	// Use this for initialization
 	public void Initialize() 
@@ -51,6 +54,8 @@ public class HitSplit : BaseObject
 
 	public void SetColors(Color insideColor, Color outsideColor)
 	{
+		InsideColor = insideColor;
+		OutsideColor = outsideColor;
 		_setInsideColor(_blurInsideSpriteRenderer, insideColor);
 		_setInsideColor(_insideSpriteRenderer, insideColor);
 
@@ -80,10 +85,9 @@ public class HitSplit : BaseObject
 		renderer.SetPropertyBlock(_propertyBlock);
 	}
 
-
 	public void Move(float time) 
 	{
-		transform.position -= new Vector3 (Speed, 0, 0) * time;
+		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
 	}
 	
 	void OnTriggerEnter2D(Collider2D other)

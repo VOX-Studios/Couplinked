@@ -19,7 +19,7 @@ namespace Assets.Scripts.SceneManagers
 
         private float _resumeCount;
 
-        private CameraShake _cameraShake;
+        public CameraShake CameraShake;
 
         [SerializeField]
         private NoHitManager _noHitManager;
@@ -51,7 +51,7 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private Transform _foreground;
 
-        private NodePairing[] _nodePairs;
+        public NodePairing[] _nodePairs;
         private GameInput[][] _gameInputs;
 
         void Start()
@@ -68,7 +68,7 @@ namespace Assets.Scripts.SceneManagers
                 _setupMultiplayer();
             }
 
-            _cameraShake = new CameraShake();
+            CameraShake = new CameraShake();
 
             _hitManager.Initialize();
             _noHitManager.Initialize();
@@ -78,7 +78,7 @@ namespace Assets.Scripts.SceneManagers
 
             _gameManager.isPaused = false;
             _gameManager.isResuming = false;
-            _cameraShake.Initialize(_gameManager);
+            CameraShake.Initialize(_gameManager);
 
             _gameManager.score = 0;
             _gameManager.ringsCollected = 0;
@@ -179,7 +179,7 @@ namespace Assets.Scripts.SceneManagers
                 Node node = nodeGameObject.GetComponent<Node>();
 
                 node.TeamId = teamIndex;
-                node.HitType = (HitTypeEnum)i; //TODO: this won't work past i = 1
+                node.NodeId = i;
 
                 _setupNodeTrail(node.ParticleSystem);
 
@@ -344,6 +344,13 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.isPaused)
                 return;
 
+            _gameManager.Grid.SetLightPosition(
+                _nodePairs[0].Nodes[0].transform.position, 
+                _nodePairs[0].Nodes[1].transform.position,
+                _gameManager.ColorManager.DefaultPlayerColors[0].NodeColors[0].OutsideColor,
+                _gameManager.ColorManager.DefaultPlayerColors[0].NodeColors[1].OutsideColor
+                );
+
             _gameManager.TimePlayedMilliseconds += Time.deltaTime * 1000;
 
             //Handle time formatting
@@ -381,7 +388,7 @@ namespace Assets.Scripts.SceneManagers
             _explosionManager.Run();
             _scoreJuiceManager.Run(Time.deltaTime);
 
-            _cameraShake.Run(Time.deltaTime);
+            CameraShake.Run(Time.deltaTime);
 
             _scoreText.text = _gameManager.score.ToString();
 
@@ -484,7 +491,7 @@ namespace Assets.Scripts.SceneManagers
             _resumeCountText.gameObject.SetActive(false);
 
             _gameManager.PotentialMaxSurvivalScore = 0;
-            _cameraShake.ClearShake();
+            CameraShake.ClearShake();
             _gameManager.ReasonForGameEnd = ReasonForGameEndEnum.None;
 
             _gameManager.SoundEffectManager.ResetVolume();
@@ -492,12 +499,12 @@ namespace Assets.Scripts.SceneManagers
 
         public void Shake()
         {
-            _cameraShake.StartShake(.35f);
+            CameraShake.StartShake(.35f);
         }
 
         public Vector3 GetCamOriginalPos()
         {
-            return _cameraShake.OriginalPos;
+            return CameraShake.OriginalPos;
         }
 
         private void _clearGame()
@@ -533,7 +540,7 @@ namespace Assets.Scripts.SceneManagers
             }
 
             _gameManager.SetStatistics();
-            _cameraShake.ClearShake();
+            CameraShake.ClearShake();
         }
 
         /// <summary>
@@ -543,6 +550,12 @@ namespace Assets.Scripts.SceneManagers
         /// <param name="reasonForGameEnd">Reason for game end.</param>
         public bool EndGame(ReasonForGameEndEnum reasonForGameEnd)
         {
+            //TODO: reenable this when we're done testing
+            if (reasonForGameEnd != ReasonForGameEndEnum.Win)
+            {
+                return false;
+            }            
+
             _gameManager.ReasonForGameEnd = reasonForGameEnd;
 
             if (_gameManager.CurrentLevel != null)

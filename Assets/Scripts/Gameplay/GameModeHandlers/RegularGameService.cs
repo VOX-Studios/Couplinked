@@ -53,7 +53,8 @@ class RegularGameService
 
             for (int i = 0; i < nodePair.Nodes.Count; i++)
             {
-                Vector2 nodeVelocity = gameInput.MoveInput(i);
+                float boostValue = Mathf.Max(1, gameInput.BoostInput(i) * 1.5f);
+                Vector2 nodeVelocity = gameInput.MoveInput(i) * nodePair.Nodes[i].Scale * boostValue;
 
                 _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
 
@@ -67,7 +68,8 @@ class RegularGameService
             for(int i = 0; i < gameInputs.Length; i++)
             {
                 GameInput gameInput = gameInputs[i];
-                Vector2 nodeVelocity = gameInput.MoveInput((int)MoveInputEnum.MoveInputCombined);
+                float boostValue = Mathf.Max(1, gameInput.BoostInput((int)BoostInputEnum.BoostInputCombined) * 1.5f);
+                Vector2 nodeVelocity = gameInput.MoveInput((int)MoveInputEnum.MoveInputCombined) * nodePair.Nodes[i].Scale * boostValue;
 
                 _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
 
@@ -95,7 +97,7 @@ class RegularGameService
         Node node = other.GetComponent<Node>();
 
         //if the appropriate node was hit
-        if (hit.TeamId == node.TeamId && node.HitType == hit.HitType)
+        if (hit.TeamId == node.TeamId && node.NodeId == hit.HitType)
         {
             _gameManager.PlayExplosionSound(hit.ExplosionPitch);
 
@@ -106,10 +108,10 @@ class RegularGameService
 
             switch (hit.HitType)
             {
-                case HitTypeEnum.Hit1:
+                case 0:
                     _gameManager.Hit1HitCount++;
                     break;
-                case HitTypeEnum.Hit2:
+                case 1:
                     _gameManager.Hit2HitCount++;
                     break;
             }
@@ -143,16 +145,16 @@ class RegularGameService
     private void _onHitSplitFirstHit(HitSplit hitSplit, Node node)
     {
         //if the appropriate node was hit
-        if (hitSplit.FirstHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitFirstType)
+        if (hitSplit.FirstHitTeamId == node.TeamId && node.NodeId == hitSplit.HitSplitFirstType)
         {
             _gameManager.PlayExplosionSound(hitSplit.ExplosionPitch);
 
             switch (hitSplit.HitSplitFirstType)
             {
-                case HitTypeEnum.Hit1:
+                case 0:
                     _gameManager.HitSplit1HitCount++;
                     break;
-                case HitTypeEnum.Hit2:
+                case 1:
                     _gameManager.HitSplit2HitCount++;
                     break;
             }
@@ -164,7 +166,9 @@ class RegularGameService
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
 
-            hitSplit.SetColors(_getHitSplitColor(hitSplit.HitSplitSecondType, hitSplit.SecondHitTeamId));
+            hitSplit.SetColors(
+                outsideColor: hitSplit.InsideColor
+                );
         }
         else //hit the wrong node first
         {
@@ -176,15 +180,15 @@ class RegularGameService
     private void _onHitSplitSecondHit(HitSplit hitSplit, Node node)
     {
         //if the appropriate second node was hit
-        if (hitSplit.SecondHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitSecondType)
+        if (hitSplit.SecondHitTeamId == node.TeamId && node.NodeId == hitSplit.HitSplitSecondType)
         {
             _gameManager.PlayExplosionSound(hitSplit.ExplosionPitch);
             switch (hitSplit.HitSplitFirstType)
             {
-                case HitTypeEnum.Hit1:
+                case 0:
                     _gameManager.Hit1HitCount++;
                     break;
-                case HitTypeEnum.Hit2:
+                case 1:
                     string unlockMessage = "";
                     if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_Twisted, out unlockMessage))
                         _gameManager.NotificationManager.QueueNotification(unlockMessage);
@@ -201,7 +205,7 @@ class RegularGameService
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
         }
-        else if(hitSplit.FirstHitTeamId == node.TeamId && node.HitType == hitSplit.HitSplitFirstType) //it's the same node as the first hit
+        else if(hitSplit.FirstHitTeamId == node.TeamId && node.NodeId == hitSplit.HitSplitFirstType) //it's the same node as the first hit
         {
             //DO NOTHING
         }
@@ -253,15 +257,8 @@ class RegularGameService
         }
     }
 
-    private Color _getHitSplitColor(HitTypeEnum hitType, int teamId)
+    private Color _getExplosionColor(int nodeId, int teamId)
     {
-        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[(int)hitType].OutsideColor.Get(); //TODO: don't do this per spawn
+        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[nodeId].ParticleColor.Get(); //TODO: don't do this per explosion
     }
-
-    private Color _getExplosionColor(HitTypeEnum hitType, int teamId)
-    {
-        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[(int)hitType].ParticleColor.Get(); //TODO: don't do this per explosion
-    }
-
-
 }

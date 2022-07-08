@@ -36,7 +36,8 @@ class LevelHandler : IGameModeHandler
 
     private RegularGameService _gameService;
 
-    private PlayerColors[] _playerColors;
+    private NodeColors[] _nodeColors;
+
 
     public LevelHandler(
         GameManager gameManager, 
@@ -70,13 +71,15 @@ class LevelHandler : IGameModeHandler
     public void Initialize()
     {
         //if multiplayer
-        if(_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+        if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
         {
-            _playerColors = _gameManager.ColorManager.DefaultPlayerColors.Select(defaultPlayerColors => new PlayerColors(defaultPlayerColors)).ToArray();
+            _nodeColors = _gameManager.ColorManager.DefaultPlayerColors.Take(2)
+                .Select(defaultPlayerColors=> new NodeColors(defaultPlayerColors.NodeColors[0]))
+                .ToArray();
         }
-        else
+        else //singleplayer
         {
-            _playerColors = _gameManager.DataManager.PlayerColors.Select(customPlayerColors => new PlayerColors(customPlayerColors)).ToArray();
+            _nodeColors = _gameManager.DataManager.PlayerColors[0].NodeColors.Select(nodeColorData => new NodeColors(nodeColorData)).ToArray();
         }
 
         _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
@@ -124,13 +127,10 @@ class LevelHandler : IGameModeHandler
 
         foreach(NodePairing nodePair in nodePairs)
         {
-            foreach(Node node in nodePair.Nodes)
-            {
-                node.transform.localScale = new Vector3(_scale, _scale, 1);
-            }
-
-            nodePair.LightningManager.SetScale(_scale);
+            nodePair.SetScale(_scale);
         }
+
+        _gameSceneManager.CameraShake.Scale = _scale;
     }
 
 
@@ -164,39 +164,37 @@ class LevelHandler : IGameModeHandler
 
             int teamId = 0;
 
-            PlayerColors playerColors = _playerColors[teamId];
-
             switch (objectData.ObjectType)
             {
                 case ObjectTypeEnum.NoHit:
                     _noHitManager.SpawnNoHit(pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit1:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit1, teamId, playerColors, pos, _scale);
+                    _hitManager.SpawnHit(0, teamId, _nodeColors[0], pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit2:
-                    _hitManager.SpawnHit(HitTypeEnum.Hit2, teamId, playerColors, pos, _scale);
+                    _hitManager.SpawnHit(1, teamId, _nodeColors[1], pos, _scale);
                     break;
                 case ObjectTypeEnum.HitSplit1:
                     _hitSplitManager.SpawnHitSplit(
-                        hitSplitFirstType: HitTypeEnum.Hit1,
-                        hitSplitSecondType: HitTypeEnum.Hit2,
+                        hitSplitFirstType: 0,
+                        hitSplitSecondType: 1,
                         firstHitTeamId: teamId,
                         secondHitTeamId: teamId,
-                        firstHitPlayerColors: playerColors,
-                        secondHitPlayerColors: playerColors,
+                        firstHitNodeColors: _nodeColors[0],
+                        secondHitNodeColors: _nodeColors[1],
                         spawnPosition: pos,
                         scale: _scale
                         );
                     break;
                 case ObjectTypeEnum.HitSplit2:
                     _hitSplitManager.SpawnHitSplit(
-                       hitSplitFirstType: HitTypeEnum.Hit2,
-                       hitSplitSecondType: HitTypeEnum.Hit1,
+                       hitSplitFirstType: 1,
+                       hitSplitSecondType: 0,
                        firstHitTeamId: teamId,
                        secondHitTeamId: teamId,
-                       firstHitPlayerColors: playerColors,
-                       secondHitPlayerColors: playerColors,
+                       firstHitNodeColors: _nodeColors[1],
+                       secondHitNodeColors: _nodeColors[0],
                        spawnPosition: pos,
                        scale: _scale
                        );

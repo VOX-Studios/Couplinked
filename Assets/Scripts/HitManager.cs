@@ -61,15 +61,15 @@ public class HitManager : MonoBehaviour
 
 		}
 	}
-	public void SpawnHit(HitTypeEnum hitType, int teamId, PlayerColors playerColors, Vector3 position, float scale)
+	public void SpawnHit(int nodeId, int teamId, NodeColors nodeColors, Vector3 position, float scale)
 	{
-		_activateHit(hitType, teamId, playerColors, position, scale, _gameManager.SoundEffectManager.NextPitch());
+		_activateHit(nodeId, teamId, nodeColors, position, scale, _gameManager.SoundEffectManager.NextPitch());
 	}
 
 	private void _activateHit(
-		HitTypeEnum hitType, 
+		int nodeId, 
 		int teamId,
-		PlayerColors playerColors,  
+		NodeColors nodeColors,  
 		Vector3 spawnPosition,
 		float scale,
 		SoundEffectManager.PitchToPlay explosionPitch
@@ -83,10 +83,10 @@ public class HitManager : MonoBehaviour
 			hitComponent.SetScale(scale);
 			hit.transform.position = spawnPosition;
 
-			hitComponent.SetColor(playerColors.NodeColors[(int)hitType].OutsideColor);
+			hitComponent.SetColor(nodeColors.OutsideColor);
 
 			hitComponent.TeamId = teamId;
-			hitComponent.HitType = hitType;
+			hitComponent.HitType = nodeId;
 			hitComponent.ExplosionPitch = explosionPitch;
 
 			hit.SetActive(true);

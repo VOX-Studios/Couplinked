@@ -5,8 +5,7 @@ using System;
 using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
-{
-	public InputActionAsset InputActions;
+{	public InputActionAsset InputActions;
 	public InputActionAsset DefaultInputActions;
 	public SteamStatsAndAchievements SteamStatsAndAchievementsManager;
 
@@ -499,7 +498,6 @@ public class GameManager : MonoBehaviour
 
 	public bool IsNewLevel;
 
-	public GameObject LinePrefab;
 	public GameObject ActivityIndicatorPrefab;
 
 	public AudioManager AudioManager;

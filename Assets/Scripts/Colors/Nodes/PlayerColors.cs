@@ -6,21 +6,13 @@ public class PlayerColors
 
     public PlayerColors(DefaultPlayerColors defaultPlayerColors)
     {
-        NodeColors = defaultPlayerColors.NodeColors.Select(nodeColors => new NodeColors()
-        {
-            InsideColor = nodeColors.InsideColor,
-            OutsideColor = nodeColors.OutsideColor,
-            ParticleColor = nodeColors.ParticleColor,
-        }).ToArray();
+        NodeColors = defaultPlayerColors.NodeColors.Select(defaultNodeColors => new NodeColors(defaultNodeColors))
+            .ToArray();
     }
 
     public PlayerColors(CustomPlayerColorData customPlayerColorData)
     {
-        NodeColors = customPlayerColorData.NodeColors.Select(nodeColors => new NodeColors()
-        {
-            InsideColor = nodeColors.InsideColor.Get(),
-            OutsideColor = nodeColors.OutsideColor.Get(),
-            ParticleColor = nodeColors.ParticleColor.Get(),
-        }).ToArray();
+        NodeColors = customPlayerColorData.NodeColors.Select(nodeColorData => new NodeColors(nodeColorData))
+            .ToArray();
     }
 }

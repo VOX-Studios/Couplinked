@@ -5,15 +5,16 @@ public class Node : MonoBehaviour
     public SpriteRenderer SpriteRenderer;
     public ParticleSystem ParticleSystem;
     public SpriteRenderer BlurSpriteRenderer;
-    public HitTypeEnum HitType;
+    public int NodeId;
     public int TeamId;
-    public float Scale { get; set; } 
+    public float Scale { get; private set; } 
 
     private MaterialPropertyBlock _propertyBlock;
 
     private void Awake()
     {
         _propertyBlock = new MaterialPropertyBlock();
+        Scale = 1;
     }
 
     public void SetScale(float scale)

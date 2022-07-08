@@ -22,7 +22,7 @@ public class NoHit : BaseObject
 
 	public void Move(float time) 
 	{
-		transform.position -= new Vector3(Speed, 0, 0) * time;
+		transform.position -= new Vector3(Speed * Scale, 0, 0) * time;
 	}
 
 	void OnTriggerEnter2D(Collider2D other)

@@ -17,6 +17,8 @@ public class CameraShake
 
 	//strength of the shake
 	private float _shakeStrength = .25f;
+
+	public float Scale = 1;
 	
 	public void Initialize(GameManager gameManager)
 	{
@@ -60,17 +62,23 @@ public class CameraShake
 	{
 		if (_shakeTimeRemaining > 0)
 		{
-			_camTransform.position = OriginalPos + Random.insideUnitSphere * _shakeStrength * (_shakeTimeRemaining / _shakeTime);
+			_camTransform.position = OriginalPos + Random.insideUnitSphere * _shakeStrength * Scale * (_shakeTimeRemaining / _shakeTime);
 			_shakeTimeRemaining -= deltaTime;
 		}
 		else
 		{
 			_shakeTimeRemaining = 0f;
 			_shakeTime = 0f;
+			
+			//move towards the original position
 			_camTransform.position = Vector3.Lerp(_camTransform.position, OriginalPos, deltaTime);
 
+			//if we're close enough to where we should be
 			if (Vector3.SqrMagnitude(_camTransform.position - OriginalPos) < .001f)
+			{
+				//just snap to the position
 				_camTransform.position = OriginalPos;
+			}
 		}
 	}
 }

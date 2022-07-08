@@ -24,6 +24,42 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Move Combined",
+                    "type": "Value",
+                    "id": "7c778ff8-c0cb-41d2-88b1-822030521f92",
+                    "expectedControlType": "Dpad",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Boost 1",
+                    "type": "Value",
+                    "id": "8ca87a33-e8e5-469d-a17f-1d2af6c60c59",
+                    "expectedControlType": "Analog",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Boost 2",
+                    "type": "Value",
+                    "id": "20af3575-4940-40de-b57c-2c0fdb258ab0",
+                    "expectedControlType": "Analog",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Boost Combined",
+                    "type": "Value",
+                    "id": "de8671ca-70d6-44b1-9447-0e3f72d692f3",
+                    "expectedControlType": "Analog",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Pause",
                     "type": "Button",
                     "id": "a3ea3228-9222-44cd-8fb3-ddbca344b58e",
@@ -49,15 +85,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Move Combined",
-                    "type": "Value",
-                    "id": "7c778ff8-c0cb-41d2-88b1-822030521f92",
-                    "expectedControlType": "Dpad",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -348,6 +375,94 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "",
+                    "id": "9904814e-9be6-48fd-ae10-0512f7e10e3e",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "589c9c77-c286-46ed-984d-08f4e42aec24",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Unpause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4489c2b8-74e7-42aa-95b3-56191e5ccdb5",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d8f1723-0543-40f4-994b-b626c8b87111",
+                    "path": "<Keyboard>/space",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ece1c7fd-8ee7-4a95-8fd5-1269a1da5d60",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a7a3b3e0-b719-490c-b144-117b49ca91d1",
+                    "path": "<Keyboard>/rightCtrl",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d08769ff-84d0-48b4-b708-881f38978299",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18f024bb-c660-4143-8b06-56325ba32cd5",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "Keyboard",
                     "id": "802afc91-404b-41b7-a7f6-e4e5d20397ca",
                     "path": "2DVector",
@@ -547,23 +662,67 @@
                 },
                 {
                     "name": "",
-                    "id": "9904814e-9be6-48fd-ae10-0512f7e10e3e",
-                    "path": "<Gamepad>/buttonEast",
+                    "id": "b6551630-6c9f-43e7-9f43-2376943e4c11",
+                    "path": "<Keyboard>/leftCtrl",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Pause",
+                    "action": "Boost Combined",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "589c9c77-c286-46ed-984d-08f4e42aec24",
-                    "path": "<Gamepad>/buttonSouth",
+                    "id": "1d71a90b-35bc-4988-b33c-7629c290b1bc",
+                    "path": "<Keyboard>/space",
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "Unpause",
+                    "action": "Boost Combined",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d21b54be-0f28-4ee0-a406-1f1e75c31324",
+                    "path": "<Keyboard>/numpad0",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost Combined",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3fa45bd3-be5c-4942-8170-28fdc4e3d515",
+                    "path": "<Keyboard>/rightCtrl",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost Combined",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f8334148-6890-4cc6-8ce1-54e2a90e495a",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost Combined",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "649a8d71-e196-4099-8917-585df811a757",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Boost Combined",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

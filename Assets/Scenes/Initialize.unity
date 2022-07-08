@@ -5313,6 +5313,7 @@ MonoBehaviour:
   - {fileID: 1422709656}
   - {fileID: 1652341431}
   - {fileID: 440321108}
+  DefaultGridColor: {r: 0, g: 0, b: 0.039, a: 1}
 --- !u!1 &737616379
 GameObject:
   m_ObjectHideFlags: 0
@@ -10781,8 +10782,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InsideColor: {r: 0.050980393, g: 0.32941177, b: 0, a: 1}
-  OutsideColor: {r: 0, g: 0.627451, b: 0, a: 1}
-  ParticleColor: {r: 0, g: 0.48235294, b: 0.050980393, a: 1}
+  OutsideColor: {r: 0, g: 0.6320754, b: 0.12577012, a: 1}
+  ParticleColor: {r: 0, g: 0.5943396, b: 0.06281632, a: 1}
 --- !u!1 &1344897322
 GameObject:
   m_ObjectHideFlags: 0
@@ -11103,6 +11104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lineRendererPrefab: {fileID: 42735209516960663, guid: 3a4b3b96c613ca046ae69023cc2280a9,
     type: 3}
+  _gridMaterial: {fileID: 2100000, guid: ba3c6e5a99d4fad4f8450f4406cbd203, type: 2}
 --- !u!1 &1610350805
 GameObject:
   m_ObjectHideFlags: 0
@@ -11400,7 +11402,6 @@ MonoBehaviour:
   ReasonForGameEnd: 0
   TheLevelSelectionMode: 0
   IsNewLevel: 0
-  LinePrefab: {fileID: 100000, guid: 7a154be22bbabfd4a8cd9c806f572233, type: 3}
   ActivityIndicatorPrefab: {fileID: 100000, guid: 35985ec41d2da2e499c63a85c24236cb,
     type: 3}
   AudioManager: {fileID: 2131765397}
@@ -16851,8 +16852,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InsideColor: {r: 0, g: 0.78039217, b: 0.37254903, a: 1}
-  OutsideColor: {r: 0.37254903, g: 1, b: 0.6313726, a: 1}
-  ParticleColor: {r: 0.0627451, g: 1, b: 0.42745098, a: 1}
+  OutsideColor: {r: 0.5330188, g: 1, b: 0.5873892, a: 1}
+  ParticleColor: {r: 0.2569865, g: 0.990566, b: 0.30916587, a: 1}
 --- !u!1 &2018900667
 GameObject:
   m_ObjectHideFlags: 0

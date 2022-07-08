@@ -30,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8521774271662656646}
   - {fileID: 8521774272328775576}
@@ -137,10 +138,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ee0662020610f547aaa20a3756aac83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PointLight: {fileID: 0}
   SpriteRenderer: {fileID: 8521774271621704264}
   ParticleSystem: {fileID: 8521774271662656644}
   BlurSpriteRenderer: {fileID: 8521774272328775575}
-  HitType: 0
+  NodeId: 0
   TeamId: 0
 --- !u!1 &8521774271662656647
 GameObject:
@@ -170,6 +172,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8521774271621704268}
   m_RootOrder: 0
@@ -4994,6 +4997,7 @@ ParticleSystemRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 3
+  m_MeshDistribution: 0
   m_SortMode: 0
   m_MinParticleSize: 0
   m_MaxParticleSize: 1
@@ -5017,6 +5021,10 @@ ParticleSystemRenderer:
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
+  m_MeshWeighting: 1
+  m_MeshWeighting1: 1
+  m_MeshWeighting2: 1
+  m_MeshWeighting3: 1
   m_MaskInteraction: 0
 --- !u!1 &8521774272328775577
 GameObject:
@@ -5045,6 +5053,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8521774271621704268}
   m_RootOrder: 1

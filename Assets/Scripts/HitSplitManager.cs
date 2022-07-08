@@ -63,41 +63,18 @@ public class HitSplitManager : MonoBehaviour
 	}
 
 	public void SpawnHitSplit(
-		HitTypeEnum hitSplitFirstType,
-		HitTypeEnum hitSplitSecondType,
+		int hitSplitFirstType,
+		int hitSplitSecondType,
 		int firstHitTeamId,
 		int secondHitTeamId,
-		PlayerColors firstHitPlayerColors,
-		PlayerColors secondHitPlayerColors,
-		Vector3 spawnPosition,
-		float scale
-		)
-	{
-		_activateHitSplit(
-			hitSplitFirstType: hitSplitFirstType,
-			hitSplitSecondType: hitSplitSecondType,
-			firstHitTeamId: firstHitTeamId,
-			secondHitTeamId: secondHitTeamId,
-			firstHitPlayerColors: firstHitPlayerColors,
-			secondHitPlayerColors: secondHitPlayerColors,
-			spawnPosition: spawnPosition,
-			scale: scale
-			);
-	}
-	
-	private void _activateHitSplit(
-		HitTypeEnum hitSplitFirstType,
-		HitTypeEnum hitSplitSecondType,
-		int firstHitTeamId,
-		int secondHitTeamId,
-		PlayerColors firstHitPlayerColors,
-		PlayerColors secondHitPlayerColors,
+		NodeColors firstHitNodeColors,
+		NodeColors secondHitNodeColors,
 		Vector3 spawnPosition,
 		float scale
 		)
 	{
 		int inactiveCount = inactiveHitSplits.Count;
-		if(inactiveCount > 0)
+		if (inactiveCount > 0)
 		{
 			GameObject hitSplit = inactiveHitSplits[inactiveCount - 1];
 			HitSplit hitSplitComponent = hitSplit.GetComponent<HitSplit>();
@@ -108,8 +85,8 @@ public class HitSplitManager : MonoBehaviour
 			hitSplitComponent.HitSplitFirstType = hitSplitFirstType;
 			hitSplitComponent.HitSplitSecondType = hitSplitSecondType;
 
-			Color firstHitColor = firstHitPlayerColors.NodeColors[(int)hitSplitFirstType].OutsideColor;
-			Color secondHitColor = secondHitPlayerColors.NodeColors[(int)hitSplitSecondType].OutsideColor;
+			Color firstHitColor = firstHitNodeColors.OutsideColor;
+			Color secondHitColor = secondHitNodeColors.OutsideColor;
 
 			hitSplitComponent.SetColors(secondHitColor, firstHitColor);
 			hitSplitComponent.FirstHitTeamId = firstHitTeamId;
