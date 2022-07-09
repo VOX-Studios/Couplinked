@@ -14,7 +14,7 @@ public class GridColorManager
 
 	private int _numDataPoints;
 	private int _textureWidth;
-	private readonly int _texelSize = 2; //minimum value is 2
+	private readonly int _texelSize = 1;
 
 	public GridColorManager(Material gridMaterial)
     {

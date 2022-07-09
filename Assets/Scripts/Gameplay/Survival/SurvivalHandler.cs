@@ -20,7 +20,7 @@ class SurvivalHandler : IGameModeHandler
     /// </summary>
     private double _minSpawnInterval = .5;
 
-    private byte _numberOfRows = 5;
+    private byte _numberOfRows = 5; //TODO: handle new lighting system scaling to match
     private float[] _rowPositions;
     private float _scale;
 

@@ -388,9 +388,9 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     return;
             }
 
-            noHitManager.Run(Time.deltaTime);
-            hitManager.Run(Time.deltaTime);
-            hitSplitManager.Run(Time.deltaTime);
+            noHitManager.Run(true, Time.deltaTime);
+            hitManager.Run(true, Time.deltaTime);
+            hitSplitManager.Run(true, Time.deltaTime);
             _explosionManager.Run();
 
             _nodePair.LightningManager.Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);

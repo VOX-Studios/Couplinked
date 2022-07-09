@@ -38,7 +38,7 @@ void Shit_float(UnityTexture2D positions, float2 positionScale, UnityTexture2D c
     float blackout = 1;
     for (int i = 0; i < numDataPoints; i++)
     {
-        float2 lookup = float2((i / numDataPoints) + (1 / (numDataPoints * 2)), 0);
+        float2 lookup = float2((i + .5) / numDataPoints, 0);
         float4 pos = tex2D(positions, lookup);
         float4 color = tex2D(colors, lookup);
 

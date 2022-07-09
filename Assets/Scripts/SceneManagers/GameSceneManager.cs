@@ -349,10 +349,6 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            //Don't update if we're paused
-            if (_gameManager.isPaused)
-                return;
-
             foreach (NodePairing nodePairing in _nodePairs)
             {
                 foreach (Node node in nodePairing.Nodes)
@@ -382,6 +378,14 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
+            _noHitManager.Run(_gameManager.isPaused, Time.deltaTime);
+            _hitManager.Run(_gameManager.isPaused, Time.deltaTime);
+            _hitSplitManager.Run(_gameManager.isPaused, Time.deltaTime);
+
+            //nothing left to do if we're paused
+            if (_gameManager.isPaused)
+                return;
+
             //if we've got a level loaded (not survival)
             if (_gameManager.CurrentLevel != null)
             {
@@ -392,9 +396,7 @@ namespace Assets.Scripts.SceneManagers
                 _survivalHandler.Run(Time.deltaTime);
             }
 
-            _noHitManager.Run(Time.deltaTime);
-            _hitManager.Run(Time.deltaTime);
-            _hitSplitManager.Run(Time.deltaTime);
+            
             _explosionManager.Run();
             _scoreJuiceManager.Run(Time.deltaTime);
 

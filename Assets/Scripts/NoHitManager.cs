@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 public class NoHitManager : MonoBehaviour 
 {
-	float spawnInterval = 5f;
-	float spawnTimer = 0f;
 	public GameObject NoHitPrefab;
 
 	public List<NoHit> activeNoHits;
@@ -38,24 +36,33 @@ public class NoHitManager : MonoBehaviour
 		Scale = scale;
 	}
 
-	public void Run(float deltaTime) 
+	public void Run(bool isPaused, float deltaTime) 
 	{
-		spawnTimer -= deltaTime;
-
-		if(spawnTimer <= 0)
-		{
-
-			spawnTimer = spawnInterval;
+		if(isPaused)
+        {
+			_runPaused();
+			return;
 		}
 
-		for(int i = activeNoHits.Count - 1; i >= 0; i--)
+		for (int i = activeNoHits.Count - 1; i >= 0; i--)
 		{
-			activeNoHits[i].Move(deltaTime);
+			NoHit noHit = activeNoHits[i];
+			noHit.Move(deltaTime);
+			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
 
-			if(activeNoHits[i].transform.position.x < GameManager.LeftX - activeNoHits[i].GetComponent<Renderer>().bounds.extents.x)
+			if (activeNoHits[i].transform.position.x < GameManager.LeftX - activeNoHits[i].GetComponent<Renderer>().bounds.extents.x)
 			{
 				DeactivateNoHit(i);
+				continue;
 			}
+		}
+	}
+
+	private void _runPaused()
+    {
+		foreach(NoHit noHit in activeNoHits)
+        {
+			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
 		}
 	}
 

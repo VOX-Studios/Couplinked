@@ -87,6 +87,8 @@ class RegularGameService
         _gameManager.ClampObjectIntoView(node.transform);
 
         _gameManager.Grid.Logic.ApplyDirectedForce(nodeVelocity.normalized * 6f * deltaTime * (1 + node.Scale), node.transform.position, .5f * node.Scale);
+
+        //_gameManager.Grid.Logic.ApplyImplosiveForce(1 * node.Scale, node.transform.position, 1 * node.Scale);
     }
 
     public void OnHitCollision(Hit hit, Collider2D other)

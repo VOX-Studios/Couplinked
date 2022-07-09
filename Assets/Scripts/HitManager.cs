@@ -4,8 +4,6 @@ using Assets.Scripts.SceneManagers;
 
 public class HitManager : MonoBehaviour 
 {
-	float spawnInterval = 5f;
-	float spawnTimer = 0f;
 	public GameObject HitPrefab;
 
 	public List<Hit> activeHits;
@@ -38,24 +36,25 @@ public class HitManager : MonoBehaviour
 		}
 	}
 	
-	public void Run(float time) 
+	public void Run(bool isPaused, float deltaTime) 
 	{
-		spawnTimer -= time;
-		
-		if(spawnTimer <= 0)
-		{
-			spawnTimer = spawnInterval;
+		if(isPaused)
+        {
+			_runPaused();
+			return;
 		}
 
 		for(int i = activeHits.Count - 1; i >= 0; i--)
 		{
-			activeHits[i].Move(time);
+			Hit hit = activeHits[i];
+			hit.Move(deltaTime);
+			_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, hit.transform.position);
 
-			if(activeHits[i].transform.position.x < GameManager.LeftX - activeHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
+			if (activeHits[i].transform.position.x < GameManager.LeftX - activeHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
 			{
 				DeactivateHit(i);
 
-				if (_gameSceneManager.EndGame(ReasonForGameEndEnum.HitOffScreen))
+				if (_gameSceneManager.EndGame(ReasonForGameEndEnum.HitOffScreen)) //TODO: should this be here?
 				{
 					break;
 				}
@@ -63,6 +62,15 @@ public class HitManager : MonoBehaviour
 
 		}
 	}
+
+	private void _runPaused()
+	{
+		foreach (Hit hit in activeHits)
+		{
+			_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, hit.transform.position);
+		}
+	}
+
 	public void SpawnHit(int nodeId, int teamId, NodeColors nodeColors, Vector3 position, float scale)
 	{
 		_activateHit(nodeId, teamId, nodeColors, position, scale, _gameManager.SoundEffectManager.NextPitch());

@@ -4,8 +4,6 @@ using Assets.Scripts.SceneManagers;
 
 public class HitSplitManager : MonoBehaviour 
 {
-	float spawnInterval = 5f;
-	float spawnTimer = 0f;
 	public GameObject HitSplitPrefab;
 
 	public List<HitSplit> activeHitSplits;
@@ -35,30 +33,41 @@ public class HitSplitManager : MonoBehaviour
 			inactiveHitSplits.Add(hitSplitComponent);
 		}
 	}
-	
-	public void Run(float time) 
+
+	public void Run(bool isPaused, float deltaTime)
 	{
-		spawnTimer -= time;
-		
-		if(spawnTimer <= 0)
+		if (isPaused)
 		{
-			spawnTimer = spawnInterval;
+			_runPaused();
+			return;
 		}
 
-		for(int i = activeHitSplits.Count - 1; i >= 0; i--)
+		for (int i = activeHitSplits.Count - 1; i >= 0; i--)
 		{
-			activeHitSplits[i].Move(time);
+			HitSplit hitSplit = activeHitSplits[i];
+			hitSplit.Move(deltaTime);
+			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
 
-
-			if(activeHitSplits[i].transform.position.x < GameManager.LeftX - activeHitSplits[i].gameObject.GetComponent<Renderer>().bounds.size.x)
+			if (activeHitSplits[i].transform.position.x < GameManager.LeftX - activeHitSplits[i].gameObject.GetComponent<Renderer>().bounds.size.x)
 			{
 				if(!activeHitSplits[i].GetComponent<HitSplit>().WasHitTwice)
 				{
 					DeactivateHitSplit(i);
-					if(_gameSceneManager.EndGame(ReasonForGameEndEnum.HitSplitOffScreen))
-                        break;
+
+					if (_gameSceneManager.EndGame(ReasonForGameEndEnum.HitSplitOffScreen)) //TODO: should this be here?
+					{
+						break;
+					}
 				}
 			}
+		}
+	}
+
+	private void _runPaused()
+	{
+		foreach (HitSplit hitSplit in activeHitSplits)
+		{
+			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
 		}
 	}
 

@@ -100,8 +100,7 @@ public class HitSplit : BaseObject
 	public void Move(float time) 
 	{
 		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
-
-		_GameManager.Grid.ColorManager.SetLightPosition(LightIndex, transform.position);
+		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);
 	}
 
 	public void ReleaseLightIndex()
