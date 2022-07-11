@@ -30,12 +30,13 @@ void FUCK_float(UnityTexture2D Image, UnitySamplerState SS, float x, out UnityTe
     Out = Image;
 }
 
-void Shit_float(UnityTexture2D positions, float2 positionScale, UnityTexture2D colors, float numDataPoints, float2 uv, float lightRange, float lightBrightness, float lightAperture, float lightFocusFactor, float lightPunchOut, out float4 Out)
+void Shit_half (UnityTexture2D positions, float2 positionScale, UnityTexture2D colors, float numDataPoints, float2 uv, float lightRange, float lightBrightness, float lightAperture, float lightFocusFactor, float lightPunchOut, out float4 Out)
 {
     float maxBrightness = 10;
     float4 result = 0;
     float2 pos = 0;
     float blackout = 1;
+
     for (int i = 0; i < numDataPoints; i++)
     {
         float2 lookup = float2((i + .5) / numDataPoints, 0);

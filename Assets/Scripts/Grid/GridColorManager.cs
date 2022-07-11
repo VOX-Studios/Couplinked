@@ -20,8 +20,10 @@ public class GridColorManager
     {
 		_gridMaterial = gridMaterial;
 
-		_numDataPoints = PlayerManager.MAX_PLAYERS * 2; //max players * 2 nodes
-		_numDataPoints += Common.MaxPerObjectInGame * 3; //3: hit, hit split, no hit
+		//_numDataPoints = PlayerManager.MAX_PLAYERS * 2; //max players * 2 nodes
+		//_numDataPoints += Common.MaxPerObjectInGame * 3; //3: hit, hit split, no hit
+
+		_numDataPoints = 70;
 
 		_textureWidth = _numDataPoints * _texelSize;
 

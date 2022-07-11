@@ -97,7 +97,7 @@ Material:
     - _Light_Shrink_Factor: 0.5
     - _Light_Size: 0.5
     - _Metallic: 0
-    - _Number_Of_Data_Points: 188
+    - _Number_Of_Data_Points: 70
     - _OcclusionStrength: 1
     - _QueueControl: 1
     - _QueueOffset: 0

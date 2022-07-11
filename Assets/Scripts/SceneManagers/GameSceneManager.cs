@@ -229,7 +229,7 @@ namespace Assets.Scripts.SceneManagers
                 node.SetParticleColor(nodeColors.ParticleColor.Get());
             }
 
-            nodePairing.LightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+            nodePairing.LightningManager.SetLaserColor(nodePairing.Nodes[0].OutsideColor, nodePairing.Nodes[1].OutsideColor);
         }
 
         /// <summary>

@@ -153,9 +153,9 @@ namespace Assets.Scripts.SceneManagers
             _resolutionDropdown.ClearOptions();
 
             //format options
-            List<Dropdown.OptionData> options = Screen.resolutions.Select(r => new Dropdown.OptionData()
+            List<Dropdown.OptionData> options = Screen.resolutions.Select(r => $"{r.width}x{r.height}").Distinct().Select(text => new Dropdown.OptionData()
             {
-                text = $"{r.width}x{r.height}"
+                text = text
             }).ToList();
 
             //add options
