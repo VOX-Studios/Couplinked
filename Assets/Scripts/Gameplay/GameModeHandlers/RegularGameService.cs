@@ -172,7 +172,7 @@ class RegularGameService
                 outsideColor: hitSplit.InsideColor
                 );
 
-            _gameManager.Grid.ColorManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
+            _gameManager.LightingManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
         }
         else //hit the wrong node first
         {

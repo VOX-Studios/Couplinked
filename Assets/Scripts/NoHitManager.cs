@@ -48,7 +48,7 @@ public class NoHitManager : MonoBehaviour
 		{
 			NoHit noHit = activeNoHits[i];
 			noHit.Move(deltaTime);
-			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
 
 			if (activeNoHits[i].transform.position.x < GameManager.LeftX - activeNoHits[i].GetComponent<Renderer>().bounds.extents.x)
 			{
@@ -62,7 +62,7 @@ public class NoHitManager : MonoBehaviour
     {
 		foreach(NoHit noHit in activeNoHits)
         {
-			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(noHit.LightIndex, noHit.transform.position);
 		}
 	}
 
@@ -80,9 +80,9 @@ public class NoHitManager : MonoBehaviour
 			noHit.SetScale(scale);
 			noHit.transform.position = spawnPosition;
 
-			noHit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
-			_gameManager.Grid.ColorManager.SetLightColor(noHit.LightIndex, Color.red);
-			_gameManager.Grid.ColorManager.SetLightPosition(noHit.LightIndex, spawnPosition);
+			noHit.LightIndex = _gameManager.LightingManager.GetLightIndex();
+			_gameManager.LightingManager.SetLightColor(noHit.LightIndex, Color.red);
+			_gameManager.LightingManager.SetLightPosition(noHit.LightIndex, spawnPosition);
 			noHit.gameObject.SetActive(true);
 
 			inactiveNoHits.RemoveAt(inactiveCount - 1);

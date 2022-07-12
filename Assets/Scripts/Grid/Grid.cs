@@ -21,7 +21,7 @@ public class Grid : MonoBehaviour
 
 	public void Initialize(GameManager gameManager)
 	{
-		ColorManager = new GridColorManager(_gridMaterial);
+		ColorManager = new GridColorManager(_gridMaterial, gameManager.LightingManager.BaseLightTexture);
 		_gameManager = gameManager;
 
 		Create();

@@ -46,7 +46,7 @@ public class HitSplitManager : MonoBehaviour
 		{
 			HitSplit hitSplit = activeHitSplits[i];
 			hitSplit.Move(deltaTime);
-			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
 
 			if (activeHitSplits[i].transform.position.x < GameManager.LeftX - activeHitSplits[i].gameObject.GetComponent<Renderer>().bounds.size.x)
 			{
@@ -67,7 +67,7 @@ public class HitSplitManager : MonoBehaviour
 	{
 		foreach (HitSplit hitSplit in activeHitSplits)
 		{
-			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(hitSplit.LightIndex, hitSplit.transform.position);
 		}
 	}
 
@@ -97,9 +97,9 @@ public class HitSplitManager : MonoBehaviour
 			Color secondHitColor = secondHitNodeColors.OutsideColor;
 
 			hitSplit.SetColors(secondHitColor, firstHitColor);
-			hitSplit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
-			_gameManager.Grid.ColorManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
-			_gameManager.Grid.ColorManager.SetLightPosition(hitSplit.LightIndex, spawnPosition);
+			hitSplit.LightIndex = _gameManager.LightingManager.GetLightIndex();
+			_gameManager.LightingManager.SetLightColor(hitSplit.LightIndex, hitSplit.OutsideColor);
+			_gameManager.LightingManager.SetLightPosition(hitSplit.LightIndex, spawnPosition);
 
 
 			hitSplit.FirstHitTeamId = firstHitTeamId;

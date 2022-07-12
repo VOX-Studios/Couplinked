@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5074963081250650978}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &4419350576484805603
 BoxCollider2D:
@@ -110,7 +110,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5074963081250650978}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &2212037009587942002
 LineRenderer:
@@ -240,7 +240,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5074963081411822079}
   - {fileID: 2157738263117620688}
   - {fileID: 6522496806628070502}
   m_Father: {fileID: 0}
@@ -258,84 +257,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69929d0a25457bd45a35c4f8a2bebc54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lightningBoltPrefab: {fileID: 100000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-  _connectorLine: {fileID: 7713031148950414384}
+  _connectorLine: {fileID: 0}
   _collider: {fileID: 4419350576484805603}
   _laser: {fileID: 2212037009587942002}
---- !u!1001 &5074963081411435391
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 5074963081250650978}
-    m_Modifications:
-    - target: {fileID: 100000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_Name
-      value: Connector Lightning Bolt
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_TagString
-      value: Untagged
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -5
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 30309882a03b8434f92beb3e6d1d82d9, type: 3}
---- !u!4 &5074963081411822079 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 400000, guid: 30309882a03b8434f92beb3e6d1d82d9,
-    type: 3}
-  m_PrefabInstance: {fileID: 5074963081411435391}
-  m_PrefabAsset: {fileID: 0}
---- !u!120 &7713031148950414384 stripped
-LineRenderer:
-  m_CorrespondingSourceObject: {fileID: 3271817842457476943, guid: 30309882a03b8434f92beb3e6d1d82d9,
-    type: 3}
-  m_PrefabInstance: {fileID: 5074963081411435391}
-  m_PrefabAsset: {fileID: 0}

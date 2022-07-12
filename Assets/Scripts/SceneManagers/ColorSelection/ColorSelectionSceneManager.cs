@@ -277,7 +277,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     break;
                 case ColorSettingEnum.Lightning:
                     _lightningColor = _currentColor;
-                    _nodePair.LightningManager.SetLightningColor(_lightningColor);
+                    //_nodePair.LightningManager.SetLightningColor(_lightningColor);
                     break;
                 case ColorSettingEnum.Grid:
                     _gridColor = _currentColor;
@@ -370,7 +370,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
 
             lightningManager.Initialize(_midground);
-            lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+            //lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
 
             NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, lightningManager);
 

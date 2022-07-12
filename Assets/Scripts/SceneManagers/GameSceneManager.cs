@@ -72,8 +72,8 @@ namespace Assets.Scripts.SceneManagers
             {
                 foreach(Node node in nodePairing.Nodes)
                 {
-                    node.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
-                    _gameManager.Grid.ColorManager.SetLightColor(node.LightIndex, node.OutsideColor);
+                    node.LightIndex = _gameManager.LightingManager.GetLightIndex();
+                    _gameManager.LightingManager.SetLightColor(node.LightIndex, node.OutsideColor);
                 }
             }
 
@@ -230,6 +230,7 @@ namespace Assets.Scripts.SceneManagers
             }
 
             nodePairing.LightningManager.SetLaserColor(nodePairing.Nodes[0].OutsideColor, nodePairing.Nodes[1].OutsideColor);
+            nodePairing.LightningManager.SetLightTexture(_gameManager.LightingManager.BaseLightTexture);
         }
 
         /// <summary>
@@ -353,7 +354,7 @@ namespace Assets.Scripts.SceneManagers
             {
                 foreach (Node node in nodePairing.Nodes)
                 {
-                    _gameManager.Grid.ColorManager.SetLightPosition(node.LightIndex, node.transform.position);
+                    _gameManager.LightingManager.SetLightPosition(node.LightIndex, node.transform.position);
                 }
             }
 
@@ -558,7 +559,7 @@ namespace Assets.Scripts.SceneManagers
             {
                 foreach (Node node in nodePairing.Nodes)
                 {
-                    _gameManager.Grid.ColorManager.ReleaseLightIndex(node.LightIndex);
+                    _gameManager.LightingManager.ReleaseLightIndex(node.LightIndex);
                     node.LightIndex = -1;
                 }
             }

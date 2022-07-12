@@ -341,7 +341,6 @@ namespace Assets.Scripts.SceneManagers
                 Destroy(node.gameObject);
             }
 
-            controllerSelectionState.NodePairing.LightningManager.DeactivateAllBolts();
             Destroy(controllerSelectionState.NodePairing.LightningManager.gameObject);
             
             _playerStates.Remove(player);

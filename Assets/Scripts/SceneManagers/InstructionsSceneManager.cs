@@ -60,7 +60,7 @@ namespace Assets.Scripts.SceneManagers
             _lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
 
             _lightningManager.Initialize(_lightningHolder);
-            _lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+            //_lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
             _lastInstructionsPageNum = _instructionsPages.transform.childCount;
 
             for (int i = 1; i < _lastInstructionsPageNum; i++)

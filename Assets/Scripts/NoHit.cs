@@ -32,7 +32,7 @@ public class NoHit : BaseObject
 
 	public void ReleaseLightIndex()
     {
-		_GameManager.Grid.ColorManager.ReleaseLightIndex(LightIndex);
+		_GameManager.LightingManager.ReleaseLightIndex(LightIndex);
 		LightIndex = -1;
 	}
 

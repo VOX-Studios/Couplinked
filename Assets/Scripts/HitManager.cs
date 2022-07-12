@@ -48,7 +48,7 @@ public class HitManager : MonoBehaviour
 		{
 			Hit hit = activeHits[i];
 			hit.Move(deltaTime);
-			_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, hit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(hit.LightIndex, hit.transform.position);
 
 			if (activeHits[i].transform.position.x < GameManager.LeftX - activeHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
 			{
@@ -67,7 +67,7 @@ public class HitManager : MonoBehaviour
 	{
 		foreach (Hit hit in activeHits)
 		{
-			_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, hit.transform.position);
+			_gameManager.LightingManager.SetLightPosition(hit.LightIndex, hit.transform.position);
 		}
 	}
 
@@ -96,9 +96,9 @@ public class HitManager : MonoBehaviour
 		hit.transform.position = spawnPosition;
 		hit.SetColor(nodeColors.OutsideColor);
 
-		hit.LightIndex = _gameManager.Grid.ColorManager.GetLightIndex();
-		_gameManager.Grid.ColorManager.SetLightColor(hit.LightIndex, hit.Color);
-		_gameManager.Grid.ColorManager.SetLightPosition(hit.LightIndex, spawnPosition);
+		hit.LightIndex = _gameManager.LightingManager.GetLightIndex();
+		_gameManager.LightingManager.SetLightColor(hit.LightIndex, hit.Color);
+		_gameManager.LightingManager.SetLightPosition(hit.LightIndex, spawnPosition);
 
 		hit.TeamId = teamId;
 		hit.HitType = nodeId;

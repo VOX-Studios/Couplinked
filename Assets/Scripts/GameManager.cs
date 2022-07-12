@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.InputSystem;
+using Assets.Scripts.Lighting;
 
 public class GameManager : MonoBehaviour
 {	public InputActionAsset InputActions;
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
 	public NotificationManager NotificationManager;
 	public PlayerManager PlayerManager;
 	public ColorManager ColorManager;
+	public LightingManager LightingManager;
 
 	public Grid Grid;
 
@@ -143,6 +145,7 @@ public class GameManager : MonoBehaviour
 		AudioManager.Initialize();
 		SoundEffectManager.Initialize(this);
 
+		LightingManager.Initialize();
 		Grid.Initialize(this);
 
 		GameState = GameStateEnum.Loading;
