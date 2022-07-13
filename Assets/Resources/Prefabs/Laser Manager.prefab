@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 5074963081250650978}
   - component: {fileID: 5074963081250650981}
   m_Layer: 0
-  m_Name: Lightning Manager
+  m_Name: Laser Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

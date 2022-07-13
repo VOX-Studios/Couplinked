@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class LightningManager : MonoBehaviour
+public class LaserManager : MonoBehaviour
 {
     [SerializeField]
     private BoxCollider2D _collider;

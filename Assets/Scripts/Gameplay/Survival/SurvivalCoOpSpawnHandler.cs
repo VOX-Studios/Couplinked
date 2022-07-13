@@ -14,8 +14,8 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
     private float[] _rowPositions;
     private float _scale;
 
-    private PlayerColors[] _playerColors;
     private SpawnPlanner _spawnPlanner;
+    private NodePairing[] _nodePairings;
 
     public SurvivalCoOpSpawnHandler(
         SurvivalHandler survivalHandler,
@@ -33,10 +33,9 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
         _noHitManager = noHitManager;
+        _nodePairings = nodePairings;
         _rowPositions = rowPositions;
         _scale = scale;
-
-        _playerColors = _gameManager.ColorManager.DefaultPlayerColors.Select(defaultPlayerColors => new PlayerColors(defaultPlayerColors)).ToArray();
 
         _spawnPlanner = new SpawnPlanner(_rowPositions.Length, nodePairings);
     }
@@ -55,7 +54,7 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
                         rowIndex: i,
                         nodeId: spawnPlanRow.Ids[0].NodeId,
                         teamId: spawnPlanRow.Ids[0].TeamId,
-                        playerColors: _playerColors
+                        nodePairings: _nodePairings
                         );
                     break;
                 case SpawnRowTypeEnum.HitSplit:
@@ -65,7 +64,7 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
                         firstTeamId: spawnPlanRow.Ids[0].TeamId,
                         secondNodeId: spawnPlanRow.Ids[1].NodeId,
                         secondTeamId: spawnPlanRow.Ids[1].TeamId,
-                        playerColors: _playerColors
+                        nodePairings: _nodePairings
                         );
                     break;
                 case SpawnRowTypeEnum.NoHit:
@@ -80,11 +79,11 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         return new Vector3(GameManager.RightX + 5, _rowPositions[rowIndex], 0);
     }
 
-    private void _spawnHit(int rowIndex, int nodeId, int teamId, PlayerColors[] playerColors)
+    private void _spawnHit(int rowIndex, int nodeId, int teamId, NodePairing[] nodePairings)
     {
-        NodeColors nodeColors = playerColors[teamId].NodeColors[nodeId];
+        Color hitColor = nodePairings[teamId].Nodes[nodeId].OutsideColor;
         Vector3 pos = _getSpawnPosition(rowIndex);
-        _hitManager.SpawnHit(nodeId, teamId, nodeColors, pos, _scale);
+        _hitManager.SpawnHit(nodeId, teamId, hitColor, pos, _scale);
         _survivalHandler.PotentialMaxScore += 10;
     }
 
@@ -94,7 +93,7 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         _noHitManager.SpawnNoHit(pos, _scale);
     }
 
-    private void _spawnHitSplit(int rowIndex, int firstNodeId, int firstTeamId, int secondNodeId, int secondTeamId, PlayerColors[] playerColors)
+    private void _spawnHitSplit(int rowIndex, int firstNodeId, int firstTeamId, int secondNodeId, int secondTeamId, NodePairing[] nodePairings)
     {
         Vector3 pos = _getSpawnPosition(rowIndex);
 
@@ -103,8 +102,8 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
                    hitSplitSecondType: secondNodeId,
                    firstHitTeamId: firstTeamId,
                    secondHitTeamId: secondTeamId,
-                   firstHitNodeColors: playerColors[firstTeamId].NodeColors[firstNodeId],
-                   secondHitNodeColors: playerColors[secondTeamId].NodeColors[secondNodeId],
+                   firstHitColor: nodePairings[firstTeamId].Nodes[firstNodeId].OutsideColor,
+                   secondHitColor: nodePairings[secondTeamId].Nodes[secondNodeId].OutsideColor,
                    spawnPosition: pos,
                    scale: _scale
                    );

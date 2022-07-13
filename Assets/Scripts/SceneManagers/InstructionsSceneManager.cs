@@ -33,7 +33,7 @@ namespace Assets.Scripts.SceneManagers
 
         [SerializeField]
         private GameObject _lightningManagerPrefab;
-        private LightningManager _lightningManager;
+        private LaserManager _lightningManager;
 
         [SerializeField]
         private Transform _lightningHolder;
@@ -57,7 +57,7 @@ namespace Assets.Scripts.SceneManagers
             CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[0];
 
             GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            _lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+            _lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
 
             _lightningManager.Initialize(_lightningHolder);
             //_lightningManager.SetLightningColor(playerColorData.LightningColor.Get());

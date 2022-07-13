@@ -32,11 +32,9 @@ class LevelHandler : IGameModeHandler
     public int RingsCollected = 0;
 
     private GameInput[][] _gameInputs;
-    private NodePairing[] _nodePairs;
+    private NodePairing[] _nodePairings;
 
     private RegularGameService _gameService;
-
-    private NodeColors[] _nodeColors;
 
 
     public LevelHandler(
@@ -46,7 +44,7 @@ class LevelHandler : IGameModeHandler
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
         GameInput[][] gameInputs,
-        NodePairing[] nodePairs
+        NodePairing[] nodePairings
         )
     {
         _gameManager = gameManager;
@@ -56,7 +54,7 @@ class LevelHandler : IGameModeHandler
         _noHitManager = noHitManager;
 
         _gameInputs = gameInputs;
-        _nodePairs = nodePairs;
+        _nodePairings = nodePairings;
 
         _gameService = new RegularGameService(
             gameManager: _gameManager,
@@ -64,26 +62,14 @@ class LevelHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairs
+            nodePairs: _nodePairings
             );
     }
 
     public void Initialize()
     {
-        //if multiplayer
-        if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
-        {
-            _nodeColors = _gameManager.ColorManager.DefaultPlayerColors.Take(2)
-                .Select(defaultPlayerColors=> new NodeColors(defaultPlayerColors.NodeColors[0]))
-                .ToArray();
-        }
-        else //singleplayer
-        {
-            _nodeColors = _gameManager.DataManager.PlayerColors[0].NodeColors.Select(nodeColorData => new NodeColors(nodeColorData)).ToArray();
-        }
-
         _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
-        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairs);
+        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings);
         _gameService.Start();
 
         _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
@@ -170,10 +156,10 @@ class LevelHandler : IGameModeHandler
                     _noHitManager.SpawnNoHit(pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit1:
-                    _hitManager.SpawnHit(0, teamId, _nodeColors[0], pos, _scale);
+                    _hitManager.SpawnHit(0, teamId, _nodePairings[teamId].Nodes[0].OutsideColor, pos, _scale);
                     break;
                 case ObjectTypeEnum.Hit2:
-                    _hitManager.SpawnHit(1, teamId, _nodeColors[1], pos, _scale);
+                    _hitManager.SpawnHit(1, teamId, _nodePairings[teamId].Nodes[1].OutsideColor, pos, _scale);
                     break;
                 case ObjectTypeEnum.HitSplit1:
                     _hitSplitManager.SpawnHitSplit(
@@ -181,8 +167,8 @@ class LevelHandler : IGameModeHandler
                         hitSplitSecondType: 1,
                         firstHitTeamId: teamId,
                         secondHitTeamId: teamId,
-                        firstHitNodeColors: _nodeColors[0],
-                        secondHitNodeColors: _nodeColors[1],
+                        firstHitColor: _nodePairings[teamId].Nodes[0].OutsideColor,
+                        secondHitColor: _nodePairings[teamId].Nodes[1].OutsideColor,
                         spawnPosition: pos,
                         scale: _scale
                         );
@@ -193,8 +179,8 @@ class LevelHandler : IGameModeHandler
                        hitSplitSecondType: 0,
                        firstHitTeamId: teamId,
                        secondHitTeamId: teamId,
-                       firstHitNodeColors: _nodeColors[1],
-                       secondHitNodeColors: _nodeColors[0],
+                       firstHitColor: _nodePairings[teamId].Nodes[1].OutsideColor,
+                       secondHitColor: _nodePairings[teamId].Nodes[0].OutsideColor,
                        spawnPosition: pos,
                        scale: _scale
                        );

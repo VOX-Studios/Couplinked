@@ -31,6 +31,8 @@ namespace Assets.Scripts.SceneManagers
 
         private List<GameObject> _teamSelectionPanels;
 
+        private int _frameCount;
+
         void Awake()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -52,11 +54,14 @@ namespace Assets.Scripts.SceneManagers
             teamPanelsLayoutGroup.CalculateLayoutInputVertical();
             teamPanelsLayoutGroup.SetLayoutHorizontal();
             teamPanelsLayoutGroup.SetLayoutVertical();
+        }
 
+        private void _onSecondFrame()
+        {
             //if we already had teams from a previous game
             if (_gameManager.GameSetupInfo.Teams != null)
             {
-                foreach(Team team in _gameManager.GameSetupInfo.Teams)
+                foreach (Team team in _gameManager.GameSetupInfo.Teams)
                 {
                     foreach (PlayerInput playerInput in team.PlayerInputs)
                     {
@@ -95,9 +100,6 @@ namespace Assets.Scripts.SceneManagers
 
             NodePairing nodePairing = _makeNodePair(2, playerInput.PlayerSlot);
 
-            //second node won't be used yet so just put it off to the side
-            nodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
-
             ControllerSelectionState selectionState = new ControllerSelectionState()
             {
                 WasJustAdded = true,
@@ -118,7 +120,7 @@ namespace Assets.Scripts.SceneManagers
         private NodePairing _makeNodePair(int numberOfNodes, int playerSlot)
         {
             List<Node> nodes = new List<Node>();
-
+            List<LaserManager> lightningManagers = new List<LaserManager>();
             DefaultPlayerColors playerColors = _gameManager.ColorManager.DefaultPlayerColors[playerSlot];
 
             for (int i = 0; i < numberOfNodes; i++)
@@ -138,14 +140,19 @@ namespace Assets.Scripts.SceneManagers
                 node.ParticleSystem.Pause();
 
                 nodes.Add(node);
+
+                if(i < numberOfNodes)
+                {
+                    GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+                    LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
+
+                    lightningManager.Initialize(_nodeMidground);
+
+                    lightningManagers.Add(lightningManager);
+                }
             }
 
-            GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
-
-            lightningManager.Initialize(_nodeMidground);
-
-            return new NodePairing(nodes, lightningManager);
+            return new NodePairing(nodes, lightningManagers);
         }
 
         private void _updateNodePositions(ControllerSelectionState changedState, int previousTeam)
@@ -156,6 +163,9 @@ namespace Assets.Scripts.SceneManagers
             if (changedState.TeamSlot == -1)
             {
                 changedState.NodePairing.Nodes[0].transform.position = GetTeamPanelsCenterWorldPoint();
+
+                //second node won't be used yet so just put it off to the side
+                changedState.NodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
                 return;
             }
 
@@ -240,6 +250,19 @@ namespace Assets.Scripts.SceneManagers
 
         void Update()
         {
+            if(_frameCount < 2)
+            {
+                _frameCount++;
+                if(_frameCount == 2)
+                {
+                    _onSecondFrame();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             //if the back button is pressed and there are no players (this is to prevent accidental exits)
             if (_gameManager.HandleBack() && _gameManager.PlayerManager.Players.Count == 0)
             {
@@ -336,12 +359,16 @@ namespace Assets.Scripts.SceneManagers
         {
             ControllerSelectionState controllerSelectionState = _playerStates[player];
 
-            foreach(Node node in controllerSelectionState.NodePairing.Nodes)
+            //TODO: should probably reuse this stuff instead of destroying it
+            foreach (Node node in controllerSelectionState.NodePairing.Nodes)
             {
                 Destroy(node.gameObject);
             }
 
-            Destroy(controllerSelectionState.NodePairing.LightningManager.gameObject);
+            foreach(LaserManager lightningManager in controllerSelectionState.NodePairing.LightningManagers)
+            {
+                Destroy(lightningManager.gameObject);
+            }
             
             _playerStates.Remove(player);
             _gameManager.PlayerManager.RemovePlayer(player);

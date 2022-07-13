@@ -86,7 +86,7 @@ namespace Assets.Scripts.Gameplay.Survival.SpawnPlans
                 
                 case 1:
                     //10% chance to spawn a number of hits equal to half the number of nodes
-                    _spawnHits(spawnPlan, (int)(_totalNodes / 2f));
+                    _spawnHits(spawnPlan, Mathf.CeilToInt(_totalNodes / 2f));
                     break;
                 case 2:
                 case 3:
@@ -96,7 +96,7 @@ namespace Assets.Scripts.Gameplay.Survival.SpawnPlans
                 case 4:
                 case 5:
                     //20% chance to spawn enough hit splits hits to require 50% the number of nodes
-                    _spawnHits(spawnPlan, (int)(_totalNodes / 2f), true);
+                    _spawnHits(spawnPlan, Mathf.CeilToInt(_totalNodes / 2f), true);
                     break;
                 default:
                     //50% chance to spawn 1/3rd the number of rows as NoHits
@@ -106,28 +106,28 @@ namespace Assets.Scripts.Gameplay.Survival.SpawnPlans
 
             return spawnPlan;
 
-            int hitsToSpawn = Random.Range(0, _totalNodes + 1);
-            int noHitsToSpawn;
-            switch (hitsToSpawn)
-            {
-                case 0:
-                    //spawn NoHits only
-                    noHitsToSpawn = Random.Range(1, (int)(_numRows/3f));
-                    _spawnNoHits(spawnPlan, noHitsToSpawn);
-                    break;
-                default:
-                    //spawn hits and nohits
-                    _spawnHits(spawnPlan, hitsToSpawn);
+            //int hitsToSpawn = Random.Range(0, _totalNodes + 1);
+            //int noHitsToSpawn;
+            //switch (hitsToSpawn)
+            //{
+            //    case 0:
+            //        //spawn NoHits only
+            //        noHitsToSpawn = Random.Range(1, (int)(_numRows/3f));
+            //        _spawnNoHits(spawnPlan, noHitsToSpawn);
+            //        break;
+            //    default:
+            //        //spawn hits and nohits
+            //        _spawnHits(spawnPlan, hitsToSpawn);
 
-                    return spawnPlan;
+            //        return spawnPlan;
 
-                    int maxNoHitsToSpawn = spawnPlan.Rows.Count(row => row.SpawnableType == SpawnRowTypeEnum.Empty);
-                    noHitsToSpawn = Random.Range(0, maxNoHitsToSpawn + 1);
-                    _spawnNoHits(spawnPlan, noHitsToSpawn);
-                    break;
-            }
+            //        int maxNoHitsToSpawn = spawnPlan.Rows.Count(row => row.SpawnableType == SpawnRowTypeEnum.Empty);
+            //        noHitsToSpawn = Random.Range(0, maxNoHitsToSpawn + 1);
+            //        _spawnNoHits(spawnPlan, noHitsToSpawn);
+            //        break;
+            //}
 
-            return spawnPlan;
+            //return spawnPlan;
         }
 
         private void _spawnHits(SpawnPlan spawnPlan, int hitsToSpawn, bool shouldSpawnHitSplits = false)

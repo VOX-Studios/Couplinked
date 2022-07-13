@@ -367,12 +367,12 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             node2.SetParticleColor(playerColorData.NodeColors[1].ParticleColor.Get());
 
             GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            LightningManager lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+            LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
 
             lightningManager.Initialize(_midground);
             //lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
 
-            NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, lightningManager);
+            NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, new List<LaserManager>() { lightningManager });
 
             _setupNodeTrail(node1.ParticleSystem);
             _setupNodeTrail(node2.ParticleSystem);
@@ -393,7 +393,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             hitSplitManager.Run(true, Time.deltaTime);
             _explosionManager.Run();
 
-            _nodePair.LightningManager.Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
+            _nodePair.LightningManagers[0].Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
 
             _handleParticles(Time.deltaTime);
         }

@@ -39,7 +39,7 @@ class SurvivalHandler : IGameModeHandler
     public int RingsCollected = 0;
 
     private GameInput[][] _gameInputs;
-    private NodePairing[] _nodePairs;
+    private NodePairing[] _nodePairings;
     private ExplosionManager _explosionManager;
 
     private RegularGameService _gameService;
@@ -64,7 +64,7 @@ class SurvivalHandler : IGameModeHandler
         _noHitManager = noHitManager;
 
         _gameInputs = gameInputs;
-        _nodePairs = nodePairs;
+        _nodePairings = nodePairs;
         _explosionManager = explosionManager;
 
         _gameService = new RegularGameService(
@@ -73,7 +73,7 @@ class SurvivalHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairs
+            nodePairs: _nodePairings
             );
     }
 
@@ -119,7 +119,7 @@ class SurvivalHandler : IGameModeHandler
     public void Initialize()
     {
         _rowPositions = _calculateRowPositions(_numberOfRows);
-        _handleScaling(_numberOfRows, _nodePairs, _explosionManager);
+        _handleScaling(_numberOfRows, _nodePairings, _explosionManager);
 
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
         {
@@ -129,6 +129,7 @@ class SurvivalHandler : IGameModeHandler
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
+                nodePairings: _nodePairings,
                 rowPositions: _rowPositions,
                 scale: _scale
                 );
@@ -141,7 +142,7 @@ class SurvivalHandler : IGameModeHandler
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
-                nodePairings: _nodePairs,
+                nodePairings: _nodePairings,
                 rowPositions: _rowPositions,
                 scale: _scale
                 );

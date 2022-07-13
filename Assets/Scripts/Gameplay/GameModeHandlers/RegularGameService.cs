@@ -58,9 +58,12 @@ class RegularGameService
 
                 _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
 
-                int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count;
-                //TODO: need an array of lightning managers
-                nodePair.LightningManager?.Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[nextNodeInLoop].transform.position);
+                //int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count; //this would only be used if we want circular connections
+
+                if (i < nodePair.Nodes.Count - 1 && nodePair.LightningManagers != null)
+                {
+                    nodePair.LightningManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
+                }
             }
         }
         else
@@ -73,9 +76,12 @@ class RegularGameService
 
                 _updateNode(nodeVelocity, nodePair.Nodes[i], deltaTime);
 
-                int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count;
-                //TODO: need an array of lightning managers
-                nodePair.LightningManager?.Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[nextNodeInLoop].transform.position);
+                //int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count; //this would only be used if we want circular connections
+
+                if (i < nodePair.Nodes.Count - 1 && nodePair.LightningManagers != null)
+                {
+                    nodePair.LightningManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
+                }
             }
         }
     }
@@ -99,16 +105,16 @@ class RegularGameService
         Node node = other.GetComponent<Node>();
 
         //if the appropriate node was hit
-        if (hit.TeamId == node.TeamId && node.NodeId == hit.HitType)
+        if (hit.TeamId == node.TeamId && node.NodeId == hit.NodeId)
         {
             _gameManager.PlayExplosionSound(hit.ExplosionPitch);
 
             _gameSceneManager.AddToScore(hit.transform.position, node);
-            _gameSceneManager.AddExplosion(hit.transform.position, _getExplosionColor(hit.HitType, hit.TeamId));
+            _gameSceneManager.AddExplosion(hit.transform.position, _getExplosionColor(hit.TeamId, hit.NodeId));
             _hitManager.DeactivateHit(hit);
             _gameSceneManager.Shake();
 
-            switch (hit.HitType)
+            switch (hit.NodeId)
             {
                 case 0:
                     _gameManager.Hit1HitCount++;
@@ -163,7 +169,7 @@ class RegularGameService
 
             hitSplit.WasHitOnce = true;
             _gameSceneManager.AddToScore(hitSplit.transform.position, node);
-            _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.HitSplitFirstType, hitSplit.FirstHitTeamId));
+            _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.FirstHitTeamId, hitSplit.HitSplitFirstType));
             _gameSceneManager.Shake();
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
@@ -203,7 +209,7 @@ class RegularGameService
 
             hitSplit.WasHitTwice = true;
             _gameSceneManager.AddToScore(hitSplit.transform.position, node);
-            _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.HitSplitSecondType, hitSplit.SecondHitTeamId));
+            _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.SecondHitTeamId, hitSplit.HitSplitSecondType));
             _hitSplitManager.DeactivateHitSplit(hitSplit);
             _gameSceneManager.Shake();
 
@@ -261,8 +267,8 @@ class RegularGameService
         }
     }
 
-    private Color _getExplosionColor(int nodeId, int teamId)
+    private Color _getExplosionColor(int teamId, int nodeId)
     {
-        return _gameManager.DataManager.PlayerColors[teamId].NodeColors[nodeId].ParticleColor.Get(); //TODO: don't do this per explosion
+        return _nodePairs[teamId].Nodes[nodeId].ParticleColor;
     }
 }

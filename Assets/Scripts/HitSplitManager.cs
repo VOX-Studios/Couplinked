@@ -76,8 +76,8 @@ public class HitSplitManager : MonoBehaviour
 		int hitSplitSecondType,
 		int firstHitTeamId,
 		int secondHitTeamId,
-		NodeColors firstHitNodeColors,
-		NodeColors secondHitNodeColors,
+		Color firstHitColor,
+		Color secondHitColor,
 		Vector3 spawnPosition,
 		float scale
 		)
@@ -92,9 +92,6 @@ public class HitSplitManager : MonoBehaviour
 
 			hitSplit.HitSplitFirstType = hitSplitFirstType;
 			hitSplit.HitSplitSecondType = hitSplitSecondType;
-
-			Color firstHitColor = firstHitNodeColors.OutsideColor;
-			Color secondHitColor = secondHitNodeColors.OutsideColor;
 
 			hitSplit.SetColors(secondHitColor, firstHitColor);
 			hitSplit.LightIndex = _gameManager.LightingManager.GetLightIndex();

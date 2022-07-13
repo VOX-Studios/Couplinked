@@ -5,7 +5,7 @@ public class Hit : BaseObject
 {
 	private IHitCollisionHandler _hitCollisionHandler;
 
-	public int HitType;
+	public int NodeId;
 	public int TeamId;
 	public float Scale;
 

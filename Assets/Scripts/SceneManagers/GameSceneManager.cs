@@ -117,7 +117,7 @@ namespace Assets.Scripts.SceneManagers
                     hitSplitManager: _hitSplitManager,
                     noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
-                    nodePairs: _nodePairs
+                    nodePairings: _nodePairs
                     );
 
                 _levelHandler.Initialize();
@@ -198,17 +198,23 @@ namespace Assets.Scripts.SceneManagers
             }
 
             //disable lightning manager for very easy mode
-            LightningManager lightningManager = null; //TODO: add more lightning managers
+            List<LaserManager> lightningManagers = null;
 
             if (_gameManager.GameDifficultyManager.GameDifficulty != GameDifficultyEnum.VeryEasy)
             {
-                GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-                lightningManager = lightningManagerGameObject.GetComponent<LightningManager>();
+                lightningManagers = new List<LaserManager>();
+                for (int i = 0; i < numberOfNodes - 1; i++)
+                {
+                    GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+                    LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
 
-                lightningManager.Initialize(_midground);
+                    lightningManager.Initialize(_midground);
+
+                    lightningManagers.Add(lightningManager);
+                }
             }
 
-            NodePairing nodePair = new NodePairing(nodes, lightningManager);
+            NodePairing nodePair = new NodePairing(nodes, lightningManagers);
 
             return nodePair;
         }
@@ -227,10 +233,12 @@ namespace Assets.Scripts.SceneManagers
                 Node node = nodePairing.Nodes[i];
                 node.SetColors(nodeColors.InsideColor.Get(), nodeColors.OutsideColor.Get());
                 node.SetParticleColor(nodeColors.ParticleColor.Get());
-            }
 
-            nodePairing.LightningManager.SetLaserColor(nodePairing.Nodes[0].OutsideColor, nodePairing.Nodes[1].OutsideColor);
-            nodePairing.LightningManager.SetLightTexture(_gameManager.LightingManager.BaseLightTexture);
+                if (i > 0 && nodePairing.LightningManagers != null)
+                {
+                    nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                }
+            }
         }
 
         /// <summary>
@@ -249,6 +257,11 @@ namespace Assets.Scripts.SceneManagers
                     Node node = nodePairing.Nodes[i];
                     node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
                     node.SetParticleColor(nodeColors.ParticleColor);
+
+                    if (i > 0 && nodePairing.LightningManagers != null)
+                    {
+                        nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                    }
                 }
 
                 return;
@@ -261,6 +274,11 @@ namespace Assets.Scripts.SceneManagers
                 Node node = nodePairing.Nodes[i];
                 node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
                 node.SetParticleColor(nodeColors.ParticleColor);
+
+                if (i > 0 && nodePairing.LightningManagers != null)
+                {
+                    nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                }
             }
         }
 
@@ -443,7 +461,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.isPaused = false;
 
             string unlockMessage = "";
-            if (_gameManager.GameSetupInfo.Teams.Count > 1)
+            if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
             {
                 _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
             }
