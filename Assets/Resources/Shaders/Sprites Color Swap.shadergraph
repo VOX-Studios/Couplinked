@@ -1,5 +1,5 @@
 {
-    "m_SGVersion": 2,
+    "m_SGVersion": 3,
     "m_Type": "UnityEditor.ShaderGraph.GraphData",
     "m_ObjectId": "602eaaa54eeb4e96ae18411541a365e6",
     "m_Properties": [
@@ -14,6 +14,12 @@
         }
     ],
     "m_Keywords": [],
+    "m_Dropdowns": [],
+    "m_CategoryData": [
+        {
+            "m_Id": "11397958d8b54b3a8df89a3afdb338ef"
+        }
+    ],
     "m_Nodes": [
         {
             "m_Id": "0a301c5818f60f8b8398ffef113cd257"
@@ -312,7 +318,7 @@
     "m_VertexContext": {
         "m_Position": {
             "x": 1762.0,
-            "y": -26.999956130981447
+            "y": -139.99998474121095
         },
         "m_Blocks": [
             {
@@ -329,7 +335,7 @@
     "m_FragmentContext": {
         "m_Position": {
             "x": 1762.0,
-            "y": 173.0000457763672
+            "y": 60.00003433227539
         },
         "m_Blocks": [
             {
@@ -347,10 +353,11 @@
         "serializedMesh": {
             "m_SerializedMesh": "{\"mesh\":{\"instanceID\":0}}",
             "m_Guid": ""
-        }
+        },
+        "preventRotation": false
     },
     "m_Path": "Shader Graphs",
-    "m_ConcretePrecision": 0,
+    "m_GraphPrecision": 0,
     "m_PreviewMode": 2,
     "m_OutputNode": {
         "m_Id": ""
@@ -457,6 +464,24 @@
     "m_Property": {
         "m_Id": "c21bcc762fbe2d85a35686b26a144cba"
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.CategoryData",
+    "m_ObjectId": "11397958d8b54b3a8df89a3afdb338ef",
+    "m_Name": "",
+    "m_ChildObjectList": [
+        {
+            "m_Id": "8a52b946e93bd68084c90308323ef65e"
+        },
+        {
+            "m_Id": "a79de8f1de9f7c81a63c1718ee7cfd8e"
+        },
+        {
+            "m_Id": "c21bcc762fbe2d85a35686b26a144cba"
+        }
+    ]
 }
 
 {
@@ -1272,17 +1297,23 @@
 }
 
 {
-    "m_SGVersion": 0,
+    "m_SGVersion": 1,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget",
     "m_ObjectId": "76cb18230e1e474684afdbfeab8f1b1c",
     "m_ActiveSubTarget": {
         "m_Id": "d8cf244955194a4cbdfedc2be19e2753"
     },
+    "m_AllowMaterialOverride": false,
     "m_SurfaceType": 0,
+    "m_ZTestMode": 4,
+    "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
-    "m_TwoSided": false,
+    "m_RenderFace": 2,
     "m_AlphaClip": false,
-    "m_CustomEditorGUI": ""
+    "m_CastShadows": true,
+    "m_ReceiveShadows": true,
+    "m_CustomEditorGUI": "",
+    "m_SupportVFX": false
 }
 
 {
@@ -1455,6 +1486,8 @@
     "m_DefaultReferenceName": "Texture2D_5ED0DA1D",
     "m_OverrideReferenceName": "_MainTex",
     "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -1463,6 +1496,8 @@
         "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"ff60876162f1cc24ab0145626bf32401\",\"type\":3}}",
         "m_Guid": ""
     },
+    "isMainTexture": false,
+    "useTilingAndOffset": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
 }
@@ -1649,6 +1684,8 @@
     "m_DefaultReferenceName": "Color_FCD97A68",
     "m_OverrideReferenceName": "_InsideColor",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -1659,6 +1696,7 @@
         "b": 1.0,
         "a": 1.0
     },
+    "isMainColor": false,
     "m_ColorMode": 0
 }
 
@@ -1700,6 +1738,8 @@
     "m_DefaultReferenceName": "Color_C4893EC1",
     "m_OverrideReferenceName": "_OutsideColor",
     "m_GeneratePropertyBlock": false,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
     "m_Precision": 0,
     "overrideHLSLDeclaration": false,
     "hlslDeclarationOverride": 0,
@@ -1710,6 +1750,7 @@
         "b": 1.0,
         "a": 1.0
     },
+    "isMainColor": false,
     "m_ColorMode": 0
 }
 
@@ -2086,7 +2127,8 @@
         "m_SerializableColors": []
     },
     "m_TextureType": 0,
-    "m_NormalMapSpace": 0
+    "m_NormalMapSpace": 0,
+    "m_EnableGlobalMipBias": true
 }
 
 {

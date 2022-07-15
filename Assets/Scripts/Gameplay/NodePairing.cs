@@ -19,9 +19,12 @@ public class NodePairing
             node.SetScale(scale);
         }
 
-        foreach(LaserManager laserManager in LaserManagers)
+        if(LaserManagers != null)
         {
-            laserManager.SetScale(scale);
+            foreach (LaserManager laserManager in LaserManagers)
+            {
+                laserManager.SetScale(scale);
+            }
         }
     }
 }
