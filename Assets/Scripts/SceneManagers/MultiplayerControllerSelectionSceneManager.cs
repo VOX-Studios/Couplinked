@@ -365,7 +365,7 @@ namespace Assets.Scripts.SceneManagers
                 Destroy(node.gameObject);
             }
 
-            foreach(LaserManager lightningManager in controllerSelectionState.NodePairing.LightningManagers)
+            foreach(LaserManager lightningManager in controllerSelectionState.NodePairing.LaserManagers)
             {
                 Destroy(lightningManager.gameObject);
             }

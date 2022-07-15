@@ -23,7 +23,7 @@ public class LaserManager : MonoBehaviour
     {
         _scale = scale;
 
-        //_connectorLine.startWidth *= scale;
+        _laser.startWidth *= scale;
 
         _collider.size = new Vector2(_collider.size.x, _collider.size.y * scale);
     }

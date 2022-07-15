@@ -117,7 +117,8 @@ namespace Assets.Scripts.SceneManagers
                     hitSplitManager: _hitSplitManager,
                     noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
-                    nodePairings: _nodePairs
+                    nodePairings: _nodePairs,
+                    explosionManager: _explosionManager
                     );
 
                 _levelHandler.Initialize();
@@ -234,9 +235,9 @@ namespace Assets.Scripts.SceneManagers
                 node.SetColors(nodeColors.InsideColor.Get(), nodeColors.OutsideColor.Get());
                 node.SetParticleColor(nodeColors.ParticleColor.Get());
 
-                if (i > 0 && nodePairing.LightningManagers != null)
+                if (i > 0 && nodePairing.LaserManagers != null)
                 {
-                    nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                    nodePairing.LaserManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
                 }
             }
         }
@@ -258,9 +259,9 @@ namespace Assets.Scripts.SceneManagers
                     node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
                     node.SetParticleColor(nodeColors.ParticleColor);
 
-                    if (i > 0 && nodePairing.LightningManagers != null)
+                    if (i > 0 && nodePairing.LaserManagers != null)
                     {
-                        nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                        nodePairing.LaserManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
                     }
                 }
 
@@ -275,9 +276,9 @@ namespace Assets.Scripts.SceneManagers
                 node.SetColors(nodeColors.InsideColor, nodeColors.OutsideColor);
                 node.SetParticleColor(nodeColors.ParticleColor);
 
-                if (i > 0 && nodePairing.LightningManagers != null)
+                if (i > 0 && nodePairing.LaserManagers != null)
                 {
-                    nodePairing.LightningManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
+                    nodePairing.LaserManagers[i - 1].SetLaserColor(nodePairing.Nodes[i - 1].OutsideColor, nodePairing.Nodes[i].OutsideColor);
                 }
             }
         }

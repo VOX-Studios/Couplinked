@@ -112,6 +112,7 @@ class SurvivalHandler : IGameModeHandler
             nodePair.SetScale(_scale);
         }
 
+        _gameManager.LightingManager.SetScale(_scale);
         explosionManager.SetScale(_scale);
         _gameSceneManager.CameraShake.Scale = _scale;
     }

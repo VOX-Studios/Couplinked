@@ -464,7 +464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BaseLightTexture: {fileID: 8400000, guid: 8e8e66b2f078cce4a9e5d44556e5978e, type: 2}
-  BaseLightMateral: {fileID: 2100000, guid: 1ce24ac48997c9b4dbebb31fbc464a1a, type: 2}
+  BaseLightRenderer: {fileID: 1503511475}
 --- !u!1 &423769155
 GameObject:
   m_ObjectHideFlags: 0

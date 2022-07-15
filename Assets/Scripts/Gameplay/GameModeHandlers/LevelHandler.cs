@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.SceneManagers;
-using System.Linq;
 using UnityEngine;
 
 class LevelHandler : IGameModeHandler
@@ -33,6 +32,7 @@ class LevelHandler : IGameModeHandler
 
     private GameInput[][] _gameInputs;
     private NodePairing[] _nodePairings;
+    private ExplosionManager _explosionManager;
 
     private RegularGameService _gameService;
 
@@ -44,7 +44,8 @@ class LevelHandler : IGameModeHandler
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
         GameInput[][] gameInputs,
-        NodePairing[] nodePairings
+        NodePairing[] nodePairings,
+        ExplosionManager explosionManager
         )
     {
         _gameManager = gameManager;
@@ -55,6 +56,7 @@ class LevelHandler : IGameModeHandler
 
         _gameInputs = gameInputs;
         _nodePairings = nodePairings;
+        _explosionManager = explosionManager;
 
         _gameService = new RegularGameService(
             gameManager: _gameManager,
@@ -69,7 +71,7 @@ class LevelHandler : IGameModeHandler
     public void Initialize()
     {
         _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
-        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings);
+        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings, _explosionManager);
         _gameService.Start();
 
         _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
@@ -100,22 +102,24 @@ class LevelHandler : IGameModeHandler
         return rowPositions;
     }
 
-    private void _handleScaling(int numRows, NodePairing[] nodePairs)
+    private void _handleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
     {
-        if(numRows <= 5)
+        if (numRows <= 3)
         {
             _scale = 1f;
         }
         else
         {
-            _scale = 5f / numRows;
+            _scale = 3f / numRows;
         }
 
-        foreach(NodePairing nodePair in nodePairs)
+        foreach (NodePairing nodePair in nodePairs)
         {
             nodePair.SetScale(_scale);
         }
 
+        _gameManager.LightingManager.SetScale(_scale);
+        explosionManager.SetScale(_scale);
         _gameSceneManager.CameraShake.Scale = _scale;
     }
 

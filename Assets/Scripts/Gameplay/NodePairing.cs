@@ -4,12 +4,12 @@ public class NodePairing
 {
     public List<Node> Nodes;
 
-    public List<LaserManager> LightningManagers;
+    public List<LaserManager> LaserManagers;
 
-    public NodePairing(List<Node> nodes, List<LaserManager> lightningManagers)
+    public NodePairing(List<Node> nodes, List<LaserManager> laserManagers)
     {
         Nodes = nodes;
-        LightningManagers = lightningManagers;
+        LaserManagers = laserManagers;
     }
 
     public void SetScale(float scale)
@@ -19,9 +19,9 @@ public class NodePairing
             node.SetScale(scale);
         }
 
-        foreach(LaserManager lightningManager in LightningManagers)
+        foreach(LaserManager laserManager in LaserManagers)
         {
-            lightningManager.SetScale(scale);
+            laserManager.SetScale(scale);
         }
     }
 }

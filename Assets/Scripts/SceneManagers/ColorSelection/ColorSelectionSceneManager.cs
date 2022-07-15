@@ -393,7 +393,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             hitSplitManager.Run(true, Time.deltaTime);
             _explosionManager.Run();
 
-            _nodePair.LightningManagers[0].Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
+            _nodePair.LaserManagers[0].Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
 
             _handleParticles(Time.deltaTime);
         }

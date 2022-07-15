@@ -60,9 +60,9 @@ class RegularGameService
 
                 //int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count; //this would only be used if we want circular connections
 
-                if (i < nodePair.Nodes.Count - 1 && nodePair.LightningManagers != null)
+                if (i < nodePair.Nodes.Count - 1 && nodePair.LaserManagers != null)
                 {
-                    nodePair.LightningManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
+                    nodePair.LaserManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
                 }
             }
         }
@@ -78,9 +78,9 @@ class RegularGameService
 
                 //int nextNodeInLoop = ((i + 1) + (nodePair.Nodes.Count * 2)) % nodePair.Nodes.Count; //this would only be used if we want circular connections
 
-                if (i < nodePair.Nodes.Count - 1 && nodePair.LightningManagers != null)
+                if (i < nodePair.Nodes.Count - 1 && nodePair.LaserManagers != null)
                 {
-                    nodePair.LightningManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
+                    nodePair.LaserManagers[i].Run(nodePair.Nodes[i].transform.position, nodePair.Nodes[i + 1].transform.position);
                 }
             }
         }

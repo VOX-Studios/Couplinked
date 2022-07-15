@@ -117,7 +117,7 @@ Material:
     - _Light_Aperture: 0.15
     - _Light_Brightness: 5
     - _Light_Focus_Factor: 0.4
-    - _Light_Punch_Out: 0.02
+    - _Light_Punch_Out: 0.035
     - _Light_Range: 0.25
     - _Metallic: 0
     - _Number_Of_Data_Points: 70

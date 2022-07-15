@@ -6,7 +6,8 @@ namespace Assets.Scripts.Lighting
     public class LightingManager : MonoBehaviour
     {
         public RenderTexture BaseLightTexture;
-        public Material BaseLightMateral;
+        public Renderer BaseLightRenderer;
+        private Material _baseLightMaterial;
 
         private Texture2D _positionsTexture;
         private Texture2D _colorsTexture;
@@ -20,8 +21,11 @@ namespace Assets.Scripts.Lighting
         private int _dataTextureWidth;
         private readonly int _texelSize = 1;
 
+        private float _lightPunchOut;
+
         public void Initialize()
         {
+            _baseLightMaterial = BaseLightRenderer.material;
             BaseLightTexture.width = Screen.width;
             BaseLightTexture.height = Screen.height;
 
@@ -42,10 +46,17 @@ namespace Assets.Scripts.Lighting
                 _availableDataPoints.Enqueue(i);
             }
 
-            BaseLightMateral.SetTexture("_Positions", _positionsTexture);
-            BaseLightMateral.SetTexture("_Colors", _colorsTexture);
+            _baseLightMaterial.SetTexture("_Positions", _positionsTexture);
+            _baseLightMaterial.SetTexture("_Colors", _colorsTexture);
 
-            BaseLightMateral.SetFloat("_Number_Of_Data_Points", _numDataPoints);
+            _baseLightMaterial.SetFloat("_Number_Of_Data_Points", _numDataPoints);
+
+            _lightPunchOut = _baseLightMaterial.GetFloat("_Light_Punch_Out");
+        }
+
+        public void SetScale(float scale)
+        {
+            _baseLightMaterial.SetFloat("_Light_Punch_Out", _lightPunchOut * scale);
         }
 
         private Texture2D _makeDataTexture(int textureWidth)
@@ -68,7 +79,7 @@ namespace Assets.Scripts.Lighting
 
         public void SetColor(Color color)
         {
-            BaseLightMateral.SetColor("_Color", color);
+            _baseLightMaterial.SetColor("_Color", color);
         }
 
         public int GetLightIndex()
