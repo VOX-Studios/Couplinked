@@ -388,9 +388,10 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     return;
             }
 
-            noHitManager.Run(true, Time.deltaTime);
-            hitManager.Run(true, Time.deltaTime);
-            hitSplitManager.Run(true, Time.deltaTime);
+            //TODO: add/move lights
+            //noHitManager.Run(true, Time.deltaTime);
+            //hitManager.Run(true, Time.deltaTime);
+            //hitSplitManager.Run(true, Time.deltaTime);
             _explosionManager.Run();
 
             _nodePair.LaserManagers[0].Run(_nodePair.Nodes[0].transform.position, _nodePair.Nodes[1].transform.position);
@@ -595,19 +596,19 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
         private void _clearGame()
         {
-            for (int i = hitManager.activeHits.Count - 1; i >= 0; i--)
+            for (int i = hitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                hitManager.DeactivateHit(i);
+                hitManager.DeactivateGameEntity(i);
             }
 
-            for (int i = noHitManager.activeNoHits.Count - 1; i >= 0; i--)
+            for (int i = noHitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                noHitManager.DeactivateNoHit(i);
+                noHitManager.DeactivateGameEntity(i);
             }
 
-            for (int i = hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)
+            for (int i = hitSplitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                hitSplitManager.DeactivateHitSplit(i);
+                hitSplitManager.DeactivateGameEntity(i);
             }
 
             _explosionManager.DeactiveExplosions();

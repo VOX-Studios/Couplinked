@@ -6,6 +6,7 @@ class RegularGameService
 {
     private GameManager _gameManager;
     private GameSceneManager _gameSceneManager;
+    private NoHitManager _noHitManager;
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
 
@@ -16,6 +17,7 @@ class RegularGameService
     public RegularGameService(
         GameManager gameManager,
         GameSceneManager gameSceneManager,
+        NoHitManager noHitManager,
         HitManager hitManager,
         HitSplitManager hitSplitManager,
         GameInput[][] gameInputs,
@@ -24,6 +26,7 @@ class RegularGameService
     {
         _gameManager = gameManager;
         _gameSceneManager = gameSceneManager;
+        _noHitManager = noHitManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
 
@@ -36,11 +39,84 @@ class RegularGameService
         _setNodeStartPositions();
     }
 
-    public void RunInput(float deltaTime)
+    public float[] CalculateRowPositions(int numRows)
     {
+        float[] rowPositions = new float[numRows];
+
+        float borderPadding = 2.5f; //TODO: share this with clamp
+        rowPositions[0] = GameManager.TopY - borderPadding;
+        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
+
+        //take top and bot and divide by remaining positions
+        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
+
+        for (int i = 1; i < rowPositions.Length - 1; i++)
+        {
+            rowPositions[i] = rowPositions[0] - (spacing * i);
+        }
+
+        return rowPositions;
+    }
+
+    public float HandleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
+    {
+        float scale;
+        if (numRows <= 3)
+        {
+            scale = 1f;
+        }
+        else
+        {
+            scale = 3f / numRows;
+        }
+
+        foreach (NodePairing nodePair in nodePairs)
+        {
+            nodePair.SetScale(scale);
+        }
+
+        _gameManager.LightingManager.SetScale(scale);
+        explosionManager.SetScale(scale);
+        _gameSceneManager.CameraShake.Scale = scale;
+
+        return scale;
+    }
+
+    public void Run(bool isPaused, float deltaTime)
+    {
+        _runGameEntityManager(_noHitManager, isPaused, deltaTime);
+        _runGameEntityManager(_hitManager, isPaused, deltaTime);
+        _runGameEntityManager(_hitSplitManager, isPaused, deltaTime);
+
+        if(isPaused)
+        {
+            return;
+        }
+
         for (int i = 0; i < _gameInputs.Length; i++)
         {
             _runInput(_gameInputs[i], _nodePairs[i], deltaTime);
+        }
+    }
+
+    private void _runGameEntityManager<T>(IGameEntityManager<T> gameEntityManager, bool isPaused, float deltaTime) where T : IGameEntity
+    {
+        for (int i = gameEntityManager.ActiveGameEntities.Count - 1; i >= 0; i--)
+        {
+            T gameEntity = gameEntityManager.ActiveGameEntities[i];
+            if (!isPaused)
+            {
+                gameEntity.Move(deltaTime);
+            }
+
+            _gameManager.LightingManager.SetLightPosition(gameEntity.LightIndex, gameEntity.Transform.position);
+
+            //TODO: don't do this here?
+            if (gameEntityManager.ActiveGameEntities[i].Transform.position.x < GameManager.LeftX - 2.5f)
+            {
+                gameEntityManager.DeactivateGameEntity(i);
+                continue;
+            }
         }
     }
 
@@ -111,7 +187,7 @@ class RegularGameService
 
             _gameSceneManager.AddToScore(hit.transform.position, node);
             _gameSceneManager.AddExplosion(hit.transform.position, _getExplosionColor(hit.TeamId, hit.NodeId));
-            _hitManager.DeactivateHit(hit);
+            _hitManager.DeactivateGameEntity(hit);
             _gameSceneManager.Shake();
 
             switch (hit.NodeId)
@@ -210,7 +286,7 @@ class RegularGameService
             hitSplit.WasHitTwice = true;
             _gameSceneManager.AddToScore(hitSplit.transform.position, node);
             _gameSceneManager.AddExplosion(hitSplit.transform.position, _getExplosionColor(hitSplit.SecondHitTeamId, hitSplit.HitSplitSecondType));
-            _hitSplitManager.DeactivateHitSplit(hitSplit);
+            _hitSplitManager.DeactivateGameEntity(hitSplit);
             _gameSceneManager.Shake();
 
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);

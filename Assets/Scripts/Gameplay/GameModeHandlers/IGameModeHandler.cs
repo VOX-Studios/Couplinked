@@ -1,12 +1,10 @@
-﻿using Assets.Scripts.SceneManagers;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 interface IGameModeHandler
 {
     void Initialize();
 
-    void Run(float deltaTime);
+    void Run(bool isPaused, float deltaTime);
 
     void OnHitCollision(Hit hit, Collider2D other);
 

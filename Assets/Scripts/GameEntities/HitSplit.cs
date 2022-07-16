@@ -1,8 +1,7 @@
 ﻿using Assets.Scripts.SceneManagers;
-using System;
 using UnityEngine;
 
-public class HitSplit : BaseObject 
+public class HitSplit : GameEntity 
 {
     private GameSceneManager _gameSceneManager;
 
@@ -28,9 +27,6 @@ public class HitSplit : BaseObject
 	public float Scale { get; private set; }
 
 	private MaterialPropertyBlock _propertyBlock;
-
-	[NonSerialized]
-	public int LightIndex = -1;
 
 	public Color InsideColor { get; private set; }
 	public Color OutsideColor { get; private set; }
@@ -97,7 +93,7 @@ public class HitSplit : BaseObject
 		renderer.SetPropertyBlock(_propertyBlock);
 	}
 
-	public void Move(float time) 
+	public override void Move(float time) 
 	{
 		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
 		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);

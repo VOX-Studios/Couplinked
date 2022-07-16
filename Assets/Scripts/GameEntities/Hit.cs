@@ -1,13 +1,12 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Hit : BaseObject 
+public class Hit : GameEntity 
 {
 	private IHitCollisionHandler _hitCollisionHandler;
 
 	public int NodeId;
 	public int TeamId;
-	public float Scale;
+	public float Scale { get; private set; }
 
 	[SerializeField]
 	private SpriteRenderer _spriteRenderer;
@@ -16,9 +15,6 @@ public class Hit : BaseObject
 	private SpriteRenderer _blurSpriteRenderer;
 
 	private MaterialPropertyBlock _propertyBlock;
-
-	[NonSerialized]
-	public int LightIndex = -1;
 
 	public Color Color;
 
@@ -54,7 +50,7 @@ public class Hit : BaseObject
 		renderer.SetPropertyBlock(_propertyBlock);
 	}
 	
-	public void Move(float time) 
+	public override void Move(float time) 
 	{
 		transform.position -= new Vector3 (Speed * Scale, 0, 0) * time;
 		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);

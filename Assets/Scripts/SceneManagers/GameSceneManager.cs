@@ -54,6 +54,9 @@ namespace Assets.Scripts.SceneManagers
         public NodePairing[] _nodePairs;
         private GameInput[][] _gameInputs;
 
+        private bool _isPaused;
+        private bool _isResuming;
+
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -85,8 +88,8 @@ namespace Assets.Scripts.SceneManagers
             _explosionManager.Initialize(_gameManager.DataManager);
             _scoreJuiceManager.Initialize();
 
-            _gameManager.isPaused = false;
-            _gameManager.isResuming = false;
+            _setPaused(false);
+            _isResuming = false;
             CameraShake.Initialize(_gameManager);
 
             _gameManager.score = 0;
@@ -125,6 +128,12 @@ namespace Assets.Scripts.SceneManagers
             }
 
             _startGame();
+        }
+
+        private void _setPaused(bool isPaused)
+        {
+            _isPaused = isPaused;
+            _gameManager.IsPaused = isPaused;
         }
 
         private void _setupSinglePlayer()
@@ -324,7 +333,7 @@ namespace Assets.Scripts.SceneManagers
 
         void Update()
         {
-            if (_gameManager.isResuming)
+            if (_isResuming)
             {
                 _resumeCount -= Time.deltaTime;
                 _resumeCountText.text = Mathf.Ceil(_resumeCount).ToString();
@@ -333,8 +342,9 @@ namespace Assets.Scripts.SceneManagers
                     return;
 
                 _resumeCountText.gameObject.SetActive(false);
-                _gameManager.isResuming = false;
-                _gameManager.isPaused = false;
+                _isResuming = false;
+
+                _setPaused(false);
 
                 foreach(NodePairing nodePair in _nodePairs)
                 {
@@ -347,7 +357,7 @@ namespace Assets.Scripts.SceneManagers
                 _explosionManager.Play();
             }
 
-            if(_gameManager.isPaused)
+            if(_isPaused)
             {
                 if (_gameInputs.Any(inputs => inputs.Any(input => input.UnpauseInput)))
                 {
@@ -398,25 +408,22 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            _noHitManager.Run(_gameManager.isPaused, Time.deltaTime);
-            _hitManager.Run(_gameManager.isPaused, Time.deltaTime);
-            _hitSplitManager.Run(_gameManager.isPaused, Time.deltaTime);
-
-            //nothing left to do if we're paused
-            if (_gameManager.isPaused)
-                return;
-
             //if we've got a level loaded (not survival)
             if (_gameManager.CurrentLevel != null)
             {
-                _levelHandler.Run(Time.deltaTime);
+                _levelHandler.Run(_isPaused, Time.deltaTime);
             }
             else
             {
-                _survivalHandler.Run(Time.deltaTime);
+                _survivalHandler.Run(_isPaused, Time.deltaTime);
             }
 
-            
+            //nothing left to do if we're paused
+            if (_isPaused)
+            {
+                return;
+            }
+
             _explosionManager.Run();
             _scoreJuiceManager.Run(Time.deltaTime);
 
@@ -459,7 +466,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.SoundEffectManager.PlayBack();
             _clearGame();
 
-            _gameManager.isPaused = false;
+            _setPaused(false);
 
             string unlockMessage = "";
             if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
@@ -488,10 +495,10 @@ namespace Assets.Scripts.SceneManagers
 
         private void _startResume()
         {
-            if (_gameManager.isPaused && !_gameManager.isResuming)
+            if (_isPaused && !_isResuming)
             {
                 _resumeCountText.fontSize = _gameManager.resumeCountNormalFontSize;
-                _gameManager.isResuming = true;
+                _isResuming = true;
                 _resumeCount = 3;
                 _resumeCountText.text = "3";
                 _resumeCountText.gameObject.SetActive(true);
@@ -500,7 +507,7 @@ namespace Assets.Scripts.SceneManagers
 
         private void _pause()
         {
-            _gameManager.isPaused = true;
+            _setPaused(true);
 
             foreach (NodePairing nodePair in _nodePairs)
             {
@@ -549,19 +556,19 @@ namespace Assets.Scripts.SceneManagers
                     break;
             }
 
-            for (int i = _hitManager.activeHits.Count - 1; i >= 0; i--)
+            for (int i = _hitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                _hitManager.DeactivateHit(i);
+                _hitManager.DeactivateGameEntity(i);
             }
 
-            for (int i = _noHitManager.activeNoHits.Count - 1; i >= 0; i--)
+            for (int i = _noHitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                _noHitManager.DeactivateNoHit(i);
+                _noHitManager.DeactivateGameEntity(i);
             }
 
-            for (int i = _hitSplitManager.activeHitSplits.Count - 1; i >= 0; i--)
+            for (int i = _hitSplitManager.ActiveGameEntities.Count - 1; i >= 0; i--)
             {
-                _hitSplitManager.DeactivateHitSplit(i);
+                _hitSplitManager.DeactivateGameEntity(i);
             }
 
             _explosionManager.DeactiveExplosions();

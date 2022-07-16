@@ -20,9 +20,7 @@ class SurvivalHandler : IGameModeHandler
     /// </summary>
     private double _minSpawnInterval = .5;
 
-    private byte _numberOfRows = 5; //TODO: handle new lighting system scaling to match
-    private float[] _rowPositions;
-    private float _scale;
+    private byte _numberOfRows = 5; //TODO: make new lighting system scale to match changes to number of rows
 
     private GameManager _gameManager;
     private GameSceneManager _gameSceneManager;
@@ -70,6 +68,7 @@ class SurvivalHandler : IGameModeHandler
         _gameService = new RegularGameService(
             gameManager: _gameManager,
             gameSceneManager: _gameSceneManager,
+            noHitManager: _noHitManager,
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
@@ -77,50 +76,10 @@ class SurvivalHandler : IGameModeHandler
             );
     }
 
-    private float[] _calculateRowPositions(int numRows)
-    {
-        float[] rowPositions = new float[numRows];
-
-        float borderPadding = 2.5f; //TODO: share this with clamp
-        rowPositions[0] = GameManager.TopY - borderPadding;
-        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
-
-        //take top and bot and divide by remaining positions
-        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
-
-        for (int i = 1; i < rowPositions.Length - 1; i++)
-        {
-            rowPositions[i] = rowPositions[0] - (spacing * i);
-        }
-
-        return rowPositions;
-    }
-
-    private void _handleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
-    {
-        if (numRows <= 3)
-        {
-            _scale = 1f;
-        }
-        else
-        {
-            _scale = 3f / numRows;
-        }
-
-        foreach (NodePairing nodePair in nodePairs)
-        {
-            nodePair.SetScale(_scale);
-        }
-
-        _gameManager.LightingManager.SetScale(_scale);
-        explosionManager.SetScale(_scale);
-        _gameSceneManager.CameraShake.Scale = _scale;
-    }
-
     public void Initialize()
     {
-        _rowPositions = _calculateRowPositions(_numberOfRows);
-        _handleScaling(_numberOfRows, _nodePairings, _explosionManager);
+        float[] rowPositions = _gameService.CalculateRowPositions(_numberOfRows);
+        float scale = _gameService.HandleScaling(_numberOfRows, _nodePairings, _explosionManager);
 
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
         {
@@ -131,8 +90,8 @@ class SurvivalHandler : IGameModeHandler
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
                 nodePairings: _nodePairings,
-                rowPositions: _rowPositions,
-                scale: _scale
+                rowPositions: rowPositions,
+                scale: scale
                 );
         }
         else
@@ -144,8 +103,8 @@ class SurvivalHandler : IGameModeHandler
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
                 nodePairings: _nodePairings,
-                rowPositions: _rowPositions,
-                scale: _scale
+                rowPositions: rowPositions,
+                scale: scale
                 );
         }
 
@@ -156,14 +115,18 @@ class SurvivalHandler : IGameModeHandler
         _gameService.Start();
     }
 
-    public void Run(float deltaTime)
+    public void Run(bool isPaused, float deltaTime)
     {
-        _handleSpawners(deltaTime);
-        _gameService.RunInput(deltaTime);
+        _handleSpawners(isPaused, deltaTime);
+        _gameService.Run(isPaused, deltaTime);
     }
 
-    private void _handleSpawners(float deltaTime)
+    private void _handleSpawners(bool isPaused, float deltaTime)
     {
+        if(isPaused)
+        {
+            return;
+        }
         _spawnTimer -= deltaTime;
 
         if (_spawnTimer > 0)

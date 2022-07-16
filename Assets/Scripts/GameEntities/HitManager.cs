@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using Assets.Scripts.SceneManagers;
 
-public class HitManager : MonoBehaviour 
+public class HitManager : MonoBehaviour, IGameEntityManager<Hit>
 {
 	public GameObject HitPrefab;
 
-	public List<Hit> activeHits;
-	public List<Hit> inactiveHits;
+	public List<Hit> ActiveGameEntities { get; private set; }
+	private List<Hit> _inactiveHits;
 
 	private GameManager _gameManager;
 
@@ -19,8 +19,8 @@ public class HitManager : MonoBehaviour
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
 
-		activeHits = new List<Hit>();
-		inactiveHits = new List<Hit>();
+		ActiveGameEntities = new List<Hit>();
+		_inactiveHits = new List<Hit>();
 
 		//TODO: move them to be under bolts
 		Transform parent = GameObject.Find("HitManager").transform;
@@ -32,42 +32,7 @@ public class HitManager : MonoBehaviour
 
 			hit.transform.parent = parent;
 			hit.SetActive(false);
-			inactiveHits.Add(hitComponent);
-		}
-	}
-	
-	public void Run(bool isPaused, float deltaTime) 
-	{
-		if(isPaused)
-        {
-			_runPaused();
-			return;
-		}
-
-		for(int i = activeHits.Count - 1; i >= 0; i--)
-		{
-			Hit hit = activeHits[i];
-			hit.Move(deltaTime);
-			_gameManager.LightingManager.SetLightPosition(hit.LightIndex, hit.transform.position);
-
-			if (activeHits[i].transform.position.x < GameManager.LeftX - activeHits[i].gameObject.GetComponent<Renderer>().bounds.extents.x)
-			{
-				DeactivateHit(i);
-
-				if (_gameSceneManager.EndGame(ReasonForGameEndEnum.HitOffScreen)) //TODO: should this be here?
-				{
-					break;
-				}
-			}
-
-		}
-	}
-
-	private void _runPaused()
-	{
-		foreach (Hit hit in activeHits)
-		{
-			_gameManager.LightingManager.SetLightPosition(hit.LightIndex, hit.transform.position);
+			_inactiveHits.Add(hitComponent);
 		}
 	}
 
@@ -85,13 +50,13 @@ public class HitManager : MonoBehaviour
 		SoundEffectManager.PitchToPlay explosionPitch
 		)
 	{
-		int inactiveCount = inactiveHits.Count;
+		int inactiveCount = _inactiveHits.Count;
 		if(inactiveCount == 0)
         {
 			return;
         }
 
-		Hit hit = inactiveHits[inactiveCount - 1];
+		Hit hit = _inactiveHits[inactiveCount - 1];
 		hit.SetScale(scale);
 		hit.transform.position = spawnPosition;
 		hit.SetColor(hitColor);
@@ -105,25 +70,25 @@ public class HitManager : MonoBehaviour
 		hit.ExplosionPitch = explosionPitch;
 
 		hit.gameObject.SetActive(true);
-		inactiveHits.RemoveAt(inactiveCount - 1);
-		activeHits.Add(hit);
+		_inactiveHits.RemoveAt(inactiveCount - 1);
+		ActiveGameEntities.Add(hit);
 	}
 	
-	public void DeactivateHit(int index)
+	public void DeactivateGameEntity(int index)
 	{
-		Hit hit = activeHits[index];
+		Hit hit = ActiveGameEntities[index];
 		hit.ReleaseLightIndex();
 		hit.gameObject.SetActive(false);
-		activeHits.RemoveAt(index);
-		inactiveHits.Add(hit);
+		ActiveGameEntities.RemoveAt(index);
+		_inactiveHits.Add(hit);
 	}
 
-	public void DeactivateHit(Hit hit)
+	public void DeactivateGameEntity(Hit hit)
 	{
 		hit.ReleaseLightIndex();
 		hit.gameObject.SetActive(false);
-		activeHits.Remove(hit);
-		inactiveHits.Add(hit);
+		ActiveGameEntities.Remove(hit);
+		_inactiveHits.Add(hit);
 	}
 
 }

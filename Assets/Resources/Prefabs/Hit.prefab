@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 400000}
   - component: {fileID: 21200000}
-  - component: {fileID: 11400000}
   - component: {fileID: 5800000}
   - component: {fileID: 5000000}
+  - component: {fileID: 11400000}
   m_Layer: 9
   m_Name: Hit
   m_TagString: Untagged
@@ -30,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2184966598529779832}
   m_Father: {fileID: 0}
@@ -87,22 +88,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e39d3e5a01b45d418743bd49bc6db76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HitType: 0
-  TeamId: 0
-  _spriteRenderer: {fileID: 21200000}
-  _blurSpriteRenderer: {fileID: 3173439728160005697}
 --- !u!58 &5800000
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -140,6 +125,24 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3310f2f55f9b7429528583e92a5e84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NodeId: 0
+  TeamId: 0
+  Scale: 1
+  _spriteRenderer: {fileID: 21200000}
+  _blurSpriteRenderer: {fileID: 3173439728160005697}
+  Color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &3340832090784708480
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,6 +170,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 400000}
   m_RootOrder: 0

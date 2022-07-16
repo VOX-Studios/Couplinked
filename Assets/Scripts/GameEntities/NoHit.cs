@@ -1,15 +1,11 @@
 ﻿using Assets.Scripts.SceneManagers;
-using System;
 using UnityEngine;
 
-public class NoHit : BaseObject
+public class NoHit : GameEntity
 {
     private GameSceneManager _gameSceneManager;
 
 	public float Scale { get; private set; }
-
-	[NonSerialized]
-	public int LightIndex = -1;
 
     // Use this for initialization
     void Start () 
@@ -24,7 +20,7 @@ public class NoHit : BaseObject
 		transform.localScale = new Vector3(scale, scale, 1);
 	}
 
-	public void Move(float time) 
+	public override void Move(float time) 
 	{
 		transform.position -= new Vector3(Speed * Scale, 0, 0) * time;
 		//_GameManager.Grid.Logic.ApplyImplosiveForce(1 * Scale, transform.position, 1 * Scale);

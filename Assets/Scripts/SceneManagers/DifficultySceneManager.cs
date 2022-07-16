@@ -22,7 +22,7 @@ namespace Assets.Scripts.SceneManagers
 
         private const string _HARD_DESCRIPTION= "The way the game was meant to be played.";
         private const string _EASY_DESCRIPTION = "For casual gamers struggling with hard mode.  Everything is slower here.";
-        private const string _VERY_EASY_DESCRIPTION = "Same as easy mode but lightning is disabled.";
+        private const string _VERY_EASY_DESCRIPTION = "Easy mode but lightning is disabled.";
 
         void Start()
         {

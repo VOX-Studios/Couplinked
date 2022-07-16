@@ -12,7 +12,6 @@ class LevelHandler : IGameModeHandler
     private float[] _rowPositions;
     private float _scale;
 
-
     /// <summary>
     /// How many seconds the length of the screen represents
     /// </summary>
@@ -61,6 +60,7 @@ class LevelHandler : IGameModeHandler
         _gameService = new RegularGameService(
             gameManager: _gameManager,
             gameSceneManager: _gameSceneManager,
+            noHitManager: _noHitManager,
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
@@ -70,8 +70,9 @@ class LevelHandler : IGameModeHandler
 
     public void Initialize()
     {
-        _rowPositions = _calculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
-        _handleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings, _explosionManager);
+        _rowPositions = _gameService.CalculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
+        _scale = _gameService.HandleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings, _explosionManager);
+
         _gameService.Start();
 
         _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
@@ -83,54 +84,18 @@ class LevelHandler : IGameModeHandler
         _nextSpawn = 0;
     }
 
-    private float[] _calculateRowPositions(int numRows)
+    public void Run(bool isPaused, float deltaTime)
     {
-        float[] rowPositions = new float[numRows];
-
-        float borderPadding = 2.5f; //TODO: share this with clamp
-        rowPositions[0] = GameManager.TopY - borderPadding;
-        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
-
-        //take top and bot and divide by remaining positions
-        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
-
-        for (int i = 1; i < rowPositions.Length - 1; i++)
+        if (isPaused)
         {
-            rowPositions[i] = rowPositions[0] - (spacing * i);
+            return;
         }
 
-        return rowPositions;
-    }
-
-    private void _handleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
-    {
-        if (numRows <= 3)
-        {
-            _scale = 1f;
-        }
-        else
-        {
-            _scale = 3f / numRows;
-        }
-
-        foreach (NodePairing nodePair in nodePairs)
-        {
-            nodePair.SetScale(_scale);
-        }
-
-        _gameManager.LightingManager.SetScale(_scale);
-        explosionManager.SetScale(_scale);
-        _gameSceneManager.CameraShake.Scale = _scale;
-    }
-
-
-    public void Run(float deltaTime)
-    {
         _gameTimeAtRightScreen += deltaTime * _gameManager.GameDifficultyManager.GameTimeModifier;
 
         _handleSpawners();
 
-        _gameService.RunInput(deltaTime);
+        _gameService.Run(isPaused, deltaTime);
     }
 
     private void _handleSpawners()
@@ -199,7 +164,7 @@ class LevelHandler : IGameModeHandler
             //will always be > 0....redundant here
             if (_gameManager.CurrentLevel.Data.Count > 0)
             {
-                if (!_hasTimerStartedForEverythingInactive && _noHitManager.activeNoHits.Count + _hitManager.activeHits.Count + _hitSplitManager.activeHitSplits.Count == 0)
+                if (!_hasTimerStartedForEverythingInactive && _noHitManager.ActiveGameEntities.Count + _hitManager.ActiveGameEntities.Count + _hitSplitManager.ActiveGameEntities.Count == 0)
                 {
                     _hasTimerStartedForEverythingInactive = true;
                 }

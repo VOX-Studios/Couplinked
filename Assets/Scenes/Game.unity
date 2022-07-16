@@ -4977,12 +4977,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 111346614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c851f0143451b1042b0056b1306a2e22, type: 3}
+  m_Script: {fileID: 11500000, guid: d29c1993c54903f4580a5bdbd04c33c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   NoHitPrefab: {fileID: 100000, guid: a19ac669ecbd05d4692889cd6741fd24, type: 3}
-  activeNoHits: []
-  inactiveNoHits: []
 --- !u!1 &284109349
 GameObject:
   m_ObjectHideFlags: 0
@@ -5166,7 +5164,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 622799776}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a424eaad8cf1294fadbd83ff7cd40f7, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fbbe39d270a3b24fa06e1f108d50275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HitPrefab: {fileID: 100000, guid: bf2a541aa0a5bfe43a4431481383b3ed, type: 3}
@@ -5234,7 +5232,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &830520222
 Transform:
   m_ObjectHideFlags: 0
@@ -10487,7 +10485,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1486135160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4a32a37bc9e6954eb20e0c44ba68ffe, type: 3}
+  m_Script: {fileID: 11500000, guid: 340476044eb06774d9d6a37d96a7eb4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HitSplitPrefab: {fileID: 100000, guid: 79d5230f07adb674c9d50639f51e0f85, type: 3}

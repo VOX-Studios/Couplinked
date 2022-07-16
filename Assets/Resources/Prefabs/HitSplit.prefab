@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 400000}
   - component: {fileID: 21200000}
-  - component: {fileID: 11400000}
   - component: {fileID: 5800000}
   - component: {fileID: 5000000}
+  - component: {fileID: 11400000}
   m_Layer: 9
   m_Name: HitSplit
   m_TagString: Untagged
@@ -30,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 266265886619843670}
   - {fileID: 8588919103346207741}
@@ -89,28 +90,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c46d98a64176cad4c8e8382248220b3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _insideSpriteRenderer: {fileID: 21200000}
-  _outsideSpriteRenderer: {fileID: 5188640455475372306}
-  _blurInsideSpriteRenderer: {fileID: 4734234447359757333}
-  _blurOutsideSpriteRenderer: {fileID: 3658066638252518624}
-  FirstHitTeamId: 0
-  SecondHitTeamId: 0
-  HitSplitFirstType: 0
-  HitSplitSecondType: 0
-  WasHitOnce: 0
-  WasHitTwice: 0
 --- !u!58 &5800000
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -148,6 +127,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fae4ee07d667644926560fbc760e79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _insideSpriteRenderer: {fileID: 21200000}
+  _outsideSpriteRenderer: {fileID: 5188640455475372306}
+  _blurInsideSpriteRenderer: {fileID: 4734234447359757333}
+  _blurOutsideSpriteRenderer: {fileID: 3658066638252518624}
+  FirstHitTeamId: 0
+  SecondHitTeamId: 0
+  HitSplitFirstType: 0
+  HitSplitSecondType: 0
+  WasHitOnce: 0
+  WasHitTwice: 0
 --- !u!1 &4399255932386558873
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +176,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 400000}
   m_RootOrder: 1
@@ -258,6 +260,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 400000}
   m_RootOrder: 2
@@ -341,6 +344,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 400000}
   m_RootOrder: 0

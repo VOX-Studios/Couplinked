@@ -29,7 +29,7 @@ namespace Assets.Scripts.Lighting
             BaseLightTexture.width = Screen.width;
             BaseLightTexture.height = Screen.height;
 
-            //60 max objects + 8 max player nodes
+            //60 max objects + 8 max player nodes (rounded up)
             _numDataPoints = 70;
 
             _dataTextureWidth = _numDataPoints * _texelSize;

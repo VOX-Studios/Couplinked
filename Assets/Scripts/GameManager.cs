@@ -512,15 +512,13 @@ public class GameManager : MonoBehaviour
 	public int score = 0;
 	public int ringsCollected = 0;
 
-	public bool isPaused = false, isResuming = false;
+	public bool IsPaused;
 
 	public int resumeCountNormalFontSize; //TODO: this is only necessary because I'm sharing text object with "PAUSED"
 
 	public GameObject MenuBackButtonPrefab;
 
 	public int LocalHighScore = 0;
-
-
 
 	public GameObject ColorSelectionSwabPrefab;
 
@@ -545,7 +543,7 @@ public class GameManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (!isPaused)
+		if (!IsPaused)
 		{
 			Grid.Run();
 		}
