@@ -13,7 +13,7 @@ public class NoHitManager : MonoBehaviour, IGameEntityManager<NoHit>
 	public float Scale { get; private set; }
 
 	// Use this for initialization
-	public void Initialize() 
+	public void Initialize(ICollisionHandler<NoHit> noHitCollisionHandler) 
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
@@ -25,9 +25,12 @@ public class NoHitManager : MonoBehaviour, IGameEntityManager<NoHit>
 		for(int i = 0; i < Common.MaxPerObjectInGame; i++)
 		{
 			GameObject noHit = (GameObject)Instantiate(NoHitPrefab);
+			NoHit noHitComponent = noHit.GetComponent<NoHit>();
+			noHitComponent.Initialize(noHitCollisionHandler);
+
 			noHit.transform.parent = parent;
 			noHit.SetActive(false);
-			_inactiveNoHits.Add(noHit.GetComponent<NoHit>());
+			_inactiveNoHits.Add(noHitComponent);
 		}
 	}
 

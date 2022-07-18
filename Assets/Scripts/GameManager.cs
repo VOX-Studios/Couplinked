@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
 		LightingManager.Initialize();
 		Grid.Initialize(this);
 
-		GameState = GameStateEnum.Loading;
+		AppState = AppStateEnum.Loading;
 
 		string unlockMessage;
 		Challenges.HandleUnlockingChallenge(Challenges.ID_IncorrectPronounciation, out unlockMessage);
@@ -524,7 +524,7 @@ public class GameManager : MonoBehaviour
 
 	public GameObject LevelInfoPrefab;
 
-	public GameStateEnum GameState;
+	public AppStateEnum AppState;
 
 	public int Hit1HitCount, Hit2HitCount, HitSplit1HitCount, HitSplit2HitCount, NoHitHitCount;
 	public int TimePlayedHours, TimePlayedMinutes, TimePlayedSeconds;
@@ -568,9 +568,9 @@ public class GameManager : MonoBehaviour
 			return;
 		}
 
-		switch (GameState)
+		switch (AppState)
 		{
-			case GameStateEnum.Loading:
+			case AppStateEnum.Loading:
 				HandleLoading();
 				break;
 		}
@@ -586,7 +586,7 @@ public class GameManager : MonoBehaviour
 
 	public void LoadScene(string sceneToLoad)
 	{
-		GameState = GameStateEnum.InBetweenScenes;
+		AppState = AppStateEnum.InBetweenScenes;
 		SceneManager.LoadScene(sceneToLoad);
 	}
 
@@ -598,64 +598,64 @@ public class GameManager : MonoBehaviour
 		switch (SceneManager.GetActiveScene().name)
 		{
 			case "Start":
-				GameState = GameStateEnum.StartScreen;
+				AppState = AppStateEnum.StartScreen;
 				break;
 			case "GameModeSelection":
-				GameState = GameStateEnum.GameModeSelection;
+				AppState = AppStateEnum.GameModeSelection;
 				break;
 			case "Level Editor":
-				GameState = GameStateEnum.LevelEditor;
+				AppState = AppStateEnum.LevelEditor;
 				break;
 			case "Levels":
-				GameState = GameStateEnum.LevelSelection;
+				AppState = AppStateEnum.LevelSelection;
 				break;
 			case "LevelEditorSelection":
-				GameState = GameStateEnum.LevelEditorSelectionScreen;
+				AppState = AppStateEnum.LevelEditorSelectionScreen;
 				break;
 			case "Multiplayer Controller Selection":
-				GameState = GameStateEnum.MultiplayerControllerSelection;
+				AppState = AppStateEnum.MultiplayerControllerSelection;
 				break;
 			case "Instructions":
-				GameState = GameStateEnum.InstructionsScreen;
+				AppState = AppStateEnum.InstructionsScreen;
 				break;
 			case "Options":
-				GameState = GameStateEnum.OptionsScreen;
+				AppState = AppStateEnum.OptionsScreen;
 				break;
 			case "Achievements":
-				GameState = GameStateEnum.AchievementsScreen;
+				AppState = AppStateEnum.AchievementsScreen;
 				break;
 			case "Graphics":
-				GameState = GameStateEnum.GraphicsScreen;
+				AppState = AppStateEnum.GraphicsScreen;
 				break;
 			case "Sound":
-				GameState = GameStateEnum.SoundScreen;
+				AppState = AppStateEnum.SoundScreen;
 				break;
 			case "Account":
-				GameState = GameStateEnum.AccountScreen;
+				AppState = AppStateEnum.AccountScreen;
 				break;
 			case "Color Selection":
-				GameState = GameStateEnum.ColorSelectionScreen;
+				AppState = AppStateEnum.ColorSelectionScreen;
 				break;
 			case "Statistics":
-				GameState = GameStateEnum.StatisticsScreen;
+				AppState = AppStateEnum.StatisticsScreen;
 				break;
 			case "Local Statistics":
-				GameState = GameStateEnum.LocalStatisticsScreen;
+				AppState = AppStateEnum.LocalStatisticsScreen;
 				break;
 			case "Game":
-				GameState = GameStateEnum.Game;
+				AppState = AppStateEnum.Game;
 				break;
 			case "End":
-				GameState = GameStateEnum.EndScreen;
+				AppState = AppStateEnum.EndScreen;
 				break;
 		}
 
-		switch (GameState)
+		switch (AppState)
 		{
 			default:
 				Cursor.visible = true;
 				break;
-			case GameStateEnum.Game:
+			case AppStateEnum.Game:
 				Cursor.visible = false;
 				break;
 		}
@@ -663,12 +663,12 @@ public class GameManager : MonoBehaviour
 		bool shouldKeepMenuBackgroundNodes = true;
 		bool shouldKeepMenuBackgroundSparkleParticles = true;
 
-		if (GameState == GameStateEnum.Game || GameState == GameStateEnum.LevelEditor)
+		if (AppState == AppStateEnum.Game || AppState == AppStateEnum.LevelEditor)
 		{
 			shouldKeepMenuBackgroundSparkleParticles = false;
 			shouldKeepMenuBackgroundNodes = false;
 		}
-		else if (GameState == GameStateEnum.MultiplayerControllerSelection)
+		else if (AppState == AppStateEnum.MultiplayerControllerSelection)
 		{
 			shouldKeepMenuBackgroundNodes = false;
 		}
@@ -678,7 +678,7 @@ public class GameManager : MonoBehaviour
 
 		if (MusicOn)
 		{
-			if (GameState == GameStateEnum.Game || GameState == GameStateEnum.EndScreen)
+			if (AppState == AppStateEnum.Game || AppState == AppStateEnum.EndScreen)
 			{
 				AudioManager.SwitchToGameMusic();
 			}
@@ -690,7 +690,7 @@ public class GameManager : MonoBehaviour
 			AudioManager.FadeIn(1);
 		}
 
-		InputManager.ToggleInputs(GameState, NotificationManager.IsActive);
+		InputManager.ToggleInputs(AppState, NotificationManager.IsActive);
 
 		if (NotificationManager.IsRequested)
 			NotificationManager.Activate();

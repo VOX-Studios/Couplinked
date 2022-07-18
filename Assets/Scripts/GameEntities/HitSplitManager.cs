@@ -14,7 +14,7 @@ public class HitSplitManager : MonoBehaviour, IGameEntityManager<HitSplit>
     private GameSceneManager _gameSceneManager;
 
     // Use this for initialization
-    public void Initialize() 
+    public void Initialize(ICollisionHandler<HitSplit> hitSplitCollisionHandler) 
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
@@ -27,7 +27,8 @@ public class HitSplitManager : MonoBehaviour, IGameEntityManager<HitSplit>
 		{
 			GameObject hitSplit = (GameObject)Instantiate(HitSplitPrefab);
 			HitSplit hitSplitComponent = hitSplit.GetComponent<HitSplit>();
-			hitSplitComponent.Initialize();
+			hitSplitComponent.Initialize(hitSplitCollisionHandler);
+
 			hitSplit.transform.parent = parent;
 			hitSplit.SetActive(false);
 			_inactiveHitSplits.Add(hitSplitComponent);

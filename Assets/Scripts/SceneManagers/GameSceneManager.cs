@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Gameplay;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers
 {
-    class GameSceneManager : MonoBehaviour, IHitCollisionHandler
+    class GameSceneManager : MonoBehaviour
     {
         private GameManager _gameManager;
 
@@ -54,8 +55,7 @@ namespace Assets.Scripts.SceneManagers
         public NodePairing[] _nodePairs;
         private GameInput[][] _gameInputs;
 
-        private bool _isPaused;
-        private bool _isResuming;
+        private GameStateEnum _gameState;
 
         void Start()
         {
@@ -80,20 +80,8 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            CameraShake = new CameraShake();
 
-            _hitManager.Initialize();
-            _noHitManager.Initialize();
-            _hitSplitManager.Initialize();
-            _explosionManager.Initialize(_gameManager.DataManager);
-            _scoreJuiceManager.Initialize();
-
-            _setPaused(false);
-            _isResuming = false;
-            CameraShake.Initialize(_gameManager);
-
-            _gameManager.score = 0;
-            _gameManager.ringsCollected = 0;
+            IGameModeHandler gameModeHandler;
 
             //if survival mode
             if(_gameManager.CurrentLevel == null)
@@ -109,7 +97,7 @@ namespace Assets.Scripts.SceneManagers
                     explosionManager: _explosionManager
                     );
 
-                _survivalHandler.Initialize();
+                gameModeHandler = _survivalHandler;
             }
             else
             {
@@ -124,16 +112,41 @@ namespace Assets.Scripts.SceneManagers
                     explosionManager: _explosionManager
                     );
 
-                _levelHandler.Initialize();
+                gameModeHandler = _levelHandler;
             }
 
+
+            _hitManager.Initialize(gameModeHandler);
+            _noHitManager.Initialize(gameModeHandler);
+            _hitSplitManager.Initialize(gameModeHandler);
+            _explosionManager.Initialize(_gameManager.DataManager);
+            _scoreJuiceManager.Initialize();
+
+            CameraShake = new CameraShake();
+            CameraShake.Initialize(_gameManager);
+
+            _setState(GameStateEnum.Playing);
+
+            _gameManager.score = 0;
+            _gameManager.ringsCollected = 0;
+
+            gameModeHandler.Initialize();
             _startGame();
         }
 
-        private void _setPaused(bool isPaused)
+        private void _setState(GameStateEnum gameState)
         {
-            _isPaused = isPaused;
-            _gameManager.IsPaused = isPaused;
+            _gameState = gameState;
+
+
+            if(gameState == GameStateEnum.Paused || gameState == GameStateEnum.Resuming)
+            {
+                _gameManager.IsPaused = true;
+            }
+            else
+            {
+                _gameManager.IsPaused = false;
+            }
         }
 
         private void _setupSinglePlayer()
@@ -292,59 +305,21 @@ namespace Assets.Scripts.SceneManagers
             }
         }
 
-        public void OnHitCollision(Hit hit, Collider2D other)
-        {
-            //if we've got a level loaded (not survival)
-            if (_gameManager.CurrentLevel != null)
-            {
-                _levelHandler.OnHitCollision(hit, other);
-            }
-            else
-            {
-                _survivalHandler.OnHitCollision(hit, other);
-            }
-        }
-
-        public void OnHitSplitCollision(HitSplit hitSplit, Collider2D other)
-        {
-            //if we've got a level loaded (not survival)
-            if (_gameManager.CurrentLevel != null)
-            {
-                _levelHandler.OnHitSplitCollision(hitSplit, other);
-            }
-            else
-            {
-                _survivalHandler.OnHitSplitCollision(hitSplit, other);
-            }
-        }
-
-        public void OnNoHitCollision(NoHit noHit, Collider2D other)
-        {
-            //if we've got a level loaded (not survival)
-            if (_gameManager.CurrentLevel != null)
-            {
-                _levelHandler.OnNoHitCollision(noHit, other);
-            }
-            else
-            {
-                _survivalHandler.OnNoHitCollision(noHit, other);
-            }
-        }
-
         void Update()
         {
-            if (_isResuming)
+            if (_gameState == GameStateEnum.Resuming)
             {
                 _resumeCount -= Time.deltaTime;
                 _resumeCountText.text = Mathf.Ceil(_resumeCount).ToString();
 
                 if (_resumeCount > 0)
+                {
                     return;
+                }
 
                 _resumeCountText.gameObject.SetActive(false);
-                _isResuming = false;
 
-                _setPaused(false);
+                _setState(GameStateEnum.Playing);
 
                 foreach(NodePairing nodePair in _nodePairs)
                 {
@@ -357,7 +332,7 @@ namespace Assets.Scripts.SceneManagers
                 _explosionManager.Play();
             }
 
-            if(_isPaused)
+            if(_gameState == GameStateEnum.Paused)
             {
                 if (_gameInputs.Any(inputs => inputs.Any(input => input.UnpauseInput)))
                 {
@@ -411,15 +386,15 @@ namespace Assets.Scripts.SceneManagers
             //if we've got a level loaded (not survival)
             if (_gameManager.CurrentLevel != null)
             {
-                _levelHandler.Run(_isPaused, Time.deltaTime);
+                _levelHandler.Run(_gameState == GameStateEnum.Paused || _gameState == GameStateEnum.Resuming, Time.deltaTime);
             }
             else
             {
-                _survivalHandler.Run(_isPaused, Time.deltaTime);
+                _survivalHandler.Run(_gameState == GameStateEnum.Paused || _gameState == GameStateEnum.Resuming, Time.deltaTime);
             }
 
             //nothing left to do if we're paused
-            if (_isPaused)
+            if (_gameState == GameStateEnum.Paused || _gameState == GameStateEnum.Resuming)
             {
                 return;
             }
@@ -431,7 +406,7 @@ namespace Assets.Scripts.SceneManagers
 
             _scoreText.text = _gameManager.score.ToString();
 
-            if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.GameState == GameStateEnum.Game)
+            if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.AppState == AppStateEnum.Game)
             {
                 EndGame(_gameManager.ReasonForGameEnd);
             }
@@ -466,7 +441,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.SoundEffectManager.PlayBack();
             _clearGame();
 
-            _setPaused(false);
+            _setState(GameStateEnum.Playing);
 
             string unlockMessage = "";
             if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
@@ -495,19 +470,22 @@ namespace Assets.Scripts.SceneManagers
 
         private void _startResume()
         {
-            if (_isPaused && !_isResuming)
+            if (_gameState != GameStateEnum.Paused)
             {
-                _resumeCountText.fontSize = _gameManager.resumeCountNormalFontSize;
-                _isResuming = true;
-                _resumeCount = 3;
-                _resumeCountText.text = "3";
-                _resumeCountText.gameObject.SetActive(true);
+                return;
             }
+
+
+            _resumeCountText.fontSize = _gameManager.resumeCountNormalFontSize;
+            _setState(GameStateEnum.Resuming);
+            _resumeCount = 3;
+            _resumeCountText.text = "3";
+            _resumeCountText.gameObject.SetActive(true);
         }
 
         private void _pause()
         {
-            _setPaused(true);
+            _setState(GameStateEnum.Paused);
 
             foreach (NodePairing nodePair in _nodePairs)
             {

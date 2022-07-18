@@ -2,7 +2,7 @@
 
 public class Hit : GameEntity 
 {
-	private IHitCollisionHandler _hitCollisionHandler;
+	private ICollisionHandler<Hit> _hitCollisionHandler;
 
 	public int NodeId;
 	public int TeamId;
@@ -19,7 +19,7 @@ public class Hit : GameEntity
 	public Color Color;
 
 	// Use this for initialization
-	public void Initialize(IHitCollisionHandler hitCollisionHandler) 
+	public void Initialize(ICollisionHandler<Hit> hitCollisionHandler) 
 	{
 		_hitCollisionHandler = hitCollisionHandler;
 		_propertyBlock = new MaterialPropertyBlock();
@@ -67,6 +67,6 @@ public class Hit : GameEntity
 		if (!gameObject.activeSelf)
 			return;
 
-		_hitCollisionHandler.OnHitCollision(this, other);
+		_hitCollisionHandler.OnCollision(this, other);
 	}
 }

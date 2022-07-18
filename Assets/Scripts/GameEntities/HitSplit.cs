@@ -1,9 +1,8 @@
-﻿using Assets.Scripts.SceneManagers;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HitSplit : GameEntity 
 {
-    private GameSceneManager _gameSceneManager;
+	private ICollisionHandler<HitSplit> _hitSplitCollisionHandler;
 
 	[SerializeField]
 	private SpriteRenderer _insideSpriteRenderer;
@@ -32,9 +31,9 @@ public class HitSplit : GameEntity
 	public Color OutsideColor { get; private set; }
 
 	// Use this for initialization
-	public void Initialize() 
+	public void Initialize(ICollisionHandler<HitSplit> hitSplitCollisionHandler) 
 	{
-        _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
+		_hitSplitCollisionHandler = hitSplitCollisionHandler;
 
 		_propertyBlock = new MaterialPropertyBlock();
 
@@ -110,6 +109,6 @@ public class HitSplit : GameEntity
 		if (!gameObject.activeSelf)
 			return;
 
-		_gameSceneManager.OnHitSplitCollision(this, other);
+		_hitSplitCollisionHandler.OnCollision(this, other);
 	}
 }

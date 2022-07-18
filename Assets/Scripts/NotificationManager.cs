@@ -68,7 +68,7 @@ public class NotificationManager : MonoBehaviour
 		IsActive = true;
 		TheText.text = Messages.Dequeue();
 
-		_gameManager.InputManager.ToggleInputs(_gameManager.GameState, IsActive);
+		_gameManager.InputManager.ToggleInputs(_gameManager.AppState, IsActive);
 	}
 
 	public void Close()
@@ -80,7 +80,7 @@ public class NotificationManager : MonoBehaviour
 	{
 		IsActive = false;
 		Notification.SetActive(false);
-		_gameManager.InputManager.ToggleInputs(_gameManager.GameState, IsActive);
+		_gameManager.InputManager.ToggleInputs(_gameManager.AppState, IsActive);
 	}
 
 	private float _transitionStep = 5f;

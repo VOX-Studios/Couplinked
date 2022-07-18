@@ -153,17 +153,17 @@ class SurvivalHandler : IGameModeHandler
         _spawnTimer = _spawnInterval;
     }
 
-    public void OnHitCollision(Hit hit, Collider2D other)
+    public void OnCollision(Hit hit, Collider2D other)
     {
         _gameService.OnHitCollision(hit, other);
     }
 
-    public void OnHitSplitCollision(HitSplit hitSplit, Collider2D other)
+    public void OnCollision(HitSplit hitSplit, Collider2D other)
     {
         _gameService.OnHitSplitCollision(hitSplit, other);
     }
 
-    public void OnNoHitCollision(NoHit noHit, Collider2D other)
+    public void OnCollision(NoHit noHit, Collider2D other)
     {
         _gameService.OnNoHitCollision(noHit, other);
     }

@@ -1,4 +1,4 @@
-﻿public enum GameStateEnum : byte
+﻿public enum AppStateEnum : byte
 {
 	Loading,
 	InBetweenScenes, //TODO: what is this?

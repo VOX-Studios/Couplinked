@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers.ColorSelection
 {
-    class ColorSelectionSceneManager : MonoBehaviour, IHitCollisionHandler
+    class ColorSelectionSceneManager : MonoBehaviour, ICollisionHandler<Hit>
     {
         private GameManager _gameManager;
 
@@ -306,7 +306,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             return new Vector3(rawConverted.x, rawConverted.y);
         }
 
-        public void OnHitCollision(Hit hit, Collider2D other)
+        public void OnCollision(Hit hit, Collider2D other)
         {
             if (hit == _hit1)
             {

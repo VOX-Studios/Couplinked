@@ -1,16 +1,15 @@
-﻿using Assets.Scripts.SceneManagers;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class NoHit : GameEntity
 {
-    private GameSceneManager _gameSceneManager;
+	private ICollisionHandler<NoHit> _noHitCollisionHandler;
 
 	public float Scale { get; private set; }
 
     // Use this for initialization
-    void Start () 
+    public void Initialize(ICollisionHandler<NoHit> noHitCollisionHandler) 
 	{
-        _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
+		_noHitCollisionHandler = noHitCollisionHandler;
 		Speed = _GameManager.GameDifficultyManager.ObjectSpeed;
 	}
 
@@ -37,6 +36,6 @@ public class NoHit : GameEntity
 		if (!gameObject.activeSelf)
 			return;
 
-		_gameSceneManager.OnNoHitCollision(this, other);
+		_noHitCollisionHandler.OnCollision(this, other);
 	}
 }

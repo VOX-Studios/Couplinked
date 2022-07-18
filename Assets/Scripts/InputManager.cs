@@ -19,7 +19,7 @@ public class InputManager
 		_defaultUiInputActionMap = defaultInputActions.FindActionMap("UI");
 	}
 
-	public void ToggleInputs(GameStateEnum gameState, bool isNotificationActive)
+	public void ToggleInputs(AppStateEnum appState, bool isNotificationActive)
     {
 		if (isNotificationActive)
 		{
@@ -35,19 +35,19 @@ public class InputManager
 		_notificationManagerInputActionMap.Disable();
 		_defaultUiInputActionMap.Enable();
 
-		switch (gameState)
+		switch (appState)
 		{
 			default:
 				_gameInputActionMap.Disable();
 				_menuInputActionMap.Enable();
 				_levelEditorInputActionMap.Disable();
 				break;
-			case GameStateEnum.Game:
+			case AppStateEnum.Game:
 				_gameInputActionMap.Enable();
 				_menuInputActionMap.Disable();
 				_levelEditorInputActionMap.Disable();
 				break;
-			case GameStateEnum.LevelEditor:
+			case AppStateEnum.LevelEditor:
 				_gameInputActionMap.Disable();
 				_menuInputActionMap.Disable();
 				_levelEditorInputActionMap.Enable();

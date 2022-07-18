@@ -14,7 +14,7 @@ public class HitManager : MonoBehaviour, IGameEntityManager<Hit>
     private GameSceneManager _gameSceneManager;
 
     // Use this for initialization
-    public void Initialize() 
+    public void Initialize(ICollisionHandler<Hit> hitCollisionHandler) 
 	{
 		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
@@ -28,7 +28,7 @@ public class HitManager : MonoBehaviour, IGameEntityManager<Hit>
 		{
 			GameObject hit = (GameObject)Instantiate(HitPrefab);
 			Hit hitComponent = hit.GetComponent<Hit>();
-			hitComponent.Initialize(_gameSceneManager);
+			hitComponent.Initialize(hitCollisionHandler);
 
 			hit.transform.parent = parent;
 			hit.SetActive(false);
