@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Gameplay;
+using Assets.Scripts.Lighting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,9 +58,13 @@ namespace Assets.Scripts.SceneManagers
 
         private GameStateEnum _gameState;
 
+        public VignetteManager VignetteManager;
+
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+            VignetteManager.Initialize();
 
             //if there's only 1 team and 1 player
             if (_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 1)
@@ -137,7 +142,6 @@ namespace Assets.Scripts.SceneManagers
         private void _setState(GameStateEnum gameState)
         {
             _gameState = gameState;
-
 
             if(gameState == GameStateEnum.Paused || gameState == GameStateEnum.Resuming)
             {
@@ -307,6 +311,12 @@ namespace Assets.Scripts.SceneManagers
 
         void Update()
         {
+            if (_gameState == GameStateEnum.Ending)
+            {
+                _handleGameEnding();
+                return;
+            }
+
             if (_gameState == GameStateEnum.Resuming)
             {
                 _resumeCount -= Time.deltaTime;
@@ -406,10 +416,135 @@ namespace Assets.Scripts.SceneManagers
 
             _scoreText.text = _gameManager.score.ToString();
 
+            //if we've won
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.AppState == AppStateEnum.Game)
             {
-                EndGame(_gameManager.ReasonForGameEnd);
+                EndGame(_gameManager.ReasonForGameEnd, true);
             }
+        }
+
+        private void _handleGameEnding()
+        {
+            foreach (NodePairing nodePair in _nodePairs)
+            {
+                foreach (Node node in nodePair.Nodes)
+                {
+                    //TODO: don't do this every frame, just on start end
+                    node.ParticleSystem.Pause();
+                }
+            }
+
+            //TODO: don't do this every frame, just on start end
+            _explosionManager.Pause();
+
+
+            VignetteManager.Run(Time.deltaTime);
+            _scoreJuiceManager.Run(Time.deltaTime);
+            CameraShake.Run(Time.deltaTime);
+
+            if (VignetteManager.Phase == 1)
+            {
+                //check for input
+                if (_gameInputs.Any(inputs => inputs.Any(input => input.ExitInput || input.PauseInput || input.UnpauseInput)))
+                {
+                    //start phase 2
+                    VignetteManager.StartClosePhase2(0);
+                    return;
+                }
+            }
+
+            if (VignetteManager.Phase == 2 && !VignetteManager.IsClosing)
+            {
+                _endGame();
+            }
+        }
+
+        private void _endGame()
+        {
+            //TODO: switch this to a call like OnGameEnd and pass into our level/survival handlers
+            if (_gameManager.CurrentLevel != null)
+            {
+                //if we're custom or campaign AND we won
+                if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor && _gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win)
+                {
+                    int savedScore = _gameManager.DataManager.GetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
+                    int playerScoreRating = _gameManager.CurrentLevel.RateScore(_gameManager.score);
+
+                    if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.Campaign)
+                    {
+                        int levelNumber = Convert.ToInt16(_gameManager.CurrentLevel.LevelData.Name.Substring(6, 2));
+                        //achievement is only for level 40 and beyond
+                        if (levelNumber > 40)
+                        {
+                            int potentialRingsCollected = _gameManager.CurrentLevel.CalculatePotentialRingsCollected();
+                            if (_gameManager.ringsCollected == potentialRingsCollected)
+                            {
+                                string unlockMessage = "";
+                                if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_CollectEveryRingInALevel, out unlockMessage))
+                                    _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                            }
+                        }
+                    }
+
+                    if (_gameManager.score > savedScore)
+                    {
+                        int savedScoreRating = _gameManager.DataManager.GetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
+
+                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
+                        _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
+
+                        if (savedScoreRating > 0)
+                            _gameManager.NotificationManager.QueueNotification("New High Score!");
+                    }
+                    else if (_gameManager.CurrentLevel.MaxScore == 0)
+                    {
+                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
+                        _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
+                    }
+
+                    if (playerScoreRating > 0 && _gameManager.TheLevelSelectionMode == LevelTypeEnum.Campaign)
+                    {
+                        string unlockMessage = _gameManager.HandleUnlockingLevels();
+                        if (unlockMessage.Length > 0)
+                            _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                    }
+                }
+            }
+            else //survival game
+            {
+                if (_gameManager.score >= 1000)
+                {
+                    string unlockMessage = "";
+                    if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_1000Points, out unlockMessage))
+                        _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                }
+
+                bool newLocalHighScore = _gameManager.LocalHighScore < _gameManager.score;
+
+                if (newLocalHighScore)
+                {
+                    _gameManager.LocalHighScore = _gameManager.score;
+                    _gameManager.DataManager.SetSurvivalHighScore(_gameManager.LocalHighScore);
+                    _gameManager.NotificationManager.QueueNotification("New High Score!");
+                }
+            }
+
+            if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor)
+            {
+                if (_gameManager.score == 0 && _gameManager.ReasonForGameEnd != ReasonForGameEndEnum.Quit)
+                {
+                    string unlockMessage = "";
+                    if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_0Points, out unlockMessage))
+                        _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                }
+            }
+
+            PlayerPrefs.Save();
+
+            _gameManager.GamesPlayed++;
+            _clearGame();
+
+            _gameManager.LoadScene(SceneNames.End);
         }
 
         private void _setupNodeTrail(ParticleSystem particleSystem)
@@ -437,6 +572,8 @@ namespace Assets.Scripts.SceneManagers
 
         private void _exit()
         {
+            //TODO: this should match the end game stuff, no?
+
             _gameManager.ReasonForGameEnd = ReasonForGameEndEnum.Quit;
             _gameManager.SoundEffectManager.PlayBack();
             _clearGame();
@@ -474,7 +611,6 @@ namespace Assets.Scripts.SceneManagers
             {
                 return;
             }
-
 
             _resumeCountText.fontSize = _gameManager.resumeCountNormalFontSize;
             _setState(GameStateEnum.Resuming);
@@ -516,7 +652,7 @@ namespace Assets.Scripts.SceneManagers
 
         public void Shake()
         {
-            CameraShake.StartShake(.35f);
+            CameraShake.StartShake(.34f);
         }
 
         public Vector3 GetCamOriginalPos()
@@ -570,114 +706,34 @@ namespace Assets.Scripts.SceneManagers
         }
 
         /// <summary>
-        /// Ends the game if the right condistions are met.
+        /// Starts ending the game or instantly ends the game.
         /// </summary>
-        /// <returns><c>true</c>, if game was ended, <c>false</c> otherwise.</returns>
         /// <param name="reasonForGameEnd">Reason for game end.</param>
-        public bool EndGame(ReasonForGameEndEnum reasonForGameEnd)
+        public void EndGame(ReasonForGameEndEnum reasonForGameEnd, bool isInstant = false)
         {
             //TODO: reenable this when we're done testing
-            if (reasonForGameEnd != ReasonForGameEndEnum.Win)
+            if (reasonForGameEnd != ReasonForGameEndEnum.Win && reasonForGameEnd != ReasonForGameEndEnum.Quit)
             {
-                return false;
-            }            
+                return;
+            }
+
+            if(reasonForGameEnd != ReasonForGameEndEnum.Win && reasonForGameEnd != ReasonForGameEndEnum.Quit)
+            {
+                _gameManager.SoundEffectManager.PlayGameOver();
+            }
 
             _gameManager.ReasonForGameEnd = reasonForGameEnd;
 
-            if (_gameManager.CurrentLevel != null)
+            if (isInstant)
             {
-                switch (reasonForGameEnd)
-                {
-                    case ReasonForGameEndEnum.HitOffScreen:
-                    case ReasonForGameEndEnum.HitSplitOffScreen:
-                        return false; //ignore off screen losses for levels
-                }
-
-                //if we're custom or campaign AND we won
-                if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor && _gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win)
-                {
-                    int savedScore = _gameManager.DataManager.GetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
-                    int playerScoreRating = _gameManager.CurrentLevel.RateScore(_gameManager.score);
-
-                    if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.Campaign)
-                    {
-                        int levelNumber = Convert.ToInt16(_gameManager.CurrentLevel.LevelData.Name.Substring(6, 2));
-                        if (levelNumber > 40)
-                        {
-                            int potentialRingsCollected = _gameManager.CurrentLevel.CalculatePotentialRingsCollected();
-                            if (_gameManager.ringsCollected == potentialRingsCollected)
-                            {
-                                string unlockMessage = "";
-                                if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_CollectEveryRingInALevel, out unlockMessage))
-                                    _gameManager.NotificationManager.QueueNotification(unlockMessage);
-                            }
-                        }
-                    }
-
-                    if (_gameManager.score > savedScore)
-                    {
-                        int savedScoreRating = _gameManager.DataManager.GetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
-
-                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
-                        _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
-
-                        if (savedScoreRating > 0)
-                            _gameManager.NotificationManager.QueueNotification("New High Score!");
-                    }
-                    else if (_gameManager.CurrentLevel.MaxScore == 0)
-                    {
-                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
-                        _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
-                    }
-
-
-                    if (playerScoreRating > 0 && _gameManager.TheLevelSelectionMode == LevelTypeEnum.Campaign)
-                    {
-                        string unlockMessage = _gameManager.HandleUnlockingLevels();
-                        if (unlockMessage.Length > 0)
-                            _gameManager.NotificationManager.QueueNotification(unlockMessage);
-                    }
-                }
+                _gameState = GameStateEnum.Ended;
+                _endGame();
             }
-            else //survival game
+            else
             {
-                if (_gameManager.score >= 1000)
-                {
-                    string unlockMessage = "";
-                    if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_1000Points, out unlockMessage))
-                        _gameManager.NotificationManager.QueueNotification(unlockMessage);
-                }
-
-                bool newLocalHighScore = _gameManager.LocalHighScore < _gameManager.score;
-
-                if (newLocalHighScore)
-                {
-                    _gameManager.LocalHighScore = _gameManager.score;
-                    _gameManager.DataManager.SetSurvivalHighScore(_gameManager.LocalHighScore);
-                    _gameManager.NotificationManager.QueueNotification("New High Score!");
-                }
+                _gameState = GameStateEnum.Ending;
+                
             }
-
-            if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor)
-            {
-                if (_gameManager.score == 0 && _gameManager.ReasonForGameEnd != ReasonForGameEndEnum.Quit)
-                {
-                    string unlockMessage = "";
-                    if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_0Points, out unlockMessage))
-                        _gameManager.NotificationManager.QueueNotification(unlockMessage);
-                }
-            }
-
-            if (_gameManager.ReasonForGameEnd != ReasonForGameEndEnum.Win)
-                _gameManager.SoundEffectManager.PlayGameOver();
-
-            PlayerPrefs.Save();
-
-            _gameManager.GamesPlayed++;
-            _clearGame();
-
-            _gameManager.LoadScene("End");
-            return true;
         }
 
         public void AddToScore(Vector3 position, Node node)

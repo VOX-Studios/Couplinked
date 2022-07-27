@@ -2,7 +2,6 @@
 
 public class PointMass
 {
-    private Vector3 _originalPosition;
     public Vector3 Position;
     public Vector3 Velocity;
     public float InverseMass;
@@ -13,7 +12,6 @@ public class PointMass
     public PointMass(Vector3 position, float invMass)
     {
         Position = position;
-        _originalPosition = position;
         InverseMass = invMass;
     }
 

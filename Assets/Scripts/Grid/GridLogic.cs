@@ -58,13 +58,13 @@ public class GridLogic
                 {
                     springList.Add(new Spring(Points[x, y], Points[x, y], 0.9f, 0.9f));
                 }
-                else if (x % 3 == 0 && y % 3 == 0) // loosely anchor 1/9th of the point masses 
-                {
-                    //springList.Add(new Spring(fixedPoints[x, y], Points[x, y], 0.01f, 0.9f));
-                }
+                //else if (x % 3 == 0 && y % 3 == 0) // loosely anchor 1/9th of the point masses 
+                //{
+                //    springList.Add(new Spring(Points[x, y], Points[x, y], 0.01f, 0.9f));
+                //}
 
-                const float stiffness = .15f; //0.28f;
-                const float damping = 0.06f; //0.06f;
+                const float stiffness = .15f;
+                const float damping = 0.06f;
                 if (x > 0)
                 {
                     springList.Add(new Spring(Points[x - 1, y], Points[x, y], stiffness, damping));

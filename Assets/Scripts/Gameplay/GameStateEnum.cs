@@ -5,6 +5,7 @@
         Playing,
         Paused,
         Resuming,
-        Ending
+        Ending,
+        Ended
     }
 }

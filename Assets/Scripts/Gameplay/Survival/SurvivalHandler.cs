@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.SceneManagers;
+﻿using Assets.Scripts.Gameplay;
+using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
 class SurvivalHandler : IGameModeHandler
@@ -78,8 +79,9 @@ class SurvivalHandler : IGameModeHandler
 
     public void Initialize()
     {
-        float[] rowPositions = _gameService.CalculateRowPositions(_numberOfRows);
-        float scale = _gameService.HandleScaling(_numberOfRows, _nodePairings, _explosionManager);
+        float[] rowPositions = RowPositionsUtility.CalculateRowPositions(_numberOfRows);
+        float scale = ScaleUtility.CalculateScale(_gameManager.CurrentLevel.NumberOfRows);
+        _gameService.SetScale(scale, _nodePairings, _explosionManager);
 
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
         {

@@ -159,7 +159,7 @@ namespace Assets.Scripts.SceneManagers
         {
             //TODO: add explosion when we move?
 
-            //teamSelection will only be -1 if the nodes have just been created
+            //TeamSlot will only be -1 if the nodes have just been created
             if (changedState.TeamSlot == -1)
             {
                 changedState.NodePairing.Nodes[0].transform.position = GetTeamPanelsCenterWorldPoint();
@@ -169,7 +169,7 @@ namespace Assets.Scripts.SceneManagers
                 return;
             }
 
-            //TODO: adjust the -1 positions?
+            //TODO: adjust the -1 positions
             if (previousTeam != -1)
             {
                 ControllerSelectionState[] previousTeamStates = _playerStates.Values.Where(state => state.TeamSlot == previousTeam).ToArray();
@@ -267,12 +267,6 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.HandleBack() && _gameManager.PlayerManager.Players.Count == 0)
             {
                 _onExitScene();
-                for (int i = _gameManager.PlayerManager.Players.Count - 1; i >= 0; i--)
-                {
-                    PlayerInput player = _gameManager.PlayerManager.Players[i];
-                    _removePlayer(player);
-                }
-
                 _gameManager.SoundEffectManager.PlayBack();
                 _gameManager.LoadScene(SceneNames.PlayerModeSelection);
                 return;
@@ -345,7 +339,7 @@ namespace Assets.Scripts.SceneManagers
                     else //player was not ready so drop
                     {
                         _removePlayer(playerInput);
-
+                        
                         //being joining again if we had stopped previously
                         if (!_gameManager.PlayerManager.IsJoining)
                         {
@@ -355,6 +349,7 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
         }
+
         private void _removePlayer(PlayerInput player)
         {
             ControllerSelectionState controllerSelectionState = _playerStates[player];
@@ -371,7 +366,12 @@ namespace Assets.Scripts.SceneManagers
             }
             
             _playerStates.Remove(player);
+
             _gameManager.PlayerManager.RemovePlayer(player);
+
+            //update positions of the team we were previously on
+            ControllerSelectionState[] previousTeamStates = _playerStates.Values.Where(state => state.TeamSlot == controllerSelectionState.TeamSlot).ToArray();
+            _updateTeamNodePositions(previousTeamStates);
         }
 
         private bool _shouldStartGame()

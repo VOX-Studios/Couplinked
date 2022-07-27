@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.PlayerInputs;
+﻿using Assets.Scripts.Gameplay;
+using Assets.Scripts.PlayerInputs;
 using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
@@ -39,37 +40,8 @@ class RegularGameService
         _setNodeStartPositions();
     }
 
-    public float[] CalculateRowPositions(int numRows)
+    public void SetScale(float scale, NodePairing[] nodePairs, ExplosionManager explosionManager)
     {
-        float[] rowPositions = new float[numRows];
-
-        float borderPadding = 2.5f; //TODO: share this with clamp
-        rowPositions[0] = GameManager.TopY - borderPadding;
-        rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
-
-        //take top and bot and divide by remaining positions
-        float spacing = (rowPositions[0] - rowPositions[rowPositions.Length - 1]) / (rowPositions.Length - 1);
-
-        for (int i = 1; i < rowPositions.Length - 1; i++)
-        {
-            rowPositions[i] = rowPositions[0] - (spacing * i);
-        }
-
-        return rowPositions;
-    }
-
-    public float HandleScaling(int numRows, NodePairing[] nodePairs, ExplosionManager explosionManager)
-    {
-        float scale;
-        if (numRows <= 3)
-        {
-            scale = 1f;
-        }
-        else
-        {
-            scale = 3f / numRows;
-        }
-
         foreach (NodePairing nodePair in nodePairs)
         {
             nodePair.SetScale(scale);
@@ -78,8 +50,6 @@ class RegularGameService
         _gameManager.LightingManager.SetScale(scale);
         explosionManager.SetScale(scale);
         _gameSceneManager.CameraShake.Scale = scale;
-
-        return scale;
     }
 
     public void Run(bool isPaused, float deltaTime)
@@ -111,10 +81,12 @@ class RegularGameService
 
             _gameManager.LightingManager.SetLightPosition(gameEntity.LightIndex, gameEntity.Transform.position);
 
-            //TODO: don't do this here?
+            //TODO: don't do this here? Pass through LevelManager/SurvivalManager and put the logic in there?
+            //          OR just have a trigger for when this shit gets to this point and handle it like we do collisions?
             if (gameEntityManager.ActiveGameEntities[i].Transform.position.x < GameManager.LeftX - 2.5f)
             {
                 gameEntityManager.DeactivateGameEntity(i);
+                //TODO: end game if it's survival mode?
                 continue;
             }
         }
@@ -204,7 +176,7 @@ class RegularGameService
         else //hit the wrong node
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hit.Scale, hit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch);
+            _endGame(ReasonForGameEndEnum.Mismatch, hit.transform.position);
         }
     }
 
@@ -259,7 +231,7 @@ class RegularGameService
         else //hit the wrong node first
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch);
+            _endGame(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
         }
     }
 
@@ -298,7 +270,7 @@ class RegularGameService
         else //hit the wrong node
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch);
+            _endGame(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
         }
     }
 
@@ -309,18 +281,19 @@ class RegularGameService
 
         if (other.gameObject.tag == "Connector")
         {
-            _endGame(ReasonForGameEndEnum.NoHitContactWithElectricity);
+            _endGame(ReasonForGameEndEnum.NoHitContactWithElectricity, noHit.transform.position);
         }
         else
         {
             //TODO: put another pulse on the node that hit?
-            _endGame(ReasonForGameEndEnum.NoHitContactWithNode);
+            _endGame(ReasonForGameEndEnum.NoHitContactWithNode, noHit.transform.position);
         }
     }
 
-    private void _endGame(ReasonForGameEndEnum reasonForGameEnd)
+    private void _endGame(ReasonForGameEndEnum reasonForGameEnd, Vector2 position)
     {
         _gameSceneManager.EndGame(reasonForGameEnd);
+        _gameSceneManager.VignetteManager.StartClosePhase1(position, .1f);
     }
 
     private void _setNodeStartPositions()

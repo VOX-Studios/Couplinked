@@ -9,21 +9,50 @@ public class CameraShake
 	/// </summary>
 	public Vector3 OriginalPos { get; private set; }
 
-	//how long the camera should shake for
+	/// <summary>
+	/// How long the camera should shake for.
+	/// </summary>
 	private float _shakeTime = 0f;
 
-	//how much longer the camera will shake for
+	/// <summary>
+	/// How much longer the camera will shake for.
+	/// </summary>
 	private float _shakeTimeRemaining = 0f;
 
-	//strength of the shake
+	/// <summary>
+	/// Strength of the shake.
+	/// </summary>
 	private float _shakeStrength = .25f;
 
 	public float Scale = 1;
+
+	private Vector3 _targetPosition;
+
+	/// <summary>
+	/// How many times the camera should move each second.
+	/// </summary>
+	private uint _shakesPerSecond = 60;
+
+	/// <summary>
+	/// Time until the camera should move again.
+	/// </summary>
+	private float _timeUntilNextShake = 0f;
+
+	/// <summary>
+	/// Value for lerping between current and target position.
+	/// </summary>
+	private float _shakeLerp = 0f;
+
+	/// <summary>
+	/// Value for lerping between current and original position.
+	/// </summary>
+	private float _resetLerp = 0f;
 	
 	public void Initialize(GameManager gameManager)
 	{
 		_camTransform = gameManager.Cam.transform;
 		OriginalPos = _camTransform.position;
+		_targetPosition = OriginalPos;
 
 		QualitySettingEnum shakeStrength = gameManager.DataManager.ScreenShakeStrength.Get();
 
@@ -62,23 +91,35 @@ public class CameraShake
 	{
 		if (_shakeTimeRemaining > 0)
 		{
-			_camTransform.position = OriginalPos + Random.insideUnitSphere * _shakeStrength * Scale * (_shakeTimeRemaining / _shakeTime);
+			_resetLerp = 0f;
+
+			_timeUntilNextShake -= deltaTime;
+			if(_timeUntilNextShake <= 0)
+            {
+				Vector2 randomOffset = Random.insideUnitCircle;
+				_targetPosition = OriginalPos + new Vector3(randomOffset.x, randomOffset.y) * _shakeStrength * Scale * (_shakeTimeRemaining / _shakeTime);
+				_timeUntilNextShake = 1f/_shakesPerSecond;
+				_shakeLerp = 0;
+			}
+
+			_shakeLerp += deltaTime * _shakesPerSecond * 2;
+			_shakeLerp = Mathf.Clamp(_shakeLerp, 0f, 1f);
+			_camTransform.position = Vector3.Lerp(_camTransform.position, _targetPosition, _shakeLerp);
 			_shakeTimeRemaining -= deltaTime;
 		}
 		else
 		{
 			_shakeTimeRemaining = 0f;
 			_shakeTime = 0f;
-			
-			//move towards the original position
-			_camTransform.position = Vector3.Lerp(_camTransform.position, OriginalPos, deltaTime);
+			_timeUntilNextShake = 0f;
 
-			//if we're close enough to where we should be
-			if (Vector3.SqrMagnitude(_camTransform.position - OriginalPos) < .001f)
-			{
-				//just snap to the position
-				_camTransform.position = OriginalPos;
-			}
+			//multiplied by shakes per second so it keeps the same timing (more or less)
+			_resetLerp += deltaTime * _shakesPerSecond;
+
+			_resetLerp = Mathf.Clamp(_resetLerp, 0f, 1f);
+
+			//move towards the original position
+			_camTransform.position = Vector3.Lerp(_camTransform.position, OriginalPos, _resetLerp);
 		}
 	}
 }

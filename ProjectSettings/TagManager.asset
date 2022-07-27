@@ -57,3 +57,6 @@ TagManager:
   - name: Foreground
     uniqueID: 475859197
     locked: 0
+  - name: Vignette
+    uniqueID: 1830423287
+    locked: 0

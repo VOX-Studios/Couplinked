@@ -11746,8 +11746,7 @@ MonoBehaviour:
   Cam: {fileID: 2018900671}
   score: 0
   ringsCollected: 0
-  isPaused: 0
-  isResuming: 0
+  IsPaused: 0
   resumeCountNormalFontSize: 0
   MenuBackButtonPrefab: {fileID: 100000, guid: cc53e4810856fc642addbae0b696c5ec, type: 3}
   LocalHighScore: 0
@@ -11755,7 +11754,7 @@ MonoBehaviour:
     type: 3}
   LevelInfoPrefab: {fileID: 347588280012457966, guid: 7ac456241abde184ebedb123257c2e58,
     type: 3}
-  GameState: 0
+  AppState: 0
   Hit1HitCount: 0
   Hit2HitCount: 0
   HitSplit1HitCount: 0

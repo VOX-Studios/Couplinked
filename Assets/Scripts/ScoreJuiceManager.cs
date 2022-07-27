@@ -24,7 +24,7 @@ public class ScoreJuiceManager : MonoBehaviour
 		for(int i = 0; i < maxScoreJuices; i++)
 		{
 			GameObject scoreJuice = (GameObject)Instantiate(ScoreJuicePrefab);
-			scoreJuice.transform.parent = parent;
+			scoreJuice.transform.SetParent(parent);
 			scoreJuice.SetActive(false);
 			inactiveScoreJuices.Add(scoreJuice);
 		}

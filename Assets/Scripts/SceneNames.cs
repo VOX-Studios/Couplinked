@@ -21,6 +21,7 @@
         public const string DifficultySelection= "Difficulty Selection";
 
         public const string Game = "Game";
+        public const string End = "End";
 
         public const string Graphics = "Graphics";
         public const string ColorSelection = "Color Selection";

@@ -22,14 +22,6 @@ void ReadGradient_float(Gradient Gradient, float Index, out float4 Color)
     Color = float4(color, alpha);
 }
 
-void FUCK_float(UnityTexture2D Image, UnitySamplerState SS, float x, out UnityTexture2D Out)
-{
-    float2 uv = float2(x, 0);
-
-    //Color = Image.Sample(SS, uv);
-    Out = Image;
-}
-
 void Shit_half (UnityTexture2D positions, float2 positionScale, UnityTexture2D colors, float numDataPoints, float2 uv, float lightRange, float lightBrightness, float lightAperture, float lightFocusFactor, float lightPunchOut, out float4 Out)
 {
     float maxBrightness = 10;

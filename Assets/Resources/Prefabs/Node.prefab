@@ -138,12 +138,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ee0662020610f547aaa20a3756aac83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PointLight: {fileID: 0}
   SpriteRenderer: {fileID: 8521774271621704264}
   ParticleSystem: {fileID: 8521774271662656644}
   BlurSpriteRenderer: {fileID: 8521774272328775575}
   NodeId: 0
   TeamId: 0
+  InsideColor: {r: 0, g: 0, b: 0, a: 0}
+  OutsideColor: {r: 0, g: 0, b: 0, a: 0}
+  ParticleColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &8521774271662656647
 GameObject:
   m_ObjectHideFlags: 0
@@ -5096,9 +5098,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: 475859197
+  m_SortingLayer: 3
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 9d2209f48b0a5c148a48bd3ff1e36830, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

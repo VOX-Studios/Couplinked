@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using Assets.Scripts.Gameplay;
 
 public static class ExtensionMethods
 {
@@ -71,6 +72,7 @@ public class LevelEditorManager : MonoBehaviour
 	private bool _objectWasSpawned;
 
 	private float[] _rowPositions;
+	private float _scale;
 
 	public void Initialize(List<Transform> placeholderPositions)
 	{
@@ -85,7 +87,9 @@ public class LevelEditorManager : MonoBehaviour
 		_mouseDeltaInputAction = levelEditorInputActionMap.FindAction("MouseDelta");
 		_gamepadActivateInputAction = levelEditorInputActionMap.FindAction("GamepadActivate");
 
-		_timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
+		_rowPositions = RowPositionsUtility.CalculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
+		_scale = ScaleUtility.CalculateScale(_gameManager.CurrentLevel.NumberOfRows);
+		_timeLengthOfScreen = GameManager.WorldWidth / (_gameManager.GameDifficultyManager.ObjectSpeed * _scale);
 
 		_timeMarkers = new List<GameObject>();
 
@@ -94,8 +98,6 @@ public class LevelEditorManager : MonoBehaviour
 		_leftIndex = 0;
 		_rightIndex = -1;
 		_cam = Camera.main;
-
-		_rowPositions = _calculateRowPositions();
 
 		PlacingRow[] rows = FindObjectsOfType<PlacingRow>();
 
@@ -145,25 +147,6 @@ public class LevelEditorManager : MonoBehaviour
 
 		_setupDragArea();
 		_setupInteractions();
-	}
-
-	private float[] _calculateRowPositions()
-	{
-		float borderPadding = 2.5f; //TODO: share this with clamp
-
-		float[] rowPositions = new float[_gameManager.CurrentLevel.NumberOfRows];
-		rowPositions[0] = GameManager.TopY - borderPadding;
-		rowPositions[rowPositions.Length - 1] = GameManager.BotY + borderPadding;
-
-		//take top and bot and divide by remaining positions
-		float spacing = (rowPositions[0] + rowPositions[rowPositions.Length - 1]) / (_gameManager.CurrentLevel.NumberOfRows - 1);
-
-		for (int i = 1; i < _gameManager.CurrentLevel.NumberOfRows - 1; i++)
-		{
-			rowPositions[i] = spacing * i;
-		}
-
-		return rowPositions;
 	}
 
 	private void _computeNumberOfTimeMarkers()

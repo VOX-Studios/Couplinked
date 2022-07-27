@@ -183,7 +183,7 @@ namespace Assets.Scripts.SceneManagers
 
                         levelInfo.GetComponent<Button>().onClick.AddListener(() => _handleLevelSelected(levelInfo));
 
-                        levelInfo.transform.parent = parent.transform;
+                        levelInfo.transform.SetParent(parent.transform, false);
                         levelInfo.transform.localScale = Vector3.one;
 
                         LevelInfo levelInfoComponent = levelInfo.GetComponent<LevelInfo>();

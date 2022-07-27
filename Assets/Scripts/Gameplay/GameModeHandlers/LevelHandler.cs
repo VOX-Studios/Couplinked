@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.SceneManagers;
+﻿using Assets.Scripts.Gameplay;
+using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
 class LevelHandler : IGameModeHandler
@@ -70,12 +71,13 @@ class LevelHandler : IGameModeHandler
 
     public void Initialize()
     {
-        _rowPositions = _gameService.CalculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
-        _scale = _gameService.HandleScaling(_gameManager.CurrentLevel.NumberOfRows, _nodePairings, _explosionManager);
+        _rowPositions = RowPositionsUtility.CalculateRowPositions(_gameManager.CurrentLevel.NumberOfRows);
+        _scale = ScaleUtility.CalculateScale(_gameManager.CurrentLevel.NumberOfRows);
+        _gameService.SetScale(_scale, _nodePairings, _explosionManager);
 
         _gameService.Start();
 
-        _timeLengthOfScreen = GameManager.WorldWidth / _gameManager.GameDifficultyManager.ObjectSpeed;
+        _timeLengthOfScreen = GameManager.WorldWidth / (_gameManager.GameDifficultyManager.ObjectSpeed * _scale);
 
         _hasTimerStartedForEverythingInactive = false;
         _timeSinceLastActiveObject = 0;
@@ -100,21 +102,28 @@ class LevelHandler : IGameModeHandler
 
     private void _handleSpawners()
     {
+        //starting from our last spawn, loop through the next objects to spawn as long as they're within the screen length
         while (_nextSpawn < _gameManager.CurrentLevel.Data.Count && _gameManager.CurrentLevel.Data[_nextSpawn].Time <= _gameTimeAtRightScreen + .5f) //TODO: the + .5f should be a calculated value based on object length
         {
+            //get the data for the next object to spawn
             ObjectData objectData = _gameManager.CurrentLevel.Data[_nextSpawn];
 
+            //get the x coordinate of the spawn position
             float x = GameManager.RightX + ((objectData.Time - _gameTimeAtRightScreen) / _timeLengthOfScreen) * GameManager.WorldWidth;
 
             Vector3 pos = new Vector3(x, 0, 0);
 
-            if(objectData.ObjectRow >= _rowPositions.Length)
+            //if the object row listed isn't supported
+            if(objectData.ObjectRow < 0 || objectData.ObjectRow >= _rowPositions.Length)
             {
-                //TODO: error? Might not need to...can just not spawn
+                //TODO: bad data...maybe throw an error?
+
+                //skip to next spawn
                 _nextSpawn++;
                 continue;
             }
 
+            //set the y coordinate of the spawn position
             pos.y = _rowPositions[objectData.ObjectRow];
 
             int teamId = 0;
@@ -159,21 +168,31 @@ class LevelHandler : IGameModeHandler
             _nextSpawn++;
         }
 
+        //if we've spawned everything already
         if (_nextSpawn >= _gameManager.CurrentLevel.Data.Count)
         {
-            //will always be > 0....redundant here
+            //if we actually had things to spawn in the level
             if (_gameManager.CurrentLevel.Data.Count > 0)
             {
+                //if we haven't started the timer yet and everything has despawned
                 if (!_hasTimerStartedForEverythingInactive && _noHitManager.ActiveGameEntities.Count + _hitManager.ActiveGameEntities.Count + _hitSplitManager.ActiveGameEntities.Count == 0)
                 {
+                    //activate the timer
                     _hasTimerStartedForEverythingInactive = true;
                 }
 
+                //if the timer is active
                 if (_hasTimerStartedForEverythingInactive)
+                {
+                    //increment the timer
                     _timeSinceLastActiveObject += Time.deltaTime;
+                }
 
-                const float timeBeforeGameEnds = 5f;
-                if (_timeSinceLastActiveObject > timeBeforeGameEnds || _gameTimeAtRightScreen - _timeLengthOfScreen > _gameManager.CurrentLevel.Data[_gameManager.CurrentLevel.Data.Count - 1].Time)
+                //this needs to be greater than or equal to how long our effects last (like score juice)
+                const float timeBeforeGameEnds = 1.5f;
+
+                //if our timer has be active long enough
+                if (_timeSinceLastActiveObject >= timeBeforeGameEnds)
                 {
                     _gameManager.ReasonForGameEnd = ReasonForGameEndEnum.Win;
                 }
