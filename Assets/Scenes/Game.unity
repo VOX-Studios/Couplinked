@@ -5096,6 +5096,7 @@ Transform:
   - {fileID: 1943385073}
   - {fileID: 799985861}
   - {fileID: 1135860133}
+  - {fileID: 627253712}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5125,6 +5126,7 @@ MonoBehaviour:
   _midground: {fileID: 1529670904}
   _foreground: {fileID: 1767108565}
   VignetteManager: {fileID: 1135860134}
+  SideExplosionManager: {fileID: 627253713}
 --- !u!1 &425938426
 GameObject:
   m_ObjectHideFlags: 0
@@ -5255,6 +5257,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HitPrefab: {fileID: 100000, guid: bf2a541aa0a5bfe43a4431481383b3ed, type: 3}
+--- !u!1 &627253711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 627253712}
+  - component: {fileID: 627253713}
+  m_Layer: 0
+  m_Name: Side Explosion Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &627253712
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627253711}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 372952467}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &627253713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627253711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b3d7343e1ae0e47a12595ef6cc05df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sideExplosionPrefab: {fileID: 7850834906702529181, guid: fa005c52bc0d23b4090836ea54aebe2d,
+    type: 3}
 --- !u!1 &799985860
 GameObject:
   m_ObjectHideFlags: 0
@@ -10332,48 +10380,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _vignetteRenderer: {fileID: 425938428}
-  Curve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: -75.62938
-      outSlope: -75.62938
-      tangentMode: 0
-      weightedMode: 2
-      inWeight: 0
-      outWeight: 0.026673108
-    - serializedVersion: 3
-      time: 0.1
-      value: 0.1
-      inSlope: 0.008817923
-      outSlope: 1.3245913
-      tangentMode: 1
-      weightedMode: 3
-      inWeight: 0.9879329
-      outWeight: 0.25166875
-    - serializedVersion: 3
-      time: 0.25
-      value: 0.1
-      inSlope: -1.511148
-      outSlope: 0.60852855
-      tangentMode: 1
-      weightedMode: 2
-      inWeight: 0.65633446
-      outWeight: 0.3259727
-    - serializedVersion: 3
-      time: 1
-      value: 0.1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 1
-      inWeight: 0.3109283
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &1171607985
 GameObject:
   m_ObjectHideFlags: 0

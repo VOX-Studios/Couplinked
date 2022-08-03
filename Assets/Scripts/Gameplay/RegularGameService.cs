@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Gameplay;
-using Assets.Scripts.PlayerInputs;
+﻿using Assets.Scripts.PlayerInputs;
 using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
@@ -14,6 +13,7 @@ class RegularGameService
     private GameInput[][] _gameInputs;
     private NodePairing[] _nodePairs;
 
+    private IGameModeHandler _gameModeHandler;
 
     public RegularGameService(
         GameManager gameManager,
@@ -22,7 +22,8 @@ class RegularGameService
         HitManager hitManager,
         HitSplitManager hitSplitManager,
         GameInput[][] gameInputs,
-        NodePairing[] nodePairs
+        NodePairing[] nodePairs,
+        IGameModeHandler gameModeHandler
         )
     {
         _gameManager = gameManager;
@@ -33,6 +34,8 @@ class RegularGameService
 
         _gameInputs = gameInputs;
         _nodePairs = nodePairs;
+
+        _gameModeHandler = gameModeHandler;
     }
 
     public void Start()
@@ -81,13 +84,11 @@ class RegularGameService
 
             _gameManager.LightingManager.SetLightPosition(gameEntity.LightIndex, gameEntity.Transform.position);
 
-            //TODO: don't do this here? Pass through LevelManager/SurvivalManager and put the logic in there?
-            //          OR just have a trigger for when this shit gets to this point and handle it like we do collisions?
             if (gameEntityManager.ActiveGameEntities[i].Transform.position.x < GameManager.LeftX - 2.5f)
             {
+                //TODO: make this event fire faster, then deactivate later
+                OnGameEntityOffScreen(gameEntityManager.ActiveGameEntities[i]);
                 gameEntityManager.DeactivateGameEntity(i);
-                //TODO: end game if it's survival mode?
-                continue;
             }
         }
     }
@@ -143,6 +144,11 @@ class RegularGameService
         _gameManager.Grid.Logic.ApplyDirectedForce(nodeVelocity.normalized * 6f * deltaTime * (1 + node.Scale), node.transform.position, .5f * node.Scale);
 
         //_gameManager.Grid.Logic.ApplyImplosiveForce(1 * node.Scale, node.transform.position, 1 * node.Scale);
+    }
+
+    private void OnGameEntityOffScreen(IGameEntity gameEntity)
+    {
+        _gameModeHandler.OnGameEntityOffScreen(gameEntity);
     }
 
     public void OnHitCollision(Hit hit, Collider2D other)

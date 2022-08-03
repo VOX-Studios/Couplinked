@@ -1,4 +1,4 @@
-﻿public enum ObjectTypeEnum : byte
+﻿public enum ObjectTypeEnum : byte //TODO: eventually replace this with GameEntityTypeEnum?
 {
 	NoHit,
 	Hit1,

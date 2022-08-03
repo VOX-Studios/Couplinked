@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.GameEntities;
+using UnityEngine;
 
 public abstract class GameEntity : MonoBehaviour, IGameEntity
 {
+    public abstract GameEntityTypeEnum GameEntityType { get; }
     public int LightIndex { get; set; } = -1;
     public float Speed { get; set; } = 7;
 

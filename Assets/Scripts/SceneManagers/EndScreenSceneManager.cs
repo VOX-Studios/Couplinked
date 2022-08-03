@@ -191,7 +191,7 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager.SoundEffectManager.PlayBack();
 
-            if (_gameManager.GameSetupInfo.Teams.Count > 1)
+            if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
                 _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
             else if (_gameManager.CurrentLevel == null)
                 _gameManager.LoadScene(SceneNames.GameModeSelection);

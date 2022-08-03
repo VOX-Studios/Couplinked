@@ -7,7 +7,7 @@ public class ExplosionManager : MonoBehaviour
 
 	private List<GameObject> _activeExplosions;
 	private  List<GameObject> _inactiveExplosions;
-	private int _maxExplosions = 10;
+	private int _maxExplosions = 10; //TODO: scale this with the number of nodes
 	private float _scale = 1;
 	
 	public void Initialize(DataManager dataManager) 

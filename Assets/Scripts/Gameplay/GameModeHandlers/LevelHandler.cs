@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Gameplay;
+﻿using Assets.Scripts.GameEntities;
+using Assets.Scripts.Gameplay;
 using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
@@ -65,7 +66,8 @@ class LevelHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairings
+            nodePairs: _nodePairings,
+            gameModeHandler: this
             );
     }
 
@@ -218,5 +220,10 @@ class LevelHandler : IGameModeHandler
     public void OnCollision(NoHit noHit, Collider2D other)
     {
         _gameService.OnNoHitCollision(noHit, other);
+    }
+
+    public void OnGameEntityOffScreen(IGameEntity gameEntity)
+    {
+        //nothing to do here
     }
 }

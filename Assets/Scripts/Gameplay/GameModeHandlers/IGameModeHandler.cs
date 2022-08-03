@@ -3,4 +3,6 @@
     void Initialize();
 
     void Run(bool isPaused, float deltaTime);
+
+    void OnGameEntityOffScreen(IGameEntity gameEntity);
 }

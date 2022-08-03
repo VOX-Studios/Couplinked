@@ -1,14 +1,17 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.GameEntities;
+using UnityEngine;
 
 public class Hit : GameEntity 
 {
+	public override GameEntityTypeEnum GameEntityType => GameEntityTypeEnum.Hit;
+
 	private ICollisionHandler<Hit> _hitCollisionHandler;
 
 	public int NodeId;
 	public int TeamId;
 	public float Scale { get; private set; }
 
-	[SerializeField]
+    [SerializeField]
 	private SpriteRenderer _spriteRenderer;
 
 	[SerializeField]

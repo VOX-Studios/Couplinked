@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.GameEntities;
+using UnityEngine;
 
 public class NoHit : GameEntity
 {
+	public override GameEntityTypeEnum GameEntityType => GameEntityTypeEnum.NoHit;
+
 	private ICollisionHandler<NoHit> _noHitCollisionHandler;
 
 	public float Scale { get; private set; }

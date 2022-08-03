@@ -11260,7 +11260,7 @@ GameObject:
   - component: {fileID: 1503511476}
   - component: {fileID: 1503511475}
   m_Layer: 6
-  m_Name: Quad
+  m_Name: Base Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

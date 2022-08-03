@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Gameplay;
+﻿using Assets.Scripts.GameEntities;
+using Assets.Scripts.Gameplay;
 using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
@@ -73,14 +74,15 @@ class SurvivalHandler : IGameModeHandler
             hitManager: _hitManager,
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
-            nodePairs: _nodePairings
+            nodePairs: _nodePairings,
+            gameModeHandler: this
             );
     }
 
     public void Initialize()
     {
         float[] rowPositions = RowPositionsUtility.CalculateRowPositions(_numberOfRows);
-        float scale = ScaleUtility.CalculateScale(_gameManager.CurrentLevel.NumberOfRows);
+        float scale = ScaleUtility.CalculateScale(_numberOfRows);
         _gameService.SetScale(scale, _nodePairings, _explosionManager);
 
         if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
@@ -168,6 +170,35 @@ class SurvivalHandler : IGameModeHandler
     public void OnCollision(NoHit noHit, Collider2D other)
     {
         _gameService.OnNoHitCollision(noHit, other);
+    }
+
+    public void OnGameEntityOffScreen(IGameEntity gameEntity)
+    {
+        ReasonForGameEndEnum reasonForGameEnd;
+        Color color;
+        if (gameEntity.GameEntityType == GameEntityTypeEnum.Hit)
+        {
+            reasonForGameEnd = ReasonForGameEndEnum.HitOffScreen;
+            color = (gameEntity as Hit).Color;
+        }
+        else if (gameEntity.GameEntityType == GameEntityTypeEnum.HitSplit)
+        {
+            reasonForGameEnd = ReasonForGameEndEnum.HitSplitOffScreen;
+            color = (gameEntity as HitSplit).OutsideColor;
+        }
+        else
+        {
+            return;
+        }
+
+        _gameSceneManager.CameraShake.StartShake(.34f);
+        _gameSceneManager.SideExplosionManager.ActivateExplosion(gameEntity.Transform.position.y, color);
+
+        //end the game
+        _gameSceneManager.EndGame(reasonForGameEnd);
+
+        Vector2 vignettePosition = new Vector2(GameManager.LeftX, gameEntity.Transform.position.y);
+        _gameSceneManager.VignetteManager.StartClosePhase1(vignettePosition, .1f);
     }
 
     public void OnGameEnd()

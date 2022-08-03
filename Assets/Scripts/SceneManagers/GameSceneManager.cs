@@ -59,6 +59,7 @@ namespace Assets.Scripts.SceneManagers
         private GameStateEnum _gameState;
 
         public VignetteManager VignetteManager;
+        public SideExplosionManager SideExplosionManager;
 
         void Start()
         {
@@ -126,6 +127,7 @@ namespace Assets.Scripts.SceneManagers
             _hitSplitManager.Initialize(gameModeHandler);
             _explosionManager.Initialize(_gameManager.DataManager);
             _scoreJuiceManager.Initialize();
+            SideExplosionManager.Initialize(5); //TODO: we could make this smart and have the game mode handler initialize it with num rows, but realistically we can use the max number of rows
 
             CameraShake = new CameraShake();
             CameraShake.Initialize(_gameManager);
@@ -411,6 +413,7 @@ namespace Assets.Scripts.SceneManagers
 
             _explosionManager.Run();
             _scoreJuiceManager.Run(Time.deltaTime);
+            SideExplosionManager.Run(Time.deltaTime);
 
             CameraShake.Run(Time.deltaTime);
 
@@ -439,6 +442,7 @@ namespace Assets.Scripts.SceneManagers
 
 
             VignetteManager.Run(Time.deltaTime);
+            SideExplosionManager.Run(Time.deltaTime);
             _scoreJuiceManager.Run(Time.deltaTime);
             CameraShake.Run(Time.deltaTime);
 
@@ -709,13 +713,14 @@ namespace Assets.Scripts.SceneManagers
         /// Starts ending the game or instantly ends the game.
         /// </summary>
         /// <param name="reasonForGameEnd">Reason for game end.</param>
+        /// <param name="isInstant"></param>
         public void EndGame(ReasonForGameEndEnum reasonForGameEnd, bool isInstant = false)
         {
-            //TODO: reenable this when we're done testing
-            if (reasonForGameEnd != ReasonForGameEndEnum.Win && reasonForGameEnd != ReasonForGameEndEnum.Quit)
-            {
-                return;
-            }
+            //enable this when we want to test without dying
+            //if (reasonForGameEnd != ReasonForGameEndEnum.Win && reasonForGameEnd != ReasonForGameEndEnum.Quit)
+            //{
+            //    return;
+            //}
 
             if(reasonForGameEnd != ReasonForGameEndEnum.Win && reasonForGameEnd != ReasonForGameEndEnum.Quit)
             {

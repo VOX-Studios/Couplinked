@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.GameEntities;
+using UnityEngine;
 
 public class HitSplit : GameEntity 
 {
+	public override GameEntityTypeEnum GameEntityType => GameEntityTypeEnum.HitSplit;
+
 	private ICollisionHandler<HitSplit> _hitSplitCollisionHandler;
 
 	[SerializeField]
