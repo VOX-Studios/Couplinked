@@ -50,8 +50,7 @@ public class HitSplitManager : MonoBehaviour, IGameEntityManager<HitSplit>
 		if (inactiveCount > 0)
 		{
 			HitSplit hitSplit = _inactiveHitSplits[inactiveCount - 1];
-			hitSplit.OnSpawn();
-			hitSplit.SetScale(scale);
+			hitSplit.OnSpawn(scale);
 			hitSplit.transform.position = spawnPosition;
 
 			hitSplit.HitSplitFirstType = hitSplitFirstType;

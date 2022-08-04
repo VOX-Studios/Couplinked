@@ -17,6 +17,9 @@ public class Hit : GameEntity
 	[SerializeField]
 	private SpriteRenderer _blurSpriteRenderer;
 
+	[SerializeField]
+	private CircleCollider2D _circleCollider;
+
 	private MaterialPropertyBlock _propertyBlock;
 
 	public Color Color;
@@ -27,12 +30,14 @@ public class Hit : GameEntity
 		_hitCollisionHandler = hitCollisionHandler;
 		_propertyBlock = new MaterialPropertyBlock();
 		Speed = _GameManager.GameDifficultyManager.ObjectSpeed;
+		SetScale(1);
 	}
 
 	public void SetScale(float scale)
 	{
 		Scale = scale;
 		transform.localScale = new Vector3(scale, scale, 1);
+		Radius = _circleCollider.radius * scale;
 	}
 
 	public void SetColor(Color color)

@@ -7,6 +7,9 @@ public class NoHit : GameEntity
 
 	private ICollisionHandler<NoHit> _noHitCollisionHandler;
 
+	[SerializeField]
+	private CircleCollider2D _circleCollider;
+
 	public float Scale { get; private set; }
 
     // Use this for initialization
@@ -14,12 +17,14 @@ public class NoHit : GameEntity
 	{
 		_noHitCollisionHandler = noHitCollisionHandler;
 		Speed = _GameManager.GameDifficultyManager.ObjectSpeed;
+		SetScale(1);
 	}
 
 	public void SetScale(float scale)
     {
 		Scale = scale;
 		transform.localScale = new Vector3(scale, scale, 1);
+		Radius = _circleCollider.radius * scale;
 	}
 
 	public override void Move(float time) 

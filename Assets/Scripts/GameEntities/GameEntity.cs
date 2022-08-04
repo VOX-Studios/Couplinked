@@ -7,6 +7,10 @@ public abstract class GameEntity : MonoBehaviour, IGameEntity
     public int LightIndex { get; set; } = -1;
     public float Speed { get; set; } = 7;
 
+    public bool IsOffScreenLeft { get; set; }
+
+    public float Radius { get; protected set; }
+
     public SoundEffectManager.PitchToPlay ExplosionPitch { get; set; }
 
     protected GameManager _GameManager;

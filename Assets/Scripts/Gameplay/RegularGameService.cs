@@ -84,11 +84,18 @@ class RegularGameService
 
             _gameManager.LightingManager.SetLightPosition(gameEntity.LightIndex, gameEntity.Transform.position);
 
-            if (gameEntityManager.ActiveGameEntities[i].Transform.position.x < GameManager.LeftX - 2.5f)
+            if (gameEntity.Transform.position.x < GameManager.LeftX - gameEntity.Radius)
             {
-                //TODO: make this event fire faster, then deactivate later
-                OnGameEntityOffScreen(gameEntityManager.ActiveGameEntities[i]);
-                gameEntityManager.DeactivateGameEntity(i);
+                if(!gameEntity.IsOffScreenLeft)
+                {
+                    gameEntity.IsOffScreenLeft = true;
+                    OnGameEntityOffScreen(gameEntity);
+                }
+
+                if (gameEntity.Transform.position.x < GameManager.LeftX - 2.5f)
+                {
+                    gameEntityManager.DeactivateGameEntity(i);
+                }
             }
         }
     }

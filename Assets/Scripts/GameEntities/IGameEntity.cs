@@ -6,6 +6,8 @@ public interface IGameEntity
     GameEntityTypeEnum GameEntityType { get; }
     int LightIndex { get; set; }
     float Speed { get; set; }
+    bool IsOffScreenLeft { get; set; }
+    float Radius { get; }
 
     Transform Transform { get; }
 

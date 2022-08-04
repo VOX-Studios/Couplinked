@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bfb2a8d41caa994ea1a3ea4b1b952ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _circleCollider: {fileID: 5800000}
 --- !u!1 &7852346197596710321
 GameObject:
   m_ObjectHideFlags: 0

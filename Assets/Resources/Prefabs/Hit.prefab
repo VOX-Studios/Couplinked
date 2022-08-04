@@ -139,9 +139,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NodeId: 0
   TeamId: 0
-  Scale: 1
   _spriteRenderer: {fileID: 21200000}
   _blurSpriteRenderer: {fileID: 3173439728160005697}
+  _circleCollider: {fileID: 5800000}
   Color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &3340832090784708480
 GameObject:

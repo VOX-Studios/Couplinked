@@ -143,6 +143,7 @@ MonoBehaviour:
   _outsideSpriteRenderer: {fileID: 5188640455475372306}
   _blurInsideSpriteRenderer: {fileID: 4734234447359757333}
   _blurOutsideSpriteRenderer: {fileID: 3658066638252518624}
+  _circleCollider: {fileID: 5800000}
   FirstHitTeamId: 0
   SecondHitTeamId: 0
   HitSplitFirstType: 0

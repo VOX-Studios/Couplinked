@@ -19,6 +19,9 @@ public class HitSplit : GameEntity
 	[SerializeField]
 	private SpriteRenderer _blurOutsideSpriteRenderer;
 
+	[SerializeField]
+	private CircleCollider2D _circleCollider;
+
 	public int FirstHitTeamId;
 	public int SecondHitTeamId;
 	public int HitSplitFirstType;
@@ -37,21 +40,24 @@ public class HitSplit : GameEntity
 	public void Initialize(ICollisionHandler<HitSplit> hitSplitCollisionHandler) 
 	{
 		_hitSplitCollisionHandler = hitSplitCollisionHandler;
-
 		_propertyBlock = new MaterialPropertyBlock();
-
 		Speed = _GameManager.GameDifficultyManager.ObjectSpeed;
+
+		SetScale(1);
 	}
-	public void OnSpawn()
+	public void OnSpawn(float scale)
     {
 		_insideSpriteRenderer.enabled = true;
 		_blurInsideSpriteRenderer.enabled = true;
+
+		SetScale(scale);
 	}
 
 	public void SetScale(float scale)
 	{
 		Scale = scale;
 		transform.localScale = new Vector3(scale, scale, 1);
+		Radius = _circleCollider.radius * scale;
 	}
 
 	public void SetColors(Color insideColor, Color outsideColor)
