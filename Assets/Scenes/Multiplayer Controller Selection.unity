@@ -381,7 +381,10 @@ MonoBehaviour:
     type: 3}
   _controllerSelectionTeamPanelPrefab: {fileID: 7769676080427331349, guid: 89cd05f0b02937d49894e1e2a42473cf,
     type: 3}
+  _playerTextPrefab: {fileID: 4746172370684785935, guid: c014a2b3b1499dc4fa585d2034c2b51b,
+    type: 3}
   _panelsContainer: {fileID: 1486699848}
+  _canvas: {fileID: 1764406025}
   _nodeMidground: {fileID: 1509452864}
   _nodeForeground: {fileID: 1459396939}
 --- !u!4 &1275322029

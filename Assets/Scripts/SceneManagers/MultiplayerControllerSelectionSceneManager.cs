@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.ControllerSelection;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +18,13 @@ namespace Assets.Scripts.SceneManagers
         private GameObject _controllerSelectionTeamPanelPrefab;
 
         [SerializeField]
+        private GameObject _playerTextPrefab;
+
+        [SerializeField]
         private RectTransform _panelsContainer;
+
+        [SerializeField]
+        private Canvas _canvas;
 
         private GameManager _gameManager;
 
@@ -100,17 +107,20 @@ namespace Assets.Scripts.SceneManagers
 
             NodePairing nodePairing = _makeNodePair(2, playerInput.PlayerSlot);
 
+            GameObject playerText = GameObject.Instantiate(_playerTextPrefab);
+            playerText.transform.SetParent(_canvas.transform);
+
             ControllerSelectionState selectionState = new ControllerSelectionState()
             {
                 WasJustAdded = true,
                 NodePairing = nodePairing,
-                TeamSlot = teamSlot
+                TeamSlot = teamSlot,
+                PlayerText = playerText.GetComponent<PlayerText>()
             };
 
-            if(teamSlot != -1)
-            {
-                selectionState.SetIsReady(true);
-            }
+            selectionState.PlayerText.PlayerNumberText.text = $"P{playerInput.PlayerSlot + 1}";
+
+            selectionState.SetIsReady(teamSlot != -1);
 
             _playerStates[playerInput] = selectionState;
 
@@ -120,7 +130,7 @@ namespace Assets.Scripts.SceneManagers
         private NodePairing _makeNodePair(int numberOfNodes, int playerSlot)
         {
             List<Node> nodes = new List<Node>();
-            List<LaserManager> lightningManagers = new List<LaserManager>();
+            List<LaserManager> laserManagers = new List<LaserManager>();
             DefaultPlayerColors playerColors = _gameManager.ColorManager.DefaultPlayerColors[playerSlot];
 
             for (int i = 0; i < numberOfNodes; i++)
@@ -141,43 +151,78 @@ namespace Assets.Scripts.SceneManagers
 
                 nodes.Add(node);
 
-                if(i < numberOfNodes)
+                if(i > 0)
                 {
-                    GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-                    LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
+                    GameObject laserManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+                    LaserManager laserManager = laserManagerGameObject.GetComponent<LaserManager>();
 
-                    lightningManager.Initialize(_nodeMidground);
-
-                    lightningManagers.Add(lightningManager);
+                    laserManager.Initialize(_nodeMidground);
+                    laserManager.SetLaserColor(nodes[i - 1].OutsideColor, node.OutsideColor);
+                    laserManagers.Add(laserManager);
                 }
             }
 
-            return new NodePairing(nodes, lightningManagers);
+            return new NodePairing(nodes, laserManagers);
         }
 
-        private void _updateNodePositions(ControllerSelectionState changedState, int previousTeam)
+        private void _updateNodePositions(ControllerSelectionState changedState, int previousTeamSlot)
         {
             //TODO: add explosion when we move?
 
+            //show arrows if we haven't selected a team
+            changedState.PlayerText.Arrows.gameObject.SetActive(changedState.TeamSlot == -1);
+
+            //show ready text if we've selected a team
+            changedState.PlayerText.ReadyText.gameObject.SetActive(changedState.TeamSlot != -1);
+
+            ControllerSelectionState[] currentTeamStates = _getTeamStates(changedState.TeamSlot);
+            
             //TeamSlot will only be -1 if the nodes have just been created
             if (changedState.TeamSlot == -1)
             {
-                changedState.NodePairing.Nodes[0].transform.position = GetTeamPanelsCenterWorldPoint();
-
-                //second node won't be used yet so just put it off to the side
-                changedState.NodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
+                _updateNoTeamNodePositions(currentTeamStates);
                 return;
             }
 
-            //TODO: adjust the -1 positions
-            if (previousTeam != -1)
+            ControllerSelectionState[] previousTeamStates = _getTeamStates(previousTeamSlot);
+            if (previousTeamSlot == -1)
             {
-                ControllerSelectionState[] previousTeamStates = _playerStates.Values.Where(state => state.TeamSlot == previousTeam).ToArray();
+                _updateNoTeamNodePositions(previousTeamStates);
+            }
+            else
+            {
                 _updateTeamNodePositions(previousTeamStates);
             }
 
-            ControllerSelectionState[] currentTeamStates = _playerStates.Values.Where(state => state.TeamSlot == changedState.TeamSlot).ToArray();
+            //update the current team
             _updateTeamNodePositions(currentTeamStates);
+        }
+
+        private void _updateNoTeamNodePositions(ControllerSelectionState[] teamStates)
+        {
+            Vector3[] corners = new Vector3[4];
+            _teamSelectionPanels[0].GetComponent<RectTransform>().GetWorldCorners(corners);
+            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+
+            Vector3 centerPoint = GetTeamPanelsCenterWorldPoint();
+
+            float panelHeight = topRight.y - bottomLeft.y;
+            float spacing = panelHeight / (teamStates.Length + 1);
+
+            for (int i = 0; i < teamStates.Length; i++)
+            {
+                ControllerSelectionState playerState = teamStates[i];
+                playerState.NodePairing.Nodes[0].transform.position = new Vector3(centerPoint.x, topRight.y - (spacing * (i + 1)));
+
+                Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
+                Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
+                playerState.PlayerText.transform.position = readyTextPosition;
+                playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -100, 0);
+
+                //move the second node off the screen
+                teamStates[i].NodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
+            }
         }
 
         private void _updateTeamNodePositions(ControllerSelectionState[] teamStates)
@@ -199,15 +244,31 @@ namespace Assets.Scripts.SceneManagers
             Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
             Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
 
+            playerState.NodePairing.LaserManagers[0].gameObject.SetActive(true);
+
             List<Node> nodes = playerState.NodePairing.Nodes;
 
             float panelWidth = topRight.x - bottomLeft.x;
             float spacing = panelWidth / (nodes.Count + 1);
 
+            Vector3 nodesAveragePosition = Vector3.zero;
             for (int i = 0; i < nodes.Count; i++)
             {
                 nodes[i].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
+                nodesAveragePosition += nodes[i].transform.position;
+
+                if(i > 0)
+                {
+                    playerState.NodePairing.LaserManagers[i - 1].SetLaserColor(nodes[i - 1].OutsideColor, nodes[i].OutsideColor);
+                    playerState.NodePairing.LaserManagers[i - 1].Run(nodes[i - 1].transform.position, nodes[i].transform.position);
+                }
             }
+            nodesAveragePosition /= nodes.Count;
+
+            Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(nodesAveragePosition);
+            Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
+            playerState.PlayerText.transform.position = readyTextPosition;
+            playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -110, 0);
         }
 
         private void _updateMultiTeamNodePositions(ControllerSelectionState[] teamStates)
@@ -222,11 +283,27 @@ namespace Assets.Scripts.SceneManagers
 
             for (int i = 0; i < teamStates.Length; i++)
             {
-                teamStates[i].NodePairing.Nodes[0].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
+                ControllerSelectionState playerState = teamStates[i];
+                playerState.NodePairing.Nodes[0].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
 
-                //TODO: have this handle more than two nodes?
+                Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
+                Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
+                playerState.PlayerText.transform.position = readyTextPosition;
+                playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -100, 0);
+
+                if (i > 0)
+                {
+                    LaserManager laserManager = teamStates[i - 1].NodePairing.LaserManagers[0];
+                    laserManager.SetLaserColor(teamStates[i - 1].NodePairing.Nodes[0].OutsideColor, playerState.NodePairing.Nodes[0].OutsideColor);
+                    laserManager.Run(teamStates[i - 1].NodePairing.Nodes[0].transform.position, playerState.NodePairing.Nodes[0].transform.position);
+                    laserManager.gameObject.SetActive(true);
+                }
+
+                //move the second node off the screen
                 teamStates[i].NodePairing.Nodes[1].transform.position = new Vector3(GameManager.RightX + 5, 0);
             }
+
+            teamStates[teamStates.Length - 1].NodePairing.LaserManagers[0].gameObject.SetActive(false);
         }
 
         private Vector3 GetTeamPanelsCenterWorldPoint()
@@ -360,18 +437,28 @@ namespace Assets.Scripts.SceneManagers
                 Destroy(node.gameObject);
             }
 
-            foreach(LaserManager lightningManager in controllerSelectionState.NodePairing.LaserManagers)
+            foreach(LaserManager laserManager in controllerSelectionState.NodePairing.LaserManagers)
             {
-                Destroy(lightningManager.gameObject);
+                Destroy(laserManager.gameObject);
             }
+
+            Destroy(controllerSelectionState.PlayerText.gameObject);
             
             _playerStates.Remove(player);
 
             _gameManager.PlayerManager.RemovePlayer(player);
 
             //update positions of the team we were previously on
-            ControllerSelectionState[] previousTeamStates = _playerStates.Values.Where(state => state.TeamSlot == controllerSelectionState.TeamSlot).ToArray();
-            _updateTeamNodePositions(previousTeamStates);
+            ControllerSelectionState[] previousTeamStates = _getTeamStates(controllerSelectionState.TeamSlot);
+
+            if(controllerSelectionState.TeamSlot == -1)
+            {
+                _updateNoTeamNodePositions(previousTeamStates);
+            }
+            else
+            {
+                _updateTeamNodePositions(previousTeamStates);
+            }
         }
 
         private bool _shouldStartGame()
@@ -408,7 +495,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.GameSetupInfo.Teams = _playerStates.GroupBy(kvp => kvp.Value.TeamSlot)
                 .Select(group => new Team(group.Key)
                 {
-                    PlayerInputs = group.Select(kvp => kvp.Key).ToList()
+                    PlayerInputs = group.Select(kvp => kvp.Key).OrderBy(_orderBy).ToList()
                 })
                 .ToList();
 
@@ -421,6 +508,19 @@ namespace Assets.Scripts.SceneManagers
             {
                 _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
             }
+        }
+
+        private int _orderBy(PlayerInput playerInput)
+        {
+            return playerInput.PlayerSlot;
+        }
+    
+        private ControllerSelectionState[] _getTeamStates(int teamSlot)
+        {
+            return _playerStates.OrderBy(kvp => _orderBy(kvp.Key))
+                .Where(kvp => kvp.Value.TeamSlot == teamSlot)
+                .Select(kvp => kvp.Value)
+                .ToArray();
         }
     }
 }

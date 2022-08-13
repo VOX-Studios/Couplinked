@@ -77,11 +77,6 @@ namespace Assets.Scripts.Lighting
             return texture;
         }
 
-        public void SetColor(Color color)
-        {
-            _baseLightMaterial.SetColor("_Color", color);
-        }
-
         public int GetLightIndex()
         {
             int index = _availableDataPoints.Dequeue();
