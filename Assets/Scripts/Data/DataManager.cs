@@ -18,6 +18,8 @@ public class DataManager
 	public readonly BoolData IsInitialSetupComplete_2_3 = new BoolData("v2.3 Initial Set Up");
 	public readonly BoolData IsInitialSetupComplete_2_7 = new BoolData("v2.7 Initial Set Up");
 
+	public readonly BoolData ShouldShowFps = new BoolData("Should Show FPS");
+
 	private const string pp_CustomLevelIDs = "Custom Level IDs";
 
 	private const string pp_LevelMaxScoreAddOn = "Max Score";

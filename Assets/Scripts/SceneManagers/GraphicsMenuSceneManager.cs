@@ -36,6 +36,9 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private Dropdown _vSyncDropdown;
 
+        [SerializeField]
+        private Button _showFpsButton;
+
         private QualitySettingEnum _gridDensity;
         private QualitySettingEnum _explosionParticles;
         private QualitySettingEnum _trailParticles;
@@ -44,6 +47,9 @@ namespace Assets.Scripts.SceneManagers
         private string _resolution;
         private FullScreenMode _windowedMode;
         private VSyncCountEnum _vSyncCount;
+
+        private string _fpsCounterOnText = "S H O W   F P S   ( ON )";
+        private string _fpsCounterOffText = "S H O W   F P S   ( OFF )";
 
         private List<KeyValuePair<FullScreenMode, string>> _supportedWindowedModes = new List<KeyValuePair<FullScreenMode, string>>()
         {
@@ -94,6 +100,9 @@ namespace Assets.Scripts.SceneManagers
             _setupResolutionDropdown();
             _setupWindowedModeDropdown();
             _setupVSyncDropdown();
+
+            _setShowFpsText();
+            _showFpsButton.onClick.AddListener(_handleShowFpsButton);
         }
 
         private void _setupQualitySettingDropdown(Dropdown dropdown, EnumData<QualitySettingEnum> repo, Action<QualitySettingEnum> setQualitySettingValue, Action afterOnValueChange = null)
@@ -326,6 +335,29 @@ namespace Assets.Scripts.SceneManagers
 
             //need to update vsync dropdown when we change resolution because that's where we get Hz from
             _setupVSyncDropdown();
+        }
+
+        
+        private void _handleShowFpsButton()
+        {
+            _gameManager.SoundEffectManager.PlaySelect();
+            _gameManager.ShouldShowFps = !_gameManager.ShouldShowFps;
+            _gameManager.DataManager.ShouldShowFps.Set(_gameManager.ShouldShowFps);
+            _gameManager.FpsCounter.gameObject.SetActive(_gameManager.ShouldShowFps);
+
+            _setShowFpsText();
+        }
+
+        private void _setShowFpsText()
+        {
+            if (_gameManager.ShouldShowFps)
+            {
+                _showFpsButton.gameObject.GetComponentInChildren<Text>().text = _fpsCounterOnText;
+            }
+            else
+            {
+                _showFpsButton.gameObject.GetComponentInChildren<Text>().text = _fpsCounterOffText;
+            }
         }
     }
 }

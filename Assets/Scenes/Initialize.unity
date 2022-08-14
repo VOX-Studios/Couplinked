@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 306208893}
   - component: {fileID: 306208895}
   m_Layer: 5
-  m_Name: FPS Text
+  m_Name: FPS Counter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11767,9 +11767,11 @@ MonoBehaviour:
   GamesPlayed: 0
   MusicOn: 1
   SfxOn: 1
+  ShouldShowFps: 0
   LevelsPerPage: 5
   LevelsDisplayingStart: -1
   LevelsDisplayingEnd: -1
+  FpsCounter: {fileID: 306208895}
   PotentialMaxSurvivalScore: 0
 --- !u!1 &1791557067
 GameObject:

@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.InputSystem;
 using Assets.Scripts.Lighting;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {	public InputActionAsset InputActions;
@@ -154,6 +155,8 @@ public class GameManager : MonoBehaviour
 		Challenges.HandleUnlockingChallenge(Challenges.ID_IncorrectPronounciation, out unlockMessage);
 
 		GameSetupInfo = new GameSetupInfo();
+
+		ShouldShowFps = DataManager.ShouldShowFps.Get();
 	}
 
 	private void SetDefaultDataValues_1_9()
@@ -535,10 +538,14 @@ public class GameManager : MonoBehaviour
 	public bool MusicOn = true;
 	public bool SfxOn = true;
 
+	public bool ShouldShowFps;
+
 	//TODO: move these?
 	public int LevelsPerPage = 5;
 	public int LevelsDisplayingStart = -1;
 	public int LevelsDisplayingEnd = -1;
+
+	public FpsCounter FpsCounter;
 
 	// Update is called once per frame
 	void Update()
@@ -689,6 +696,8 @@ public class GameManager : MonoBehaviour
 
 			AudioManager.FadeIn(1);
 		}
+
+		FpsCounter.gameObject.SetActive(ShouldShowFps);
 
 		InputManager.ToggleInputs(AppState, NotificationManager.IsActive);
 
