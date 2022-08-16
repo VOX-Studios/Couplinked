@@ -6,6 +6,5 @@
     Node2Inside,
     Node2Outside,
     Node2Particles,
-    Lightning,
     Grid
 }

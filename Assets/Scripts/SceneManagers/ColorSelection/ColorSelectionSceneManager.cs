@@ -81,9 +81,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
         private Button _node2ParticlesButton;
 
         [SerializeField]
-        private Button _lightningButton;
-
-        [SerializeField]
         private Button _gridButton;
 
 
@@ -104,9 +101,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
         [SerializeField]
         private Image _node2ParticlesColorPreviewImage;
-
-        [SerializeField]
-        private Image _lightningColorPreviewImage;
 
         [SerializeField]
         private Image _gridColorPreviewImage;
@@ -136,7 +130,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
         private Color _node2InsideColor;
         private Color _node2OutsideColor;
         private Color _node2ParticlesColor;
-        private Color _lightningColor;
         private Color _gridColor;
 
         void Start()
@@ -156,7 +149,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             _node2InsideButton.onClick.AddListener(() => _handleMenuSelection(ColorSettingEnum.Node2Inside));
             _node2OutsideButton.onClick.AddListener(() => _handleMenuSelection(ColorSettingEnum.Node2Outside));
             _node2ParticlesButton.onClick.AddListener(() => _handleMenuSelection(ColorSettingEnum.Node2Particles));
-            _lightningButton.onClick.AddListener(() => _handleMenuSelection(ColorSettingEnum.Lightning));
             _gridButton.onClick.AddListener(() => _handleMenuSelection(ColorSettingEnum.Grid));
 
             _rSlider.onValueChanged.AddListener(_handleRSliderChange);
@@ -177,7 +169,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             _node2InsideColor = playerColors.NodeColors[1].InsideColor.Get();
             _node2OutsideColor = playerColors.NodeColors[1].OutsideColor.Get();
             _node2ParticlesColor = playerColors.NodeColors[1].ParticleColor.Get();
-            _lightningColor = playerColors.LightningColor.Get();
             _gridColor = playerColors.GridColor.Get();
 
             _node1InsideColorPreviewImage.color = _node1InsideColor;
@@ -186,7 +177,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             _node2InsideColorPreviewImage.color =_node2InsideColor;
             _node2OutsideColorPreviewImage.color = _node2OutsideColor;
             _node2ParticlesColorPreviewImage.color = _node2ParticlesColor;
-            _lightningColorPreviewImage.color = _lightningColor;
             _gridColorPreviewImage.color = _gridColor;
         }
 
@@ -215,9 +205,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     break;
                 case ColorSettingEnum.Node2Particles:
                     _currentSettingText.text = "NODE 2 PARTICLES";
-                    break;
-                case ColorSettingEnum.Lightning:
-                    _currentSettingText.text = "LIGHTNING";
                     break;
                 case ColorSettingEnum.Grid:
                     _currentSettingText.text = "GRID";
@@ -257,6 +244,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     _node1OutsideColor = _currentColor;
                     _nodePair.Nodes[0].SetColors(_node1InsideColor, _node1OutsideColor);
                     _hit1.SetColor(_node1OutsideColor);
+                    _nodePair.LaserManagers[0].SetLaserColor(_node1OutsideColor, _node2OutsideColor);
                     break;
                 case ColorSettingEnum.Node1Particles:
                     _node1ParticlesColor = _currentColor;
@@ -270,14 +258,11 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     _node2OutsideColor = _currentColor;
                     _nodePair.Nodes[1].SetColors(_node2InsideColor, _node2OutsideColor);
                     _hit2.SetColor(_node2OutsideColor);
+                    _nodePair.LaserManagers[0].SetLaserColor(_node1OutsideColor, _node2OutsideColor);
                     break;
                 case ColorSettingEnum.Node2Particles:
                     _node2ParticlesColor = _currentColor;
                     _nodePair.Nodes[1].SetParticleColor(_node2ParticlesColor);
-                    break;
-                case ColorSettingEnum.Lightning:
-                    _lightningColor = _currentColor;
-                    //_nodePair.LightningManager.SetLightningColor(_lightningColor);
                     break;
                 case ColorSettingEnum.Grid:
                     _gridColor = _currentColor;
@@ -367,12 +352,12 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
             node2.SetParticleColor(playerColorData.NodeColors[1].ParticleColor.Get());
 
             GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
+            LaserManager laserManager = lightningManagerGameObject.GetComponent<LaserManager>();
 
-            lightningManager.Initialize(_midground);
-            //lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+            laserManager.Initialize(_midground);
+            laserManager.SetLaserColor(playerColorData.NodeColors[0].OutsideColor.Get(), playerColorData.NodeColors[1].OutsideColor.Get());
 
-            NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, new List<LaserManager>() { lightningManager });
+            NodePairing nodePair = new NodePairing(new List<Node>() { node1, node2 }, new List<LaserManager>() { laserManager });
 
             _setupNodeTrail(node1.ParticleSystem);
             _setupNodeTrail(node2.ParticleSystem);
@@ -472,9 +457,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                 case ColorSettingEnum.Node2Particles:
                     _currentColor = _node2ParticlesColor;
                     break;
-                case ColorSettingEnum.Lightning:
-                    _currentColor = _lightningColor;
-                    break;
                 case ColorSettingEnum.Grid:
                     _currentColor = _gridColor;
                     break;
@@ -525,10 +507,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     gameObjectToSelect = _node2ParticlesButton.gameObject;
                     _node2ParticlesColorPreviewImage.color = _currentColor;
                     break;
-                case ColorSettingEnum.Lightning:
-                    gameObjectToSelect = _lightningButton.gameObject;
-                    _lightningColorPreviewImage.color = _currentColor;
-                    break;
                 case ColorSettingEnum.Grid:
                     gameObjectToSelect = _gridButton.gameObject;
                     _gridColorPreviewImage.color = _currentColor;
@@ -561,9 +539,6 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
                     break;
                 case ColorSettingEnum.Node2Particles:
                     _gameManager.DataManager.PlayerColors[_playerIndex].NodeColors[1].ParticleColor.Set(_currentColor);
-                    break;
-                case ColorSettingEnum.Lightning:
-                    _gameManager.DataManager.PlayerColors[_playerIndex].LightningColor.Set(_currentColor);
                     break;
                 case ColorSettingEnum.Grid:
                     _gameManager.DataManager.PlayerColors[_playerIndex].GridColor.Set(_currentColor);

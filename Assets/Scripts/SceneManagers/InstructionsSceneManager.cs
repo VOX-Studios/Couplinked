@@ -32,8 +32,8 @@ namespace Assets.Scripts.SceneManagers
         private bool _isTransitioning;
 
         [SerializeField]
-        private GameObject _lightningManagerPrefab;
-        private LaserManager _lightningManager;
+        private GameObject _laserManagerPrefab;
+        private LaserManager _laserManager;
 
         [SerializeField]
         private Transform _lightningHolder;
@@ -56,11 +56,11 @@ namespace Assets.Scripts.SceneManagers
 
             CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[0];
 
-            GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-            _lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
+            GameObject lightningManagerGameObject = GameObject.Instantiate(_laserManagerPrefab);
+            _laserManager = lightningManagerGameObject.GetComponent<LaserManager>();
 
-            _lightningManager.Initialize(_lightningHolder);
-            //_lightningManager.SetLightningColor(playerColorData.LightningColor.Get());
+            _laserManager.Initialize(_lightningHolder);
+            _laserManager.SetLaserColor(playerColorData.NodeColors[0].OutsideColor.Get(), playerColorData.NodeColors[1].OutsideColor.Get());
             _lastInstructionsPageNum = _instructionsPages.transform.childCount;
 
             for (int i = 1; i < _lastInstructionsPageNum; i++)
@@ -92,9 +92,9 @@ namespace Assets.Scripts.SceneManagers
                 _instructionsRight.GetComponent<Image>().enabled = true;
 
             
-            if (_lightningManager.gameObject.activeInHierarchy)
+            if (_laserManager.gameObject.activeInHierarchy)
             {
-                _lightningManager.Run(_convertFromPlaceholderPosition(InstructionsCircle1.transform.position), _convertFromPlaceholderPosition(InstructionsCircle2.transform.position));
+                _laserManager.Run(_convertFromPlaceholderPosition(InstructionsCircle1.transform.position), _convertFromPlaceholderPosition(InstructionsCircle2.transform.position));
             }
 
             if (!_isTransitioning)

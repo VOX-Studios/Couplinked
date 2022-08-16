@@ -195,8 +195,6 @@ public class GameManager : MonoBehaviour
 			node2InsideColor.Set(defaultColors.NodeColors[1].InsideColor);
 			node2OutsideColor.Set(defaultColors.NodeColors[1].OutsideColor);
 			node2ParticlesColor.Set(defaultColors.NodeColors[1].ParticleColor);
-
-			DataManager.PlayerColors[i].LightningColor.Set(Color.white);
 		}
 
 		//delete old lightning key
@@ -252,6 +250,10 @@ public class GameManager : MonoBehaviour
 			PlayerPrefs.DeleteKey(oldNode2InsideColor.PlayerPreferenceKey);
 			PlayerPrefs.DeleteKey(oldNode2OutsideColor.PlayerPreferenceKey);
 			PlayerPrefs.DeleteKey(oldNode2ParticlesColor.PlayerPreferenceKey);
+
+			//delete old lightning color
+			PlayerPrefs.DeleteKey($"P{i} Lightning Color");
+
 			PlayerPrefs.Save();
 		}
 
@@ -274,8 +276,6 @@ public class GameManager : MonoBehaviour
 			node2InsideColor.Set(defaultColors.NodeColors[1].InsideColor);
 			node2OutsideColor.Set(defaultColors.NodeColors[1].OutsideColor);
 			node2ParticlesColor.Set(defaultColors.NodeColors[1].ParticleColor);
-
-			DataManager.PlayerColors[i].LightningColor.Set(Color.white);
 		}
 
 

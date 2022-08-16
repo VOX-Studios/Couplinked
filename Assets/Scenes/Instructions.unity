@@ -502,7 +502,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Don't touch the red nodes, even with your lightning!
+  m_Text: Don't touch the red nodes, even with your laser!
 --- !u!222 &125069229
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3032,7 +3032,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: They're connected by lightning.
+  m_Text: They're connected by a laser.
 --- !u!222 &1581075035
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4013,7 +4013,7 @@ MonoBehaviour:
   _instructionsPages: {fileID: 1215963107}
   _instructionsLeft: {fileID: 39878725}
   _instructionsRight: {fileID: 752499745}
-  _lightningManagerPrefab: {fileID: 5074963081250650980, guid: e5d2214f4156ae5429f19e36acdd0f16,
+  _laserManagerPrefab: {fileID: 5074963081250650980, guid: e5d2214f4156ae5429f19e36acdd0f16,
     type: 3}
   _lightningHolder: {fileID: 1164742275}
 --- !u!4 &1988595103
