@@ -55,6 +55,8 @@ public class GameManager : MonoBehaviour
 	{
 		GameObject.DontDestroyOnLoad(this.gameObject);
 
+        SceneManager.sceneLoaded += _onSceneLoaded;
+
 		DataManager = new DataManager();
 		InputManager = new InputManager(InputActions, DefaultInputActions);
 		NotificationManager.Initialize(this);
@@ -159,7 +161,7 @@ public class GameManager : MonoBehaviour
 		ShouldShowFps = DataManager.ShouldShowFps.Get();
 	}
 
-	private void SetDefaultDataValues_1_9()
+    private void SetDefaultDataValues_1_9()
 	{
 		DataManager.GridDensity.Set(QualitySettingEnum.High);
 		DataManager.ExplosionParticleQuality.Set(QualitySettingEnum.High);
@@ -519,8 +521,6 @@ public class GameManager : MonoBehaviour
 
 	public int resumeCountNormalFontSize; //TODO: this is only necessary because I'm sharing text object with "PAUSED"
 
-	public GameObject MenuBackButtonPrefab;
-
 	public int LocalHighScore = 0;
 
 	public GameObject ColorSelectionSwabPrefab;
@@ -597,12 +597,12 @@ public class GameManager : MonoBehaviour
 		SceneManager.LoadScene(sceneToLoad);
 	}
 
-	void OnLevelWasLoaded(int level)
+
+	private void _onSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
 	{
 		Cam = Camera.main;
 
-		//TODO: wtf do we do with default?
-		switch (SceneManager.GetActiveScene().name)
+		switch (scene.name)
 		{
 			case "Start":
 				AppState = AppStateEnum.StartScreen;
@@ -704,8 +704,6 @@ public class GameManager : MonoBehaviour
 		if (NotificationManager.IsRequested)
 			NotificationManager.Activate();
 	}
-
-
 
 	public void ResetLevelDisplayNumbers()
 	{

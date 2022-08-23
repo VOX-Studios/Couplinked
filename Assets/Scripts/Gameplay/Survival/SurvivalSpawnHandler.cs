@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 class SurvivalSpawnHandler : ISurvivalSpawnHandler
 {
-    private GameManager _gameManager;
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
     private NoHitManager _noHitManager;
@@ -17,7 +15,6 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
 
     public SurvivalSpawnHandler(
         SurvivalHandler survivalHandler,
-        GameManager gameManager, 
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
@@ -27,7 +24,6 @@ class SurvivalSpawnHandler : ISurvivalSpawnHandler
         )
     {
         _survivalHandler = survivalHandler;
-        _gameManager = gameManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
         _noHitManager = noHitManager;

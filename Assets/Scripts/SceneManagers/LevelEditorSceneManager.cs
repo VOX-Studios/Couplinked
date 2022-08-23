@@ -67,10 +67,6 @@ namespace Assets.Scripts.SceneManagers
             _snapButton.onClick.AddListener(_handleSnapButton);
             _exportButton.onClick.AddListener(_handleExportButton);
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
-
             List<Transform> placeholderPositions = new List<Transform>();
             int children = _placeholderPanel.transform.childCount;
             for (int i = 0; i < children; ++i)

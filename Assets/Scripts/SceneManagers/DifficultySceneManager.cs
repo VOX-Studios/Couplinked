@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.RuleSets;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -84,6 +85,16 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.SoundEffectManager.PlaySelect();
 
             _gameManager.GameDifficultyManager.ChangeDifficulty(gameDifficulty);
+
+
+            if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Level)
+            {
+                _gameManager.GameSetupInfo.RuleSet = new RuleSet()
+                {
+                    GameSpeed = gameDifficulty,
+                    AreLasersOn = gameDifficulty != GameDifficultyEnum.VeryEasy
+                };
+            }
 
             if(_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
             {

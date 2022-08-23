@@ -20,6 +20,7 @@ public class GameDifficultyManager
 		{  GameDifficultyEnum.Hard, 7 },
 	};
 
+	//TODO: background particle stuff isn't used...remove it?
 	public float BackgroundParticleSpawnInterval { get; private set; }
 	private float _backgroundParticleBaseSpawnInterval = .3f;
 
@@ -45,11 +46,13 @@ public class GameDifficultyManager
     {
 		GameDifficulty = gameDifficulty;
 
+		//percentage of speed relative to hard difficulty
 		GameTimeModifier = _objectSpeed[gameDifficulty] / _objectSpeed[GameDifficultyEnum.Hard];
 		LevelStartDelay = _levelStartDelay[gameDifficulty] * GameTimeModifier;
 
 		NodeSpeed = _nodeSpeed[gameDifficulty];
 		ObjectSpeed = _objectSpeed[gameDifficulty];
+
 		BackgroundParticleSpawnInterval = _backgroundParticleBaseSpawnInterval / (_backgroundParticleSpeed[gameDifficulty] / _backgroundParticleSpeed[GameDifficultyEnum.Hard]);
 		BackgroundParticleSpeed = _backgroundParticleSpeed[gameDifficulty];	
 	}

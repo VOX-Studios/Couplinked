@@ -25,9 +25,6 @@ namespace Assets.Scripts.SceneManagers
             EventSystem.current.SetSelectedGameObject(_toggleMusicButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
             _toggleMusicButton.onClick.AddListener(_handleToggleMusicButton);
             _toggleFxButton.onClick.AddListener(_handleToggleFxButton);
             

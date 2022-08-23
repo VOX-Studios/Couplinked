@@ -1,4 +1,6 @@
 ﻿using Assets.Scripts.GameEntities;
+using Assets.Scripts.Gameplay;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class NoHit : GameEntity
@@ -11,6 +13,8 @@ public class NoHit : GameEntity
 	private CircleCollider2D _circleCollider;
 
 	public float Scale { get; private set; }
+
+	private HashSet<Node> _currentNodeCollisions = new HashSet<Node>();
 
     // Use this for initialization
     public void Initialize(ICollisionHandler<NoHit> noHitCollisionHandler) 
@@ -42,8 +46,31 @@ public class NoHit : GameEntity
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (!gameObject.activeSelf)
+		{
 			return;
+		}
 
-		_noHitCollisionHandler.OnCollision(this, other);
+		//always call OnCollision when a node enters
+		if (other.tag == "Node")
+        {
+			_noHitCollisionHandler.OnCollision(this, other);
+			_currentNodeCollisions.Add(other.GetComponent<Node>());
+		}
+		else if(other.tag == "Connector") //only call OnCollision when the a connector enters if its nodes aren't already touching
+        {
+			LaserNodeConnections laser = other.GetComponent<LaserNodeConnections>();
+			if(!_currentNodeCollisions.Contains(laser.Node1) && !_currentNodeCollisions.Contains(laser.Node2))
+            {
+				_noHitCollisionHandler.OnCollision(this, other);
+			}
+		}
+	}
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+		if (other.tag == "Node")
+		{
+			_currentNodeCollisions.Remove(other.GetComponent<Node>());
+		}
 	}
 }

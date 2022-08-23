@@ -22,9 +22,6 @@ namespace Assets.Scripts.SceneManagers
             _newLevelButton.onClick.AddListener(_handleNewLevelButton);
             _openLevelButton.onClick.AddListener(_handleOpenLevelButton);
 
-            GameObject mainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            mainMenuBackButton.name = "MainMenuBackButton";
-
             _gameManager.TheLevelSelectionMode = LevelTypeEnum.LevelEditor;
         }
 

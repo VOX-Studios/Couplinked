@@ -48,9 +48,10 @@ namespace Assets.Scripts.SceneManagers
 
         private void _tempStartSurvival()
         {
+            _gameManager.GameSetupInfo.GameMode = GameModeEnum.Survival;
             _gameManager.GameDifficultyManager.ChangeDifficulty(GameDifficultyEnum.Hard);
             _gameManager.CurrentLevel = null;
-            _gameManager.LoadScene(SceneNames.Game);
+            _gameManager.LoadScene(SceneNames.RuleSetSelection);
         }
     }
 }

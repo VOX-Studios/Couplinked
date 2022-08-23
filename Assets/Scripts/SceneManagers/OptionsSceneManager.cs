@@ -25,9 +25,6 @@ namespace Assets.Scripts.SceneManagers
             EventSystem.current.SetSelectedGameObject(_graphicsButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
             _statisticsButton.onClick.AddListener(_handleStatisticsButton);
             _graphicsButton.onClick.AddListener(_handleGraphicsButton);
             _soundButton.onClick.AddListener(_handleSoundButton);

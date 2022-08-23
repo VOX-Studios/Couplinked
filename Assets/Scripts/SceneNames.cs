@@ -18,12 +18,14 @@
         public const string Levels = "Levels";
         public const string LevelEditor = "Level Editor";
 
-        public const string DifficultySelection= "Difficulty Selection";
+        public const string DifficultySelection = "Difficulty Selection";
 
         public const string Game = "Game";
         public const string End = "End";
 
         public const string Graphics = "Graphics";
         public const string ColorSelection = "Color Selection";
+
+        public const string RuleSetSelection = "Rule Set Selection";
     }
 }

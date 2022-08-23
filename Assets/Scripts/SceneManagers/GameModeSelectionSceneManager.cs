@@ -49,9 +49,6 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.TheLevelSelectionMode = LevelTypeEnum.Campaign;
 
             _gameManager.LoadScene(SceneNames.DifficultySelection);
-            
-            //_gameManager.ResetLevelDisplayNumbers();
-            //_gameManager.LoadScene("Levels");
         }
 
         private void _handleSurvivalButton()
@@ -61,7 +58,7 @@ namespace Assets.Scripts.SceneManagers
 
             _gameManager.CurrentLevel = null;
 
-            _gameManager.LoadScene(SceneNames.Game);
+            _gameManager.LoadScene(SceneNames.RuleSetSelection);
 
             _gameManager.SoundEffectManager.PlaySelect();
         }

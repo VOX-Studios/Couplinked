@@ -56,8 +56,8 @@ namespace Assets.Scripts.SceneManagers
 
             CustomPlayerColorData playerColorData = _gameManager.DataManager.PlayerColors[0];
 
-            GameObject lightningManagerGameObject = GameObject.Instantiate(_laserManagerPrefab);
-            _laserManager = lightningManagerGameObject.GetComponent<LaserManager>();
+            GameObject laserManagerGameObject = GameObject.Instantiate(_laserManagerPrefab);
+            _laserManager = laserManagerGameObject.GetComponent<LaserManager>();
 
             _laserManager.Initialize(_lightningHolder);
             _laserManager.SetLaserColor(playerColorData.NodeColors[0].OutsideColor.Get(), playerColorData.NodeColors[1].OutsideColor.Get());

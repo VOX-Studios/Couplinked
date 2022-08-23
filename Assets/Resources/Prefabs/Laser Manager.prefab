@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2157738263117620688}
   - component: {fileID: 4419350576484805603}
   - component: {fileID: 6179168678398987160}
+  - component: {fileID: 3044532288127260164}
   m_Layer: 8
   m_Name: Collider
   m_TagString: Connector
@@ -67,7 +68,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 993392666640068202}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -80,6 +81,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &3044532288127260164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993392666640068202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4a67035a58b3554eb9d6969f1f0e944, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Node1: {fileID: 0}
+  Node2: {fileID: 0}
 --- !u!1 &3852437087895542069
 GameObject:
   m_ObjectHideFlags: 0
@@ -90,8 +105,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6522496806628070502}
   - component: {fileID: 2212037009587942002}
-  m_Layer: 0
-  m_Name: Laser
+  m_Layer: 8
+  m_Name: Line Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -221,7 +236,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5074963081250650978}
   - component: {fileID: 5074963081250650981}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Laser Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -258,4 +273,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 4419350576484805603}
-  _laser: {fileID: 2212037009587942002}
+  _lineRenderer: {fileID: 2212037009587942002}
+  LaserNodeConnections: {fileID: 3044532288127260164}

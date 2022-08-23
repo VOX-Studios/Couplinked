@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Gameplay;
+using UnityEngine;
 
 public class LaserManager : MonoBehaviour
 {
@@ -6,7 +7,9 @@ public class LaserManager : MonoBehaviour
     private BoxCollider2D _collider;
 
     [SerializeField]
-    private LineRenderer _laser;
+    private LineRenderer _lineRenderer;
+
+    public LaserNodeConnections LaserNodeConnections;
 
     private float _scale = 1;
 
@@ -23,28 +26,28 @@ public class LaserManager : MonoBehaviour
     {
         _scale = scale;
 
-        _laser.startWidth *= scale;
+        _lineRenderer.startWidth *= scale;
 
         _collider.size = new Vector2(_collider.size.x, _collider.size.y * scale);
     }
 
     public void SetLaserColor(Color color1, Color color2)
     {
-        _laser.material.SetColor("_Color_1", color1);
-        _laser.material.SetColor("_Color_2", color2);
+        _lineRenderer.material.SetColor("_Color_1", color1);
+        _lineRenderer.material.SetColor("_Color_2", color2);
     }
 
     public void SetLightTexture(RenderTexture renderTexture)
     {
-        _laser.material.SetTexture("_Light_Texture", renderTexture);
+        _lineRenderer.material.SetTexture("_Light_Texture", renderTexture);
     }
 
     public void Run(Vector3 pos1, Vector3 pos2)
     {
-        _laser.material.SetVector("_Position_1", pos1);
-        _laser.material.SetVector("_Position_2", pos2);
-        _laser.SetPosition(0, pos1);
-        _laser.SetPosition(1, pos2);
+        _lineRenderer.material.SetVector("_Position_1", pos1);
+        _lineRenderer.material.SetVector("_Position_2", pos2);
+        _lineRenderer.SetPosition(0, pos1);
+        _lineRenderer.SetPosition(1, pos2);
 
         //The difference between our start and end points
         Vector2 distance = pos2 - pos1;

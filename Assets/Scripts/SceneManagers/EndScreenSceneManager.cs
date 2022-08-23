@@ -44,9 +44,6 @@ namespace Assets.Scripts.SceneManagers
             _nextLevelInputAction = menuInputActionMap.FindAction("Next Level");
             _playAgainInputAction = menuInputActionMap.FindAction("Play Again");
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
             _nextLevelButton.onClick.AddListener(_handleNextLevelButton);
             _playAgainButton.onClick.AddListener(_handlePlayAgainButton);
             _backButton.onClick.AddListener(_handleBackButton);
@@ -176,7 +173,7 @@ namespace Assets.Scripts.SceneManagers
                     _gameManager.LevelsDisplayingStart = levelNumber;
                     _gameManager.LevelsDisplayingEnd = _gameManager.LevelsDisplayingStart + _gameManager.LevelsPerPage;
                 }
-                _gameManager.LoadScene("Game");
+                _gameManager.LoadScene(SceneNames.Game);
                 _gameManager.SoundEffectManager.PlaySelect();
             }
         }
@@ -191,14 +188,23 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager.SoundEffectManager.PlayBack();
 
+            //if it's regular multiplayer
             if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+            {
                 _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
+            }
             else if (_gameManager.CurrentLevel == null)
+            {
                 _gameManager.LoadScene(SceneNames.GameModeSelection);
+            }
             else if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
+            {
                 _gameManager.LoadScene(SceneNames.LevelEditor);
+            }
             else
+            {
                 _gameManager.LoadScene(SceneNames.Levels);
+            }
         }
     }
 }

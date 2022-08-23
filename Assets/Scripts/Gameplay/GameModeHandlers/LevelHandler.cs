@@ -67,7 +67,8 @@ class LevelHandler : IGameModeHandler
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
             nodePairs: _nodePairings,
-            gameModeHandler: this
+            gameModeHandler: this,
+            lives: 1
             );
     }
 

@@ -73,7 +73,9 @@ public class Hit : GameEntity
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (!gameObject.activeSelf)
+		{
 			return;
+		}
 
 		_hitCollisionHandler.OnCollision(this, other);
 	}

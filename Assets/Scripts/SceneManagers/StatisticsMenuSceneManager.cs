@@ -18,9 +18,6 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
             _localStatisticsButton.onClick.AddListener(_handleLocalStatisticsButton);
         }
 

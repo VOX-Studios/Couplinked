@@ -15,6 +15,8 @@ class RegularGameService
 
     private IGameModeHandler _gameModeHandler;
 
+    private int _lives;
+
     public RegularGameService(
         GameManager gameManager,
         GameSceneManager gameSceneManager,
@@ -23,7 +25,8 @@ class RegularGameService
         HitSplitManager hitSplitManager,
         GameInput[][] gameInputs,
         NodePairing[] nodePairs,
-        IGameModeHandler gameModeHandler
+        IGameModeHandler gameModeHandler,
+        int lives
         )
     {
         _gameManager = gameManager;
@@ -36,6 +39,8 @@ class RegularGameService
         _nodePairs = nodePairs;
 
         _gameModeHandler = gameModeHandler;
+
+        _lives = lives;
     }
 
     public void Start()
@@ -161,7 +166,9 @@ class RegularGameService
     public void OnHitCollision(Hit hit, Collider2D other)
     {
         if (other.tag != "Node")
+        {
             return;
+        }
 
         Node node = other.GetComponent<Node>();
 
@@ -189,14 +196,16 @@ class RegularGameService
         else //hit the wrong node
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hit.Scale, hit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch, hit.transform.position);
+            SubtractLife(ReasonForGameEndEnum.Mismatch, hit.transform.position);
         }
     }
 
     public void OnHitSplitCollision(HitSplit hitSplit, Collider2D other)
     {
         if (other.tag != "Node")
+        {
             return;
+        }
 
         Node node = other.GetComponent<Node>();
 
@@ -244,7 +253,7 @@ class RegularGameService
         else //hit the wrong node first
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
+            SubtractLife(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
         }
     }
 
@@ -283,7 +292,7 @@ class RegularGameService
         else //hit the wrong node
         {
             _gameManager.Grid.Logic.ApplyExplosiveForce(GameplayUtility.EXPLOSIVE_FORCE * hitSplit.Scale, hitSplit.transform.position, GameplayUtility.EXPLOSIVE_RADIUS * hitSplit.Scale);
-            _endGame(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
+            SubtractLife(ReasonForGameEndEnum.Mismatch, hitSplit.transform.position);
         }
     }
 
@@ -294,19 +303,24 @@ class RegularGameService
 
         if (other.gameObject.tag == "Connector")
         {
-            _endGame(ReasonForGameEndEnum.NoHitContactWithElectricity, noHit.transform.position);
+            SubtractLife(ReasonForGameEndEnum.NoHitContactWithElectricity, noHit.transform.position);
         }
         else
         {
-            //TODO: put another pulse on the node that hit?
-            _endGame(ReasonForGameEndEnum.NoHitContactWithNode, noHit.transform.position);
+            //TODO: put another explosive force on the node that hit?
+            SubtractLife(ReasonForGameEndEnum.NoHitContactWithNode, noHit.transform.position);
         }
     }
 
-    private void _endGame(ReasonForGameEndEnum reasonForGameEnd, Vector2 position)
+    public void SubtractLife(ReasonForGameEndEnum reasonForGameEnd, Vector2 position)
     {
-        _gameSceneManager.EndGame(reasonForGameEnd);
-        _gameSceneManager.VignetteManager.StartClosePhase1(position, .1f);
+        _lives--;
+
+        if (_lives <= 0)
+        {
+            _gameSceneManager.EndGame(reasonForGameEnd);
+            _gameSceneManager.VignetteManager.StartClosePhase1(position, .1f);
+        }
     }
 
     private void _setNodeStartPositions()

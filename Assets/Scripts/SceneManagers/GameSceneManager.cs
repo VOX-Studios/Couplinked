@@ -86,7 +86,6 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-
             IGameModeHandler gameModeHandler;
 
             //if survival mode
@@ -100,7 +99,8 @@ namespace Assets.Scripts.SceneManagers
                     noHitManager: _noHitManager,
                     gameInputs: _gameInputs,
                     nodePairs: _nodePairs,
-                    explosionManager: _explosionManager
+                    explosionManager: _explosionManager,
+                    gameSetupInfo: _gameManager.GameSetupInfo
                     );
 
                 gameModeHandler = _survivalHandler;
@@ -132,7 +132,7 @@ namespace Assets.Scripts.SceneManagers
             CameraShake = new CameraShake();
             CameraShake.Initialize(_gameManager);
 
-            _setState(GameStateEnum.Playing);
+            _setGameState(GameStateEnum.Playing);
 
             _gameManager.score = 0;
             _gameManager.ringsCollected = 0;
@@ -141,7 +141,7 @@ namespace Assets.Scripts.SceneManagers
             _startGame();
         }
 
-        private void _setState(GameStateEnum gameState)
+        private void _setGameState(GameStateEnum gameState)
         {
             _gameState = gameState;
 
@@ -164,7 +164,7 @@ namespace Assets.Scripts.SceneManagers
             _setNodeColors(nodePair, 0);
             _nodePairs[0] = nodePair;
 
-            //TODO: pass player input
+            //TODO: pass player input?
 
             _gameInputs = new GameInput[1][];
             InputActionMap gameInputActionMap = _gameManager.InputActions.FindActionMap("Game");
@@ -226,24 +226,26 @@ namespace Assets.Scripts.SceneManagers
                 nodes.Add(node);
             }
 
-            //disable lightning manager for very easy mode
-            List<LaserManager> lightningManagers = null;
+            //only add lasers if the setting is turned on
+            List<LaserManager> laserManagers = null;
 
-            if (_gameManager.GameDifficultyManager.GameDifficulty != GameDifficultyEnum.VeryEasy)
+            if (_gameManager.GameSetupInfo.RuleSet.AreLasersOn)
             {
-                lightningManagers = new List<LaserManager>();
+                laserManagers = new List<LaserManager>();
                 for (int i = 0; i < numberOfNodes - 1; i++)
                 {
-                    GameObject lightningManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
-                    LaserManager lightningManager = lightningManagerGameObject.GetComponent<LaserManager>();
+                    GameObject laserManagerGameObject = GameObject.Instantiate(_lightningManagerPrefab);
+                    LaserManager laserManager = laserManagerGameObject.GetComponent<LaserManager>();
 
-                    lightningManager.Initialize(_midground);
+                    laserManager.Initialize(_midground);
+                    laserManager.LaserNodeConnections.Node1 = nodes[i];
+                    laserManager.LaserNodeConnections.Node2 = nodes[i + 1];
 
-                    lightningManagers.Add(lightningManager);
+                    laserManagers.Add(laserManager);
                 }
             }
 
-            NodePairing nodePair = new NodePairing(nodes, lightningManagers);
+            NodePairing nodePair = new NodePairing(nodes, laserManagers);
 
             return nodePair;
         }
@@ -331,7 +333,7 @@ namespace Assets.Scripts.SceneManagers
 
                 _resumeCountText.gameObject.SetActive(false);
 
-                _setState(GameStateEnum.Playing);
+                _setGameState(GameStateEnum.Playing);
 
                 foreach(NodePairing nodePair in _nodePairs)
                 {
@@ -582,7 +584,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.SoundEffectManager.PlayBack();
             _clearGame();
 
-            _setState(GameStateEnum.Playing);
+            _setGameState(GameStateEnum.Playing);
 
             string unlockMessage = "";
             if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
@@ -617,7 +619,7 @@ namespace Assets.Scripts.SceneManagers
             }
 
             _resumeCountText.fontSize = _gameManager.resumeCountNormalFontSize;
-            _setState(GameStateEnum.Resuming);
+            _setGameState(GameStateEnum.Resuming);
             _resumeCount = 3;
             _resumeCountText.text = "3";
             _resumeCountText.gameObject.SetActive(true);
@@ -625,7 +627,7 @@ namespace Assets.Scripts.SceneManagers
 
         private void _pause()
         {
-            _setState(GameStateEnum.Paused);
+            _setGameState(GameStateEnum.Paused);
 
             foreach (NodePairing nodePair in _nodePairs)
             {

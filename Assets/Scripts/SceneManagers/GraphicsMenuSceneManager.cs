@@ -58,14 +58,10 @@ namespace Assets.Scripts.SceneManagers
             new KeyValuePair<FullScreenMode, string>(FullScreenMode.Windowed, "Windowed"),
         };
 
-
         void Start()
         {
             EventSystem.current.SetSelectedGameObject(_colorSelectionButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
 
             _windowedMode = _gameManager.DataManager.WindowedModePreference.Get();
             _vSyncCount = _gameManager.DataManager.VSyncCountPreference.Get();
@@ -175,13 +171,18 @@ namespace Assets.Scripts.SceneManagers
 
             //default to full screen if no preference found
             if (string.IsNullOrWhiteSpace(_resolution))
+            {
                 _resolution = $"{Screen.currentResolution.width}x{Screen.currentResolution.height}";
+            }
 
             //set dropdown to selected value
             for (int i = 0; i < _resolutionDropdown.options.Count; i++)
             {
                 if (_resolutionDropdown.options[i].text == _resolution)
+                {
                     _resolutionDropdown.value = i;
+                    break;
+                }
             }
 
             _resolutionDropdown.onValueChanged.AddListener(_handleResolutionSelection);
@@ -210,11 +211,13 @@ namespace Assets.Scripts.SceneManagers
             }
             catch
             {
-
+                //swallow the error
             }
 
             if (currentModeDisplayText == null)
+            {
                 currentModeDisplayText = _supportedWindowedModes.First(mode => mode.Key == FullScreenMode.FullScreenWindow).Value;
+            }
 
             //set dropdown to selected value
             for (int i = 0; i < _windowedModeDropdown.options.Count; i++)
@@ -264,7 +267,7 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.HandleBack())
             {
                 _gameManager.SoundEffectManager.PlayBack();
-                _gameManager.LoadScene("Options");
+                _gameManager.LoadScene(SceneNames.Options);
                 return;
             }
         }

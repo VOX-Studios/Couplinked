@@ -1,11 +1,8 @@
 ﻿using Assets.Scripts.Gameplay.Survival.SpawnPlans;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
 {
-    private GameManager _gameManager;
     private HitManager _hitManager;
     private HitSplitManager _hitSplitManager;
     private NoHitManager _noHitManager;
@@ -19,7 +16,6 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
 
     public SurvivalCoOpSpawnHandler(
         SurvivalHandler survivalHandler,
-        GameManager gameManager, 
         HitManager hitManager, 
         HitSplitManager hitSplitManager, 
         NoHitManager noHitManager,
@@ -29,7 +25,6 @@ class SurvivalCoOpSpawnHandler : ISurvivalSpawnHandler
         )
     {
         _survivalHandler = survivalHandler;
-        _gameManager = gameManager;
         _hitManager = hitManager;
         _hitSplitManager = hitSplitManager;
         _noHitManager = noHitManager;

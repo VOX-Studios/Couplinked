@@ -65,4 +65,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/End.unity
     guid: 4ccdbfacff4fb604187069f3f9841769
+  - enabled: 1
+    path: Assets/Scenes/Rule Set Selection.unity
+    guid: ce40a24e90d948e4fb0c10ebaaf6a7ef
   m_configObjects: {}

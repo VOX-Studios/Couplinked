@@ -36,9 +36,6 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            GameObject MainMenuBackButton = (GameObject)GameObject.Instantiate(_gameManager.MenuBackButtonPrefab);
-            MainMenuBackButton.name = "MainMenuBackButton";
-
             _hit1HitCountText.text = _gameManager.Hit1HitCount.ToString();
             _hit2HitCountText.text = _gameManager.Hit2HitCount.ToString();
             _hitSplit1HitCountText.text = _gameManager.HitSplit1HitCount.ToString();

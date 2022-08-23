@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.GameEntities;
 using Assets.Scripts.Gameplay;
+using Assets.Scripts.RuleSets;
 using Assets.Scripts.SceneManagers;
 using UnityEngine;
 
@@ -21,8 +22,6 @@ class SurvivalHandler : IGameModeHandler
     /// The smallest amount of time allowed between each spawn (aka spawn interval can't be less than this number).
     /// </summary>
     private double _minSpawnInterval = .5;
-
-    private byte _numberOfRows = 5; //TODO: make new lighting system scale to match changes to number of rows
 
     private GameManager _gameManager;
     private GameSceneManager _gameSceneManager;
@@ -46,6 +45,8 @@ class SurvivalHandler : IGameModeHandler
 
     private ISurvivalSpawnHandler _spawnHandler;
 
+    private GameSetupInfo _gameSetupInfo;
+
     public SurvivalHandler(
         GameManager gameManager,
         GameSceneManager gameSceneManager, 
@@ -54,7 +55,8 @@ class SurvivalHandler : IGameModeHandler
         NoHitManager noHitManager,
         GameInput[][] gameInputs,
         NodePairing[] nodePairs,
-        ExplosionManager explosionManager
+        ExplosionManager explosionManager,
+        GameSetupInfo gameSetupInfo
         )
     {
         _gameManager = gameManager;
@@ -67,6 +69,8 @@ class SurvivalHandler : IGameModeHandler
         _nodePairings = nodePairs;
         _explosionManager = explosionManager;
 
+        _gameSetupInfo = gameSetupInfo;
+
         _gameService = new RegularGameService(
             gameManager: _gameManager,
             gameSceneManager: _gameSceneManager,
@@ -75,21 +79,21 @@ class SurvivalHandler : IGameModeHandler
             hitSplitManager: _hitSplitManager,
             gameInputs: _gameInputs,
             nodePairs: _nodePairings,
-            gameModeHandler: this
+            gameModeHandler: this,
+            lives: _gameSetupInfo.RuleSet.NumberOfLives
             );
     }
 
     public void Initialize()
     {
-        float[] rowPositions = RowPositionsUtility.CalculateRowPositions(_numberOfRows);
-        float scale = ScaleUtility.CalculateScale(_numberOfRows);
+        float[] rowPositions = RowPositionsUtility.CalculateRowPositions(_gameSetupInfo.RuleSet.NumberOfRows);
+        float scale = ScaleUtility.CalculateScale(_gameSetupInfo.RuleSet.NumberOfRows);
         _gameService.SetScale(scale, _nodePairings, _explosionManager);
 
-        if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Survival)
+        if (_gameSetupInfo.GameMode == GameModeEnum.Survival)
         {
             _spawnHandler = new SurvivalSpawnHandler(
                 survivalHandler: this,
-                gameManager: _gameManager,
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
@@ -102,7 +106,6 @@ class SurvivalHandler : IGameModeHandler
         {
             _spawnHandler = new SurvivalCoOpSpawnHandler(
                 survivalHandler: this,
-                gameManager: _gameManager,
                 hitManager: _hitManager,
                 hitSplitManager: _hitSplitManager,
                 noHitManager: _noHitManager,
@@ -131,10 +134,13 @@ class SurvivalHandler : IGameModeHandler
         {
             return;
         }
+        
         _spawnTimer -= deltaTime;
 
         if (_spawnTimer > 0)
+        {
             return;
+        }
 
         if (_spawnInterval > _minSpawnInterval)
         {
@@ -194,11 +200,10 @@ class SurvivalHandler : IGameModeHandler
         _gameSceneManager.CameraShake.StartShake(.34f);
         _gameSceneManager.SideExplosionManager.ActivateExplosion(gameEntity.Transform.position.y, color);
 
-        //end the game
-        _gameSceneManager.EndGame(reasonForGameEnd);
-
         Vector2 vignettePosition = new Vector2(GameManager.LeftX, gameEntity.Transform.position.y);
-        _gameSceneManager.VignetteManager.StartClosePhase1(vignettePosition, .1f);
+
+        //subtract a life
+        _gameService.SubtractLife(reasonForGameEnd, vignettePosition);
     }
 
     public void OnGameEnd()

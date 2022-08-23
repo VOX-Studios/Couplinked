@@ -379,7 +379,7 @@ namespace Assets.Scripts.SceneManagers
                     else
                     {
                         playerState.TeamSlot += playerInput.Lobby.ChangeTeamInputValue > 0 ? 1 : -1;
-                        playerState.TeamSlot = (playerState.TeamSlot + (PlayerManager.MAX_PLAYERS * 2)) % PlayerManager.MAX_PLAYERS;
+                        playerState.TeamSlot = (playerState.TeamSlot + PlayerManager.MAX_PLAYERS) % PlayerManager.MAX_PLAYERS;
                     }
 
                     _updateNodePositions(playerState, previousTeam);
