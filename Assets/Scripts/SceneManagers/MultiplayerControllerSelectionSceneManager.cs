@@ -30,6 +30,8 @@ namespace Assets.Scripts.SceneManagers
 
         private Dictionary<PlayerInput, ControllerSelectionState> _playerStates;
 
+        private Dictionary<PlayerInput, int> _playerOrders;
+
         [SerializeField]
         private Transform _nodeMidground;
 
@@ -45,6 +47,7 @@ namespace Assets.Scripts.SceneManagers
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
             _playerStates = new Dictionary<PlayerInput, ControllerSelectionState>();
+            _playerOrders = new Dictionary<PlayerInput, int>();
             _teamSelectionPanels = new List<GameObject>();
 
             //create the panels
@@ -123,6 +126,9 @@ namespace Assets.Scripts.SceneManagers
             selectionState.SetIsReady(teamSlot != -1);
 
             _playerStates[playerInput] = selectionState;
+
+            //set player order
+            _playerOrders[playerInput] = _playerStates.Count(kvp => kvp.Value.TeamSlot == selectionState.TeamSlot) - 1;
 
             _updateNodePositions(selectionState, -1);
         }
@@ -360,30 +366,19 @@ namespace Assets.Scripts.SceneManagers
                     continue;
                 }
 
-                if (playerInput.Lobby.ChangeTeamInputTriggered && !_playerStates[playerInput].IsReady)
+                if (!_playerStates[playerInput].IsReady)
                 {
-                    ControllerSelectionState playerState = _playerStates[playerInput];
-
-                    int previousTeam = playerState.TeamSlot;
-                    if(playerState.TeamSlot == -1)
+                    if (playerInput.Lobby.ChangeTeamInputTriggered)
                     {
-                        if(playerInput.Lobby.ChangeTeamInputValue < 0)
-                        {
-                            playerState.TeamSlot = Mathf.FloorToInt((PlayerManager.MAX_PLAYERS - 1) / 2f);
-                        }
-                        else
-                        {
-                            playerState.TeamSlot = Mathf.CeilToInt((PlayerManager.MAX_PLAYERS - 1) / 2f); ;
-                        }
-                    }
-                    else
-                    {
-                        playerState.TeamSlot += playerInput.Lobby.ChangeTeamInputValue > 0 ? 1 : -1;
-                        playerState.TeamSlot = (playerState.TeamSlot + PlayerManager.MAX_PLAYERS) % PlayerManager.MAX_PLAYERS;
+                        _handleChangeTeamInput(playerInput);
                     }
 
-                    _updateNodePositions(playerState, previousTeam);
+                    if (playerInput.Lobby.CycleOrderInputTriggered)
+                    {
+                        _handleCycleOrderInput(playerInput);
+                    }
                 }
+
 
                 //if a player hits the ready button
                 if (playerInput.Lobby.SelectInput)
@@ -427,6 +422,110 @@ namespace Assets.Scripts.SceneManagers
             }
         }
 
+        private void _handleChangeTeamInput(PlayerInput playerInput)
+        {
+            ControllerSelectionState playerState = _playerStates[playerInput];
+
+            int previousTeam = playerState.TeamSlot;
+            if (playerState.TeamSlot == -1)
+            {
+                if (playerInput.Lobby.ChangeTeamInputValue < 0)
+                {
+                    playerState.TeamSlot = Mathf.FloorToInt((PlayerManager.MAX_PLAYERS - 1) / 2f);
+                }
+                else
+                {
+                    playerState.TeamSlot = Mathf.CeilToInt((PlayerManager.MAX_PLAYERS - 1) / 2f); ;
+                }
+            }
+            else
+            {
+                playerState.TeamSlot += playerInput.Lobby.ChangeTeamInputValue > 0 ? 1 : -1;
+                playerState.TeamSlot = (playerState.TeamSlot + PlayerManager.MAX_PLAYERS) % PlayerManager.MAX_PLAYERS;
+            }
+
+            //adjust previous team's player orders
+            int previousOrder = _playerOrders[playerInput];
+            IEnumerable<PlayerInput> previousTeamInputs = _playerStates.Where(kvp => kvp.Value.TeamSlot == previousTeam).Select(kvp => kvp.Key);
+
+            foreach(PlayerInput input in previousTeamInputs)
+            {
+                if(_playerOrders[input] > previousOrder)
+                {
+                    _playerOrders[input]--;
+                }
+            }
+
+            //set player order on new team
+            _playerOrders[playerInput] = _playerStates.Count(kvp => kvp.Value.TeamSlot == playerState.TeamSlot) - 1;
+
+            _updateNodePositions(playerState, previousTeam);
+        }
+
+        private void _handleCycleOrderInput(PlayerInput playerInput)
+        {
+            ControllerSelectionState playerState = _playerStates[playerInput];
+
+            //get every input on the team
+            PlayerInput[] teamInputs = _playerStates.Where(kvp => kvp.Value.TeamSlot == playerState.TeamSlot)
+                .Select(kvp => kvp.Key)
+                .ToArray();
+
+            int newOrder = _playerOrders[playerInput];
+            newOrder += playerInput.Lobby.CycleOrderInputValue > 0 ? 1 : -1;
+
+            int wrappedOrder = (newOrder + teamInputs.Length) % teamInputs.Length;
+            bool didOrderWrap = wrappedOrder != newOrder;
+
+            newOrder = wrappedOrder;
+
+            //if there's at least one other player on the team
+            if (teamInputs.Length > 1)
+            {
+                if (didOrderWrap)
+                {
+                    foreach (PlayerInput input in teamInputs)
+                    {
+                        if (input == playerInput)
+                        {
+                            continue;
+                        }
+
+                        if (newOrder == 0)
+                        {
+                            _playerOrders[input]++;
+                        }
+                        else
+                        {
+                            _playerOrders[input]--;
+                        }
+                    }
+                }
+                else
+                {
+                    PlayerInput playerToSwapOrderWith = teamInputs.First(input => _playerOrders[input] == newOrder);
+
+                    //swap the order with the appropriate player
+                    _playerOrders[playerToSwapOrderWith] = _playerOrders[playerInput];
+                }
+            }
+
+            //set the new order
+            _playerOrders[playerInput] = newOrder;
+
+            ControllerSelectionState[] currentTeamStates = _getTeamStates(playerState.TeamSlot);
+
+            //update node positions
+            if (playerState.TeamSlot == -1)
+            {
+                _updateNoTeamNodePositions(currentTeamStates);
+            }
+            else
+            {
+                _updateTeamNodePositions(currentTeamStates);
+            }
+        }
+
         private void _removePlayer(PlayerInput player)
         {
             ControllerSelectionState controllerSelectionState = _playerStates[player];
@@ -448,10 +547,24 @@ namespace Assets.Scripts.SceneManagers
 
             _gameManager.PlayerManager.RemovePlayer(player);
 
+            //update orders
+            int playerOrder = _playerOrders[player];
+            IEnumerable<PlayerInput> previousTeamInputs = _playerStates.Where(kvp => kvp.Value.TeamSlot == controllerSelectionState.TeamSlot).Select(kvp => kvp.Key);
+            foreach (PlayerInput input in previousTeamInputs)
+            {
+                if(_playerOrders[input] > playerOrder)
+                {
+                    _playerOrders[input]--;
+                }
+            }
+
+            //remove the player order
+            _playerOrders.Remove(player);
+
             //update positions of the team we were previously on
             ControllerSelectionState[] previousTeamStates = _getTeamStates(controllerSelectionState.TeamSlot);
 
-            if(controllerSelectionState.TeamSlot == -1)
+            if (controllerSelectionState.TeamSlot == -1)
             {
                 _updateNoTeamNodePositions(previousTeamStates);
             }
@@ -512,7 +625,7 @@ namespace Assets.Scripts.SceneManagers
 
         private int _orderBy(PlayerInput playerInput)
         {
-            return playerInput.PlayerSlot;
+            return _playerOrders[playerInput];
         }
     
         private ControllerSelectionState[] _getTeamStates(int teamSlot)

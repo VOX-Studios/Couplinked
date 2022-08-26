@@ -316,6 +316,9 @@ class RegularGameService
     {
         _lives--;
 
+        //TODO: have a different sound depending on if we lose a life vs. lose the game
+        _gameManager.SoundEffectManager.PlayGameOver();
+
         if (_lives <= 0)
         {
             _gameSceneManager.EndGame(reasonForGameEnd);

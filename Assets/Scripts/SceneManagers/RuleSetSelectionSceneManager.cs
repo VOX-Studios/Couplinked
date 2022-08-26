@@ -64,7 +64,7 @@ namespace Assets.Scripts.SceneManagers
 
         void Start()
         {
-            EventSystem.current.SetSelectedGameObject(_gameSpeedDropdown.gameObject);
+            EventSystem.current.SetSelectedGameObject(_playButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
             if (_gameManager.GameSetupInfo.RuleSet == null)
