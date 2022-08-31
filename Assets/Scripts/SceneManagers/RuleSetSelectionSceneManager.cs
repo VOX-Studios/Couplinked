@@ -67,6 +67,7 @@ namespace Assets.Scripts.SceneManagers
             EventSystem.current.SetSelectedGameObject(_playButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
+            //if the rule set is null (this should only happen the first time we run singleplayer survival)
             if (_gameManager.GameSetupInfo.RuleSet == null)
             {
                 _gameManager.GameSetupInfo.RuleSet = new RuleSet()
@@ -110,9 +111,16 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.HandleBack())
             {
                 _gameManager.SoundEffectManager.PlayBack();
-                
-                //TODO: or multiplayer
-                _gameManager.LoadScene(SceneNames.GameModeSelection);
+
+                if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
+                {
+                    _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
+                }
+                else
+                {
+                    _gameManager.LoadScene(SceneNames.GameModeSelection);
+                }
+
                 return;
             }
         }

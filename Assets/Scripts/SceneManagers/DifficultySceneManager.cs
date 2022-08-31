@@ -89,9 +89,12 @@ namespace Assets.Scripts.SceneManagers
 
             if (_gameManager.GameSetupInfo.GameMode == GameModeEnum.Level)
             {
+                //TODO: pull this from level data?
                 _gameManager.GameSetupInfo.RuleSet = new RuleSet()
                 {
                     GameSpeed = gameDifficulty,
+                    NumberOfRows = 3,
+                    NumberOfLives = 1,
                     AreLasersOn = gameDifficulty != GameDifficultyEnum.VeryEasy
                 };
             }

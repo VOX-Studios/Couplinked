@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.ControllerSelection;
+using Assets.Scripts.RuleSets;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -91,9 +92,50 @@ namespace Assets.Scripts.SceneManagers
             }
         }
 
+        private void _adjustRuleSet(List<Team> previousTeams)
+        {
+            if (_gameManager.GameSetupInfo.RuleSet == null)
+            {
+                _gameManager.GameSetupInfo.RuleSet = new RuleSet()
+                {
+                    GameSpeed = GameDifficultyEnum.Hard,
+                    NumberOfRows = 3,
+                    NumberOfLives = 1,
+                    AreLasersOn = true
+                };
+            }
+
+            int previousNumberOfTeams = previousTeams.Count(team => team.TeamSlot != -1);
+            int previousNumberOfNodes = previousTeams.Where(team => team.TeamSlot != -1)
+                .Sum(team => team.PlayerInputs.Count == 1 ? 2 : team.PlayerInputs.Count);
+
+            List<Team> currentTeams = _getTeams();
+
+            int currentNumberOfTeams = currentTeams.Count(team => team.TeamSlot != -1);
+            int currentNumberOfNodes = currentTeams.Where(team => team.TeamSlot != -1)
+                .Sum(team => team.PlayerInputs.Count == 1 ? 2 : team.PlayerInputs.Count);
+
+            //if we were previously "large"
+            if (previousNumberOfTeams > 2 || previousNumberOfNodes > 4)
+            {
+                //if we're now "small"
+                if (currentNumberOfTeams <= 2 && currentNumberOfNodes <= 4)
+                {
+                    _gameManager.GameSetupInfo.RuleSet.NumberOfRows = 3;
+                }
+            }
+            else if (currentNumberOfTeams > 2 && currentNumberOfNodes > 4) //we were previously "small" and now we're "large"
+            {
+                _gameManager.GameSetupInfo.RuleSet.NumberOfRows = 5;
+            }
+        }
+
         private void _onPlayerAdded(object sender, PlayerAddedEventArgs e)
         {
+            List<Team> previousTeams = _getTeams();
             _setupNewPlayer(e.PlayerAdded);
+
+            _adjustRuleSet(previousTeams);
 
             //once we hit max players, disable joining
             if (_gameManager.PlayerManager.Players.Count == PlayerManager.MAX_PLAYERS)
@@ -346,12 +388,9 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            //if the back button is pressed and there are no players (this is to prevent accidental exits)
-            if (_gameManager.HandleBack() && _gameManager.PlayerManager.Players.Count == 0)
+            //if we need to back out of the screen
+            if (_handleBack())
             {
-                _onExitScene();
-                _gameManager.SoundEffectManager.PlayBack();
-                _gameManager.LoadScene(SceneNames.PlayerModeSelection);
                 return;
             }
 
@@ -422,8 +461,25 @@ namespace Assets.Scripts.SceneManagers
             }
         }
 
+        private bool _handleBack()
+        {
+            //if the back button is pressed and there are no players (this is to prevent accidental exits)
+            if (_gameManager.HandleBack() && _gameManager.PlayerManager.Players.Count == 0)
+            {
+                _onExitScene();
+                _gameManager.GameSetupInfo.RuleSet = null;
+                _gameManager.SoundEffectManager.PlayBack();
+                _gameManager.LoadScene(SceneNames.PlayerModeSelection);
+                return true;
+            }
+
+            return false;
+        }
+
         private void _handleChangeTeamInput(PlayerInput playerInput)
         {
+            List<Team> previousTeams = _getTeams();
+
             ControllerSelectionState playerState = _playerStates[playerInput];
 
             int previousTeam = playerState.TeamSlot;
@@ -460,6 +516,8 @@ namespace Assets.Scripts.SceneManagers
             _playerOrders[playerInput] = _playerStates.Count(kvp => kvp.Value.TeamSlot == playerState.TeamSlot) - 1;
 
             _updateNodePositions(playerState, previousTeam);
+
+            _adjustRuleSet(previousTeams);
         }
 
         private void _handleCycleOrderInput(PlayerInput playerInput)
@@ -528,6 +586,7 @@ namespace Assets.Scripts.SceneManagers
 
         private void _removePlayer(PlayerInput player)
         {
+            List<Team> previousTeams = _getTeams();
             ControllerSelectionState controllerSelectionState = _playerStates[player];
 
             //TODO: should probably reuse this stuff instead of destroying it
@@ -572,6 +631,8 @@ namespace Assets.Scripts.SceneManagers
             {
                 _updateTeamNodePositions(previousTeamStates);
             }
+
+            _adjustRuleSet(previousTeams);
         }
 
         private bool _shouldStartGame()
@@ -599,21 +660,26 @@ namespace Assets.Scripts.SceneManagers
             _gameManager.PlayerManager.OnPlayerAdded -= _onPlayerAdded;
         }
 
+        private List<Team> _getTeams()
+        {
+            return _playerStates.GroupBy(kvp => kvp.Value.TeamSlot)
+                .Select(group => new Team(group.Key)
+                {
+                    PlayerInputs = group.Select(kvp => kvp.Key).OrderBy(_orderBy).ToList()
+                })
+                .ToList();
+        }
+
         private void _startGame()
         {
             _onExitScene();
 
             _gameManager.SoundEffectManager.PlaySelect();
 
-            _gameManager.GameSetupInfo.Teams = _playerStates.GroupBy(kvp => kvp.Value.TeamSlot)
-                .Select(group => new Team(group.Key)
-                {
-                    PlayerInputs = group.Select(kvp => kvp.Key).OrderBy(_orderBy).ToList()
-                })
-                .ToList();
+            _gameManager.GameSetupInfo.Teams = _getTeams();
 
             //if there's one team and only two players
-            if(_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 2)
+            if (_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 2)
             {
                 _gameManager.LoadScene(SceneNames.GameModeSelection);
             }
