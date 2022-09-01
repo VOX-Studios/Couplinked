@@ -51,7 +51,7 @@ namespace Assets.Scripts.SceneManagers
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win)
             {
                 _title.text = "VICTORY";
-                _ratingLevelInfo.SetTextureBasedOnRating(_gameManager.CurrentLevel.RateScore(_gameManager.score));
+                _ratingLevelInfo.SetTextureBasedOnRating(_gameManager.CurrentLevel.RateScore(_gameManager.Score));
             }
             else
             {
@@ -63,7 +63,7 @@ namespace Assets.Scripts.SceneManagers
             {
                 _rearrangeEndScreenButtons();
 
-                _ratingLevelInfo.SetTextureBasedOnRating(Level.RateEfficiencyScore(_gameManager.score, _gameManager.PotentialMaxSurvivalScore));
+                _ratingLevelInfo.SetTextureBasedOnRating(Level.RateEfficiencyScore(_gameManager.Score, _gameManager.PotentialMaxSurvivalScore));
             }
             else
             {
@@ -86,7 +86,7 @@ namespace Assets.Scripts.SceneManagers
                 if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win)
                 {
                     _title.text = "VICTORY";
-                    _ratingLevelInfo.SetTextureBasedOnRating(_gameManager.CurrentLevel.RateScore(_gameManager.score));
+                    _ratingLevelInfo.SetTextureBasedOnRating(_gameManager.CurrentLevel.RateScore(_gameManager.Score));
                 }
                 else
                 {
@@ -95,7 +95,7 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
-            _finalScoreText.GetComponent<Text>().text = _gameManager.score.ToString();
+            _finalScoreText.GetComponent<Text>().text = _gameManager.Score.ToString();
             _reasonForGameEndText.text = _gameManager.MapReasonsForLossToString(_gameManager.ReasonForGameEnd);
         }
 

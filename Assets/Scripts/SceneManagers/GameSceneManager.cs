@@ -19,6 +19,9 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private Text _scoreText;
 
+        [SerializeField]
+        private Text _livesText;
+
         private float _resumeCount;
 
         public CameraShake CameraShake;
@@ -64,6 +67,12 @@ namespace Assets.Scripts.SceneManagers
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+            //disable lives text if we're not using more than one life
+            if(_gameManager.GameSetupInfo.RuleSet.NumberOfLives == 1)
+            {
+                _livesText.transform.parent.gameObject.SetActive(false);
+            }
 
             VignetteManager.Initialize();
 
@@ -134,8 +143,10 @@ namespace Assets.Scripts.SceneManagers
 
             _setGameState(GameStateEnum.Playing);
 
-            _gameManager.score = 0;
+            _gameManager.Score = 0;
             _gameManager.ringsCollected = 0;
+
+            UpdateScoreText(_gameManager.Score);
 
             gameModeHandler.Initialize();
             _startGame();
@@ -419,13 +430,27 @@ namespace Assets.Scripts.SceneManagers
 
             CameraShake.Run(Time.deltaTime);
 
-            _scoreText.text = _gameManager.score.ToString();
-
             //if we've won
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.AppState == AppStateEnum.Game)
             {
                 EndGame(_gameManager.ReasonForGameEnd, true);
             }
+        }
+
+        public void UpdateScoreText(int score)
+        {
+            _scoreText.text = score.ToString();
+        }
+
+        public void UpdateLivesText(int lives)
+        {
+            if(_gameManager.GameSetupInfo.RuleSet.NumberOfLives == 1)
+            {
+                //only show lives text if we're using more than one life
+                return;
+            }
+
+            _livesText.text = lives.ToString();
         }
 
         private void _handleGameEnding()
@@ -474,7 +499,7 @@ namespace Assets.Scripts.SceneManagers
                 if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor && _gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win)
                 {
                     int savedScore = _gameManager.DataManager.GetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
-                    int playerScoreRating = _gameManager.CurrentLevel.RateScore(_gameManager.score);
+                    int playerScoreRating = _gameManager.CurrentLevel.RateScore(_gameManager.Score);
 
                     if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.Campaign)
                     {
@@ -492,11 +517,11 @@ namespace Assets.Scripts.SceneManagers
                         }
                     }
 
-                    if (_gameManager.score > savedScore)
+                    if (_gameManager.Score > savedScore)
                     {
                         int savedScoreRating = _gameManager.DataManager.GetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty);
 
-                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
+                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.Score);
                         _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
 
                         if (savedScoreRating > 0)
@@ -504,7 +529,7 @@ namespace Assets.Scripts.SceneManagers
                     }
                     else if (_gameManager.CurrentLevel.MaxScore == 0)
                     {
-                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.score);
+                        _gameManager.DataManager.SetLevelPlayerScore(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, _gameManager.Score);
                         _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
                     }
 
@@ -518,18 +543,18 @@ namespace Assets.Scripts.SceneManagers
             }
             else //survival game
             {
-                if (_gameManager.score >= 1000)
+                if (_gameManager.Score >= 1000)
                 {
                     string unlockMessage = "";
                     if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_1000Points, out unlockMessage))
                         _gameManager.NotificationManager.QueueNotification(unlockMessage);
                 }
 
-                bool newLocalHighScore = _gameManager.LocalHighScore < _gameManager.score;
+                bool newLocalHighScore = _gameManager.LocalHighScore < _gameManager.Score;
 
                 if (newLocalHighScore)
                 {
-                    _gameManager.LocalHighScore = _gameManager.score;
+                    _gameManager.LocalHighScore = _gameManager.Score;
                     _gameManager.DataManager.SetSurvivalHighScore(_gameManager.LocalHighScore);
                     _gameManager.NotificationManager.QueueNotification("New High Score!");
                 }
@@ -537,7 +562,7 @@ namespace Assets.Scripts.SceneManagers
 
             if (_gameManager.TheLevelSelectionMode != LevelTypeEnum.LevelEditor)
             {
-                if (_gameManager.score == 0 && _gameManager.ReasonForGameEnd != ReasonForGameEndEnum.Quit)
+                if (_gameManager.Score == 0 && _gameManager.ReasonForGameEnd != ReasonForGameEndEnum.Quit)
                 {
                     string unlockMessage = "";
                     if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_0Points, out unlockMessage))
@@ -750,7 +775,7 @@ namespace Assets.Scripts.SceneManagers
             float screenX = Camera.main.WorldToViewportPoint(position).x;
             screenX = Mathf.Clamp(screenX, 0.1f, 1);
             int points = (int)Mathf.Round(screenX * 10); //will get 1 to 10
-            _gameManager.score += points; //TODO: multiply by time so score becomes exponential?
+            _gameManager.Score += points; //TODO: multiply by time so score becomes exponential?
             string unlockMessage = "";
 
             if (points == 1 && position.x < node.transform.position.x)
@@ -771,6 +796,8 @@ namespace Assets.Scripts.SceneManagers
                 direction: (position - node.transform.position).normalized,
                 scale: node.Scale
                 );
+
+            UpdateScoreText(_gameManager.Score);
         }
 
         public void AddExplosion(Vector3 position, Color color)

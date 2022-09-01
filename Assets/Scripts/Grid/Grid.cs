@@ -106,9 +106,9 @@ public class Grid : MonoBehaviour
 	{
         Logic.Update();
 
-		for (int i = 0, y = 0; y < _ySize; y++)
+		for (int y = 0; y < _ySize; y++)
 		{
-			for (int x = 0; x < _xSize; x++, i++)
+			for (int x = 0; x < _xSize; x++)
 			{
 				_lineRenderersVertical[x].SetPosition(y, Logic.Points[x, y].Position);
 				_lineRenderersHorizontal[y].SetPosition(x, Logic.Points[x, y].Position);

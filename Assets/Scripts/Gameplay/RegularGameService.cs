@@ -46,6 +46,8 @@ class RegularGameService
     public void Start()
     {
         _setNodeStartPositions();
+
+        _gameSceneManager.UpdateLivesText(_lives);
     }
 
     public void SetScale(float scale, NodePairing[] nodePairs, ExplosionManager explosionManager)
@@ -315,6 +317,8 @@ class RegularGameService
     public void SubtractLife(ReasonForGameEndEnum reasonForGameEnd, Vector2 position)
     {
         _lives--;
+
+        _gameSceneManager.UpdateLivesText(_lives);
 
         //TODO: have a different sound depending on if we lose a life vs. lose the game
         _gameManager.SoundEffectManager.PlayGameOver();

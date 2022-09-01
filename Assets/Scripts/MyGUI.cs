@@ -9,11 +9,11 @@ public class MyGUI : MonoBehaviour
 	void Start()
 	{
 		gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-		txtScore.text = gameManager.score.ToString();
+		txtScore.text = gameManager.Score.ToString();
 	}
 
 	void OnGUI()
 	{
-		txtScore.text = gameManager.score.ToString();
+		txtScore.text = gameManager.Score.ToString();
 	}
 }

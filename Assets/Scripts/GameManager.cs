@@ -514,7 +514,7 @@ public class GameManager : MonoBehaviour
 
 	public Camera Cam;
 
-	public int score = 0;
+	public int Score = 0;
 	public int ringsCollected = 0;
 
 	public bool IsPaused;
