@@ -723,7 +723,7 @@ public class GameManager : MonoBehaviour
 
 	public bool HandleBack() //TODO: rework this to be a button listener per scene manager
 	{
-		return InputActions.FindActionMap("Menu").FindAction("Back").triggered;
+		return InputActions.FindActionMap("Menu").FindAction("Cancel").triggered;
 	}
 
 	static string[] tempSplit;
