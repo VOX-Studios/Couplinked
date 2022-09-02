@@ -612,16 +612,14 @@ namespace Assets.Scripts.SceneManagers
             _setGameState(GameStateEnum.Playing);
 
             string unlockMessage = "";
-            if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
-            {
-                _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
-            }
-            else if (_gameManager.CurrentLevel == null)
+            if (_gameManager.CurrentLevel == null)
             {
                 if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_Quit, out unlockMessage))
+                {
                     _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                }
 
-                _gameManager.LoadScene(SceneNames.GameModeSelection);
+                _gameManager.LoadScene(SceneNames.RuleSetSelection);
             }
             else if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
             {
@@ -630,7 +628,9 @@ namespace Assets.Scripts.SceneManagers
             else
             {
                 if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_Quit, out unlockMessage))
+                {
                     _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                }
 
                 _gameManager.LoadScene(SceneNames.Levels);
             }

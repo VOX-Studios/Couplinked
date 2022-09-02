@@ -266,9 +266,20 @@ namespace Assets.Scripts.SceneManagers
         {
             if (_gameManager.HandleBack())
             {
-                _gameManager.SoundEffectManager.PlayBack();
-                _gameManager.LoadScene(SceneNames.Options);
-                return;
+                if ( //dropdown with a child count of 3 is closed
+                    _gridDensityDropdown.transform.childCount == 3
+                    && _explosionParticlesDropdown.transform.childCount == 3
+                    && _trailParticlesDropdown.transform.childCount == 3
+                    && _screenShakeDropdown.transform.childCount == 3
+                    && _resolutionDropdown.transform.childCount == 3
+                    && _windowedModeDropdown.transform.childCount == 3
+                    && _vSyncDropdown.transform.childCount == 3
+                    )
+                {
+                    _gameManager.SoundEffectManager.PlayBack();
+                    _gameManager.LoadScene(SceneNames.Options);
+                    return;
+                }
             }
         }
 

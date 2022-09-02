@@ -110,18 +110,27 @@ namespace Assets.Scripts.SceneManagers
         {
             if (_gameManager.HandleBack())
             {
-                _gameManager.SoundEffectManager.PlayBack();
-
-                if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
+                if ( //dropdown with a child count of 3 is closed
+                    _gameSpeedDropdown.transform.childCount == 3
+                    && _rowsDropdown.transform.childCount == 3
+                    && _livesDropdown.transform.childCount == 3
+                    && _lasersDropdown.transform.childCount == 3
+                    )
                 {
-                    _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
-                }
-                else
-                {
-                    _gameManager.LoadScene(SceneNames.GameModeSelection);
-                }
 
-                return;
+                    _gameManager.SoundEffectManager.PlayBack();
+
+                    if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 2)
+                    {
+                        _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
+                    }
+                    else
+                    {
+                        _gameManager.LoadScene(SceneNames.GameModeSelection);
+                    }
+
+                    return;
+                }
             }
         }
 

@@ -128,7 +128,6 @@ namespace Assets.Scripts.SceneManagers
             {
                 _handleBackButton();
                 _gameManager.SoundEffectManager.PlayBack();
-
                 return;
             }
             
@@ -188,14 +187,9 @@ namespace Assets.Scripts.SceneManagers
         {
             _gameManager.SoundEffectManager.PlayBack();
 
-            //if it's regular multiplayer
-            if (_gameManager.GameSetupInfo.Teams.Count > 1 || _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count > 1)
+            if (_gameManager.CurrentLevel == null)
             {
-                _gameManager.LoadScene(SceneNames.MultiplayerGameModeSelection);
-            }
-            else if (_gameManager.CurrentLevel == null)
-            {
-                _gameManager.LoadScene(SceneNames.GameModeSelection);
+                _gameManager.LoadScene(SceneNames.RuleSetSelection);
             }
             else if (_gameManager.TheLevelSelectionMode == LevelTypeEnum.LevelEditor)
             {
