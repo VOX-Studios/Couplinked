@@ -64,6 +64,9 @@ namespace Assets.Scripts.SceneManagers
         public VignetteManager VignetteManager;
         public SideExplosionManager SideExplosionManager;
 
+        [SerializeField]
+        private ParticleSystem _backgroundParticles;
+
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -73,6 +76,9 @@ namespace Assets.Scripts.SceneManagers
             {
                 _livesText.transform.parent.gameObject.SetActive(false);
             }
+
+            ParticleSystem.ShapeModule backgroundParticlesShape = _backgroundParticles.shape;
+            backgroundParticlesShape.scale = new Vector3(GameManager.RightX - GameManager.LeftX, GameManager.TopY - GameManager.BotY, 1);
 
             VignetteManager.Initialize();
 
@@ -355,6 +361,7 @@ namespace Assets.Scripts.SceneManagers
                 }
 
                 _explosionManager.Play();
+                _backgroundParticles.Play();
             }
 
             if(_gameState == GameStateEnum.Paused)
@@ -466,6 +473,7 @@ namespace Assets.Scripts.SceneManagers
 
             //TODO: don't do this every frame, just on start end
             _explosionManager.Pause();
+            _backgroundParticles.Pause();
 
 
             VignetteManager.Run(Time.deltaTime);
@@ -663,6 +671,7 @@ namespace Assets.Scripts.SceneManagers
             }
 
             _explosionManager.Pause();
+            _backgroundParticles.Pause();
 
             _resumeCountText.fontSize = (int)Mathf.Ceil(_gameManager.resumeCountNormalFontSize / 2f);
             _resumeCountText.text = "PAUSED";
