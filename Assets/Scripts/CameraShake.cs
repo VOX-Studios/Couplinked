@@ -113,13 +113,16 @@ public class CameraShake
 			_shakeTime = 0f;
 			_timeUntilNextShake = 0f;
 
-			//multiplied by shakes per second so it keeps the same timing (more or less)
-			_resetLerp += deltaTime * _shakesPerSecond;
+			if (_camTransform.position != OriginalPos)
+			{
+				//multiplied by shakes per second so it keeps the same timing (more or less)
+				_resetLerp += deltaTime * _shakesPerSecond;
 
-			_resetLerp = Mathf.Clamp(_resetLerp, 0f, 1f);
+				_resetLerp = Mathf.Clamp(_resetLerp, 0f, 1f);
 
-			//move towards the original position
-			_camTransform.position = Vector3.Lerp(_camTransform.position, OriginalPos, _resetLerp);
+				//move towards the original position
+				_camTransform.position = Vector3.Lerp(_camTransform.position, OriginalPos, _resetLerp);
+			}
 		}
 	}
 }

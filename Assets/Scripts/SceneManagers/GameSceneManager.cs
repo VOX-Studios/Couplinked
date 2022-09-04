@@ -386,6 +386,12 @@ namespace Assets.Scripts.SceneManagers
                 }
             }
 
+            //if we're not paused or resuming, run the camera shake before we set our lighting
+            if (_gameState != GameStateEnum.Paused && _gameState != GameStateEnum.Resuming)
+            {
+                CameraShake.Run(Time.deltaTime);
+            }
+
             foreach (NodePairing nodePairing in _nodePairs)
             {
                 foreach (Node node in nodePairing.Nodes)
@@ -435,7 +441,7 @@ namespace Assets.Scripts.SceneManagers
             _scoreJuiceManager.Run(Time.deltaTime);
             SideExplosionManager.Run(Time.deltaTime);
 
-            CameraShake.Run(Time.deltaTime);
+            
 
             //if we've won
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.AppState == AppStateEnum.Game)
@@ -462,6 +468,8 @@ namespace Assets.Scripts.SceneManagers
 
         private void _handleGameEnding()
         {
+            CameraShake.Run(Time.deltaTime);
+
             foreach (NodePairing nodePair in _nodePairs)
             {
                 foreach (Node node in nodePair.Nodes)
@@ -475,11 +483,9 @@ namespace Assets.Scripts.SceneManagers
             _explosionManager.Pause();
             _backgroundParticles.Pause();
 
-
             VignetteManager.Run(Time.deltaTime);
             SideExplosionManager.Run(Time.deltaTime);
             _scoreJuiceManager.Run(Time.deltaTime);
-            CameraShake.Run(Time.deltaTime);
 
             if (VignetteManager.Phase == 1)
             {
