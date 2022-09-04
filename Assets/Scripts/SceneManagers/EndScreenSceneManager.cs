@@ -31,18 +31,10 @@ namespace Assets.Scripts.SceneManagers
         [SerializeField]
         private Text _reasonForGameEndText;
 
-        private InputAction _nextLevelInputAction;
-        private InputAction _playAgainInputAction;
-
         void Start()
         {
             EventSystem.current.SetSelectedGameObject(_nextLevelButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-            InputActionMap menuInputActionMap = _gameManager.InputActions.FindActionMap("Menu");
-
-            _nextLevelInputAction = menuInputActionMap.FindAction("Next Level");
-            _playAgainInputAction = menuInputActionMap.FindAction("Play Again");
 
             _nextLevelButton.onClick.AddListener(_handleNextLevelButton);
             _playAgainButton.onClick.AddListener(_handlePlayAgainButton);
@@ -129,15 +121,6 @@ namespace Assets.Scripts.SceneManagers
                 _handleBackButton();
                 _gameManager.SoundEffectManager.PlayBack();
                 return;
-            }
-            
-            if (_nextLevelInputAction.triggered)
-            {
-                _handleNextLevelButton();
-            }
-            else if (_playAgainInputAction.triggered)
-            {
-                _handlePlayAgainButton();
             }
         }
 
