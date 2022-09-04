@@ -91,14 +91,12 @@ class LevelHandler : IGameModeHandler
 
     public void Run(bool isPaused, float deltaTime)
     {
-        if (isPaused)
+        if (!isPaused)
         {
-            return;
+            _gameTimeAtRightScreen += deltaTime * _gameManager.GameDifficultyManager.GameTimeModifier;
+
+            _handleSpawners();
         }
-
-        _gameTimeAtRightScreen += deltaTime * _gameManager.GameDifficultyManager.GameTimeModifier;
-
-        _handleSpawners();
 
         _gameService.Run(isPaused, deltaTime);
     }

@@ -84,6 +84,7 @@ class RegularGameService
         for (int i = gameEntityManager.ActiveGameEntities.Count - 1; i >= 0; i--)
         {
             T gameEntity = gameEntityManager.ActiveGameEntities[i];
+
             if (!isPaused)
             {
                 gameEntity.Move(deltaTime);
@@ -91,17 +92,20 @@ class RegularGameService
 
             _gameManager.LightingManager.SetLightPosition(gameEntity.LightIndex, gameEntity.Transform.position);
 
-            if (gameEntity.Transform.position.x < GameManager.LeftX - gameEntity.Radius)
+            if (!isPaused)
             {
-                if(!gameEntity.IsOffScreenLeft)
+                if (gameEntity.Transform.position.x < GameManager.LeftX - gameEntity.Radius)
                 {
-                    gameEntity.IsOffScreenLeft = true;
-                    OnGameEntityOffScreen(gameEntity);
-                }
+                    if (!gameEntity.IsOffScreenLeft)
+                    {
+                        gameEntity.IsOffScreenLeft = true;
+                        OnGameEntityOffScreen(gameEntity);
+                    }
 
-                if (gameEntity.Transform.position.x < GameManager.LeftX - 2.5f)
-                {
-                    gameEntityManager.DeactivateGameEntity(i);
+                    if (gameEntity.Transform.position.x < GameManager.LeftX - 2.5f)
+                    {
+                        gameEntityManager.DeactivateGameEntity(i);
+                    }
                 }
             }
         }

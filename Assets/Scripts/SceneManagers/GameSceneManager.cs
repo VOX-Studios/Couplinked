@@ -392,13 +392,7 @@ namespace Assets.Scripts.SceneManagers
                 CameraShake.Run(Time.deltaTime);
             }
 
-            foreach (NodePairing nodePairing in _nodePairs)
-            {
-                foreach (Node node in nodePairing.Nodes)
-                {
-                    _gameManager.LightingManager.SetLightPosition(node.LightIndex, node.transform.position);
-                }
-            }
+            _setNodeLightPositions();
 
             _gameManager.TimePlayedMilliseconds += Time.deltaTime * 1000;
 
@@ -439,14 +433,23 @@ namespace Assets.Scripts.SceneManagers
 
             _explosionManager.Run();
             _scoreJuiceManager.Run(Time.deltaTime);
-            SideExplosionManager.Run(Time.deltaTime);
-
-            
+            SideExplosionManager.Run(Time.deltaTime);            
 
             //if we've won
             if (_gameManager.ReasonForGameEnd == ReasonForGameEndEnum.Win && _gameManager.AppState == AppStateEnum.Game)
             {
                 EndGame(_gameManager.ReasonForGameEnd, true);
+            }
+        }
+
+        private void _setNodeLightPositions()
+        {
+            foreach (NodePairing nodePairing in _nodePairs)
+            {
+                foreach (Node node in nodePairing.Nodes)
+                {
+                    _gameManager.LightingManager.SetLightPosition(node.LightIndex, node.transform.position);
+                }
             }
         }
 
@@ -477,6 +480,18 @@ namespace Assets.Scripts.SceneManagers
                     //TODO: don't do this every frame, just on start end
                     node.ParticleSystem.Pause();
                 }
+            }
+
+            _setNodeLightPositions();
+
+            //if we've got a level loaded (not survival)
+            if (_gameManager.CurrentLevel != null)
+            {
+                _levelHandler.Run(true, Time.deltaTime);
+            }
+            else
+            {
+                _survivalHandler.Run(true, Time.deltaTime);
             }
 
             //TODO: don't do this every frame, just on start end
@@ -526,7 +541,9 @@ namespace Assets.Scripts.SceneManagers
                             {
                                 string unlockMessage = "";
                                 if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_CollectEveryRingInALevel, out unlockMessage))
+                                {
                                     _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                                }
                             }
                         }
                     }
@@ -539,7 +556,9 @@ namespace Assets.Scripts.SceneManagers
                         _gameManager.DataManager.SetLevelPlayerScoreRating(_gameManager.CurrentLevel.LevelData.Id, _gameManager.GameDifficultyManager.GameDifficulty, playerScoreRating);
 
                         if (savedScoreRating > 0)
+                        {
                             _gameManager.NotificationManager.QueueNotification("New High Score!");
+                        }
                     }
                     else if (_gameManager.CurrentLevel.MaxScore == 0)
                     {
@@ -551,7 +570,9 @@ namespace Assets.Scripts.SceneManagers
                     {
                         string unlockMessage = _gameManager.HandleUnlockingLevels();
                         if (unlockMessage.Length > 0)
+                        {
                             _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                        }
                     }
                 }
             }
@@ -561,7 +582,9 @@ namespace Assets.Scripts.SceneManagers
                 {
                     string unlockMessage = "";
                     if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_1000Points, out unlockMessage))
+                    {
                         _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                    }
                 }
 
                 bool newLocalHighScore = _gameManager.LocalHighScore < _gameManager.Score;
@@ -580,7 +603,9 @@ namespace Assets.Scripts.SceneManagers
                 {
                     string unlockMessage = "";
                     if (_gameManager.Challenges.HandleUnlockingChallenge(Challenges.ID_0Points, out unlockMessage))
+                    {
                         _gameManager.NotificationManager.QueueNotification(unlockMessage);
+                    }
                 }
             }
 
