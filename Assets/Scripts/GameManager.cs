@@ -7,8 +7,8 @@ using Assets.Scripts.Lighting;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
-{	public InputActionAsset InputActions;
-	public InputActionAsset DefaultInputActions;
+{	
+	public InputActionAsset InputActions;
 	public SteamStatsAndAchievements SteamStatsAndAchievementsManager;
 
 	public Challenges Challenges;
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         SceneManager.sceneLoaded += _onSceneLoaded;
 
 		DataManager = new DataManager();
-		InputManager = new InputManager(InputActions, DefaultInputActions);
+		InputManager = new InputManager(InputActions);
 		NotificationManager.Initialize(this);
 
 		Challenges = new Challenges(SteamStatsAndAchievementsManager);

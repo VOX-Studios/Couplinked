@@ -7,16 +7,12 @@ public class InputManager
 	private InputActionMap _levelEditorInputActionMap;
 	private InputActionMap _notificationManagerInputActionMap;
 
-	private InputActionMap _defaultUiInputActionMap;
-
-	public InputManager(InputActionAsset inputActions, InputActionAsset defaultInputActions)
+	public InputManager(InputActionAsset inputActions)
 	{
 		_gameInputActionMap = inputActions.FindActionMap("Game");
 		_menuInputActionMap = inputActions.FindActionMap("Menu");
 		_levelEditorInputActionMap = inputActions.FindActionMap("Level Editor");
 		_notificationManagerInputActionMap = inputActions.FindActionMap("Notification Manager");
-
-		_defaultUiInputActionMap = defaultInputActions.FindActionMap("UI");
 	}
 
 	public void ToggleInputs(AppStateEnum appState, bool isNotificationActive)
@@ -28,12 +24,10 @@ public class InputManager
 			_gameInputActionMap.Disable();
 			_menuInputActionMap.Disable();
 			_levelEditorInputActionMap.Disable();
-			_defaultUiInputActionMap.Disable();
 			return;
 		}
 
 		_notificationManagerInputActionMap.Disable();
-		_defaultUiInputActionMap.Enable();
 
 		switch (appState)
 		{
