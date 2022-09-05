@@ -43,7 +43,7 @@ public class InputManager
 				break;
 			case AppStateEnum.LevelEditor:
 				_gameInputActionMap.Disable();
-				_menuInputActionMap.Disable();
+				_menuInputActionMap.Enable(); //sharing menu controls for now
 				_levelEditorInputActionMap.Enable();
 				break;
 		}
