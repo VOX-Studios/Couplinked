@@ -5,6 +5,8 @@ namespace Assets.Scripts.Lighting
 {
     public class LightingManager : MonoBehaviour
     {
+        private GameManager _gameManager;
+
         public RenderTexture BaseLightTexture;
         public Renderer BaseLightRenderer;
         private Material _baseLightMaterial;
@@ -23,8 +25,9 @@ namespace Assets.Scripts.Lighting
 
         private float _lightPunchOut;
 
-        public void Initialize()
+        public void Initialize(GameManager gameManager)
         {
+            _gameManager = gameManager;
             _baseLightMaterial = BaseLightRenderer.material;
             BaseLightTexture.width = Screen.width;
             BaseLightTexture.height = Screen.height;
@@ -106,7 +109,7 @@ namespace Assets.Scripts.Lighting
                 return;
             }
 
-            Vector2 screenPosition = Camera.main.WorldToViewportPoint(worldPosition);
+            Vector2 screenPosition = _gameManager.Cam.WorldToViewportPoint(worldPosition);
             _applyToTexture(_positionsTexture, lightIndex, new Color(screenPosition.x, screenPosition.y, 0));
         }
 

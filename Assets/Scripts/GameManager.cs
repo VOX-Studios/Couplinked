@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.InputSystem;
 using Assets.Scripts.Lighting;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
-{	
+{
+	public Camera Cam;
+
 	public InputActionAsset InputActions;
 	public SteamStatsAndAchievements SteamStatsAndAchievementsManager;
 
@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
 		AudioManager.Initialize();
 		SoundEffectManager.Initialize(this);
 
-		LightingManager.Initialize();
+		LightingManager.Initialize(this);
 		Grid.Initialize(this);
 
 		AppState = AppStateEnum.Loading;
@@ -506,13 +506,9 @@ public class GameManager : MonoBehaviour
 
 	public bool IsNewLevel;
 
-	public GameObject ActivityIndicatorPrefab;
-
 	public AudioManager AudioManager;
 	public SoundEffectManager SoundEffectManager;
 	public DefaultButtonStyleTemplate DefaultButtonStyleTemplate;
-
-	public Camera Cam;
 
 	public int Score = 0;
 	public int ringsCollected = 0;
@@ -600,8 +596,6 @@ public class GameManager : MonoBehaviour
 
 	private void _onSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
 	{
-		Cam = Camera.main;
-
 		switch (scene.name)
 		{
 			case "Start":
@@ -803,24 +797,6 @@ public class GameManager : MonoBehaviour
 			t.position = new Vector3(RightX - clampBorderXOffset,
 			                         t.position.y,
 			                         t.position.z);
-		}
-	}
-
-	public GameObject CreateActivityIndicator(Vector3 pos)
-	{
-		GameObject activityIndicator = (GameObject)Instantiate(ActivityIndicatorPrefab, pos, Quaternion.identity);
-		activityIndicator.GetComponent<ActivityIndicator>().SetOriginalPos(pos);
-		StartCoroutine(RunActivityIndicator(activityIndicator));
-		return activityIndicator;
-	}
-
-	public IEnumerator RunActivityIndicator(GameObject activityIndicator)
-	{
-		ActivityIndicator activityIndicatorScript = activityIndicator.GetComponent<ActivityIndicator>();
-		while(activityIndicator != null)
-		{
-			activityIndicatorScript.Move();
-			yield return null;
 		}
 	}
 

@@ -250,8 +250,8 @@ namespace Assets.Scripts.SceneManagers
         {
             Vector3[] corners = new Vector3[4];
             _teamSelectionPanels[0].GetComponent<RectTransform>().GetWorldCorners(corners);
-            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
-            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+            Vector3 bottomLeft = _gameManager.Cam.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = _gameManager.Cam.ScreenToWorldPoint(corners[2]);
 
             Vector3 centerPoint = GetTeamPanelsCenterWorldPoint();
 
@@ -263,7 +263,7 @@ namespace Assets.Scripts.SceneManagers
                 ControllerSelectionState playerState = teamStates[i];
                 playerState.NodePairing.Nodes[0].transform.position = new Vector3(centerPoint.x, topRight.y - (spacing * (i + 1)));
 
-                Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
+                Vector3 nodeScreenPosition = _gameManager.Cam.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
                 Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
                 playerState.PlayerText.transform.position = readyTextPosition;
                 playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -100, 0);
@@ -289,8 +289,8 @@ namespace Assets.Scripts.SceneManagers
         {
             Vector3[] corners = new Vector3[4];
             _teamSelectionPanels[playerState.TeamSlot].GetComponent<RectTransform>().GetWorldCorners(corners);
-            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
-            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+            Vector3 bottomLeft = _gameManager.Cam.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = _gameManager.Cam.ScreenToWorldPoint(corners[2]);
 
             playerState.NodePairing.LaserManagers[0].gameObject.SetActive(true);
 
@@ -313,7 +313,7 @@ namespace Assets.Scripts.SceneManagers
             }
             nodesAveragePosition /= nodes.Count;
 
-            Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(nodesAveragePosition);
+            Vector3 nodeScreenPosition = _gameManager.Cam.WorldToScreenPoint(nodesAveragePosition);
             Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
             playerState.PlayerText.transform.position = readyTextPosition;
             playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -110, 0);
@@ -323,8 +323,8 @@ namespace Assets.Scripts.SceneManagers
         {
             Vector3[] corners = new Vector3[4];
             _teamSelectionPanels[teamStates[0].TeamSlot].GetComponent<RectTransform>().GetWorldCorners(corners);
-            Vector3 bottomLeft = Camera.main.ScreenToWorldPoint(corners[0]);
-            Vector3 topRight = Camera.main.ScreenToWorldPoint(corners[2]);
+            Vector3 bottomLeft = _gameManager.Cam.ScreenToWorldPoint(corners[0]);
+            Vector3 topRight = _gameManager.Cam.ScreenToWorldPoint(corners[2]);
 
             float panelWidth = topRight.x - bottomLeft.x;
             float spacing = panelWidth / (teamStates.Length + 1);
@@ -334,7 +334,7 @@ namespace Assets.Scripts.SceneManagers
                 ControllerSelectionState playerState = teamStates[i];
                 playerState.NodePairing.Nodes[0].transform.position = new Vector3(bottomLeft.x + (spacing * (i + 1)), (bottomLeft.y + topRight.y) / 2);
 
-                Vector3 nodeScreenPosition = Camera.main.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
+                Vector3 nodeScreenPosition = _gameManager.Cam.WorldToScreenPoint(playerState.NodePairing.Nodes[0].transform.position);
                 Vector3 readyTextPosition = new Vector3(nodeScreenPosition.x, nodeScreenPosition.y, 0);
                 playerState.PlayerText.transform.position = readyTextPosition;
                 playerState.PlayerText.ReadyText.transform.localPosition = new Vector3(0, -100, 0);
@@ -368,7 +368,7 @@ namespace Assets.Scripts.SceneManagers
             Vector3 topRight = corners[2];
 
             Vector3 screenPoint = new Vector3((bottomLeft.x + topRight.x) / 2f, (bottomLeft.y + topRight.y) / 2f);
-            Vector3 worldPoint = Camera.main.ScreenToWorldPoint(screenPoint);
+            Vector3 worldPoint = _gameManager.Cam.ScreenToWorldPoint(screenPoint);
 
             return new Vector3(worldPoint.x, worldPoint.y, 0);
         }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Lighting
 {
-    class SideExplosionManager : MonoBehaviour
+    public class SideExplosionManager : MonoBehaviour
     {
 		[SerializeField]
 		private SideExplosion _sideExplosionPrefab;

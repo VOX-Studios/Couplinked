@@ -287,7 +287,7 @@ namespace Assets.Scripts.SceneManagers.ColorSelection
 
         private Vector3 _convertFromPlaceholderPosition(Vector3 placeholderPosition)
         {
-            Vector3 rawConverted = Camera.main.ScreenToWorldPoint(placeholderPosition);
+            Vector3 rawConverted = _gameManager.Cam.ScreenToWorldPoint(placeholderPosition);
             return new Vector3(rawConverted.x, rawConverted.y);
         }
 

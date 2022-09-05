@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using Assets.Scripts.SceneManagers;
 
 public class ScoreJuiceManager : MonoBehaviour 
 {
@@ -12,9 +13,9 @@ public class ScoreJuiceManager : MonoBehaviour
 
 	private GameManager _gameManager;
 
-	public void Initialize () 
+	public void Initialize(GameManager gameManager, GameSceneManager gameSceneManger) 
 	{
-		_gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+		_gameManager = gameManager;
 
 		activeScoreJuices = new List<GameObject>();
 		inactiveScoreJuices = new List<GameObject>();
@@ -24,6 +25,7 @@ public class ScoreJuiceManager : MonoBehaviour
 		for(int i = 0; i < maxScoreJuices; i++)
 		{
 			GameObject scoreJuice = (GameObject)Instantiate(ScoreJuicePrefab);
+			scoreJuice.GetComponent<ScoreJuice>().Initialize(_gameManager, gameSceneManger);
 			scoreJuice.transform.SetParent(parent);
 			scoreJuice.SetActive(false);
 			inactiveScoreJuices.Add(scoreJuice);

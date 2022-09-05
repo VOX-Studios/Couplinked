@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.SceneManagers
 {
-    class GameSceneManager : MonoBehaviour
+    public class GameSceneManager : MonoBehaviour
     {
         private GameManager _gameManager;
 
@@ -80,7 +80,7 @@ namespace Assets.Scripts.SceneManagers
             ParticleSystem.ShapeModule backgroundParticlesShape = _backgroundParticles.shape;
             backgroundParticlesShape.scale = new Vector3(GameManager.RightX - GameManager.LeftX, GameManager.TopY - GameManager.BotY, 1);
 
-            VignetteManager.Initialize();
+            VignetteManager.Initialize(_gameManager);
 
             //if there's only 1 team and 1 player
             if (_gameManager.GameSetupInfo.Teams.Count == 1 && _gameManager.GameSetupInfo.Teams[0].PlayerInputs.Count == 1)
@@ -141,7 +141,7 @@ namespace Assets.Scripts.SceneManagers
             _noHitManager.Initialize(gameModeHandler);
             _hitSplitManager.Initialize(gameModeHandler);
             _explosionManager.Initialize(_gameManager.DataManager);
-            _scoreJuiceManager.Initialize();
+            _scoreJuiceManager.Initialize(_gameManager, this);
             SideExplosionManager.Initialize(5); //TODO: we could make this smart and have the game mode handler initialize it with num rows, but realistically we can use the max number of rows
 
             CameraShake = new CameraShake();

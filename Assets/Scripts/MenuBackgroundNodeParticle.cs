@@ -67,7 +67,7 @@ public class MenuBackgroundNodeParticle : MonoBehaviour
         }
 
 
-        Vector3 worldPos = Camera.main.ViewportToWorldPoint(new Vector3(_position.x, _position.y, -Camera.main.transform.position.z));
+        Vector3 worldPos = _gameManager.Cam.ViewportToWorldPoint(new Vector3(_position.x, _position.y, -Camera.main.transform.position.z));
         _gameManager.Grid.Logic.ApplyDirectedForce(_velocity.normalized * .05f, worldPos, .4f);
         Particles.transform.position = worldPos;
 

@@ -97,7 +97,7 @@ public class LevelEditorManager : MonoBehaviour
 
 		_leftIndex = 0;
 		_rightIndex = -1;
-		_cam = Camera.main;
+		_cam = _gameManager.Cam;
 
 		PlacingRow[] rows = FindObjectsOfType<PlacingRow>();
 
@@ -245,7 +245,7 @@ public class LevelEditorManager : MonoBehaviour
 
 	private Vector3 _convertFromPlaceholderPosition(Vector3 placeholderPosition)
     {
-		Vector3 rawConverted = Camera.main.ScreenToWorldPoint(placeholderPosition);
+		Vector3 rawConverted = _gameManager.Cam.ScreenToWorldPoint(placeholderPosition);
 		return new Vector3(rawConverted.x, rawConverted.y);
 	}
 	

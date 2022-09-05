@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.Lighting
 {
-    class VignetteManager : MonoBehaviour //TODO: rename "close" variables to reflect open/close
+    public class VignetteManager : MonoBehaviour //TODO: rename "close" variables to reflect open/close
     {
+        private GameManager _gameManager;
         [SerializeField]
         private SpriteRenderer _vignetteRenderer;
 
@@ -23,8 +24,9 @@ namespace Assets.Scripts.Lighting
         private float _sizeToCloseTo;
         private Func<float, float> _easingFunction;
 
-        public void Initialize()
+        public void Initialize(GameManager gameManager)
         {
+            _gameManager = gameManager;
             _vignetteMaterial = _vignetteRenderer.material;
             _setSize(1);
         }
@@ -63,7 +65,7 @@ namespace Assets.Scripts.Lighting
 
         private void _setPosition(Vector2 worldPosition)
         {
-            Vector2 screenPosition = Camera.main.WorldToViewportPoint(worldPosition);
+            Vector2 screenPosition = _gameManager.Cam.WorldToViewportPoint(worldPosition);
             _vignetteMaterial.SetVector(_POSITION, screenPosition);
         }
 

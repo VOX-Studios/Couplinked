@@ -79,7 +79,7 @@ public class PlaceableObjectSpawner : MonoBehaviour
 		obj.transform.parent = transform;
 		obj.GetComponent<PlaceableObject>().ObjectType = PlaceableObjectType;
 		obj.GetComponent<CircleCollider2D>().radius = .5f; //.5f for a lil gap
-		obj.GetComponent<PlaceableObject>().Initialize();
+		obj.GetComponent<PlaceableObject>().Initialize(_gameManager);
 		obj.SetActive(false);
 
 		return obj;
@@ -130,7 +130,7 @@ public class PlaceableObjectSpawner : MonoBehaviour
 		if (placeableObject != null)
 		{
 			PlaceableObjectImage placeableObjectImage = PlaceableObjectImagesPool.ActivateObject()?.GetComponent<PlaceableObjectImage>();
-			placeableObjectImage.transform.position = Camera.main.WorldToScreenPoint(placeableObject.transform.position);
+			placeableObjectImage.transform.position = _gameManager.Cam.WorldToScreenPoint(placeableObject.transform.position);
 			placeableObject.PlaceableObjectImage = placeableObjectImage;
 		}
 
@@ -150,7 +150,7 @@ public class PlaceableObjectSpawner : MonoBehaviour
 		if (placedObject != null)
 		{
 			PlacedObjectButton placedObjectButton = PlacedObjectButtonsPool.ActivateObject()?.GetComponent<PlacedObjectButton>();
-			placedObjectButton.transform.position = Camera.main.WorldToScreenPoint(placedObject.transform.position);
+			placedObjectButton.transform.position = _gameManager.Cam.WorldToScreenPoint(placedObject.transform.position);
 
 			placedObject.PlacedObjectButton = placedObjectButton;
 		}
@@ -220,7 +220,7 @@ public class PlaceableObjectSpawner : MonoBehaviour
 			_temp = PlacedObjectsPool.activeObjects[i];
 			
 			_temp.transform.position += new Vector3(deltaX,0,0);
-			_temp.GetComponent<PlacedObject>().PlacedObjectButton.transform.position = Camera.main.WorldToScreenPoint(_temp.transform.position);
+			_temp.GetComponent<PlacedObject>().PlacedObjectButton.transform.position = _gameManager.Cam.WorldToScreenPoint(_temp.transform.position);
 
 			if ((_temp.transform.position.x < GameManager.LeftX //- temp.renderer.bounds.extents.x
 			    && deltaX < 0)
@@ -241,7 +241,7 @@ public class PlaceableObjectSpawner : MonoBehaviour
 		if (!shouldSpawn)
 			return;
 
-		PlaceableObject placeableObject = ActivatePlaceableObject(Camera.main.ScreenToWorldPoint(SpawnButton.transform.position));
+		PlaceableObject placeableObject = ActivatePlaceableObject(_gameManager.Cam.ScreenToWorldPoint(SpawnButton.transform.position));
 
 		_levelEditorManager.OnPlaceableObjectSpawned(placeableObject);
 	}

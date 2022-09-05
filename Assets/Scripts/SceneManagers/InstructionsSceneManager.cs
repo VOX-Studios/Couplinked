@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -41,6 +42,8 @@ namespace Assets.Scripts.SceneManagers
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+            EventSystem.current.SetSelectedGameObject(_instructionsRight.gameObject);
 
             _instructionsLeft.onClick.AddListener(_handleInstructionsLeftButton);
             _instructionsRight.onClick.AddListener(_handleInstructionsRightButton);
@@ -107,7 +110,7 @@ namespace Assets.Scripts.SceneManagers
         }
         private Vector3 _convertFromPlaceholderPosition(Vector3 placeholderPosition)
         {
-            Vector3 rawConverted = Camera.main.ScreenToWorldPoint(placeholderPosition);
+            Vector3 rawConverted = _gameManager.Cam.ScreenToWorldPoint(placeholderPosition);
             return new Vector3(rawConverted.x, rawConverted.y);
         }
 

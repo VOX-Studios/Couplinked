@@ -4,19 +4,20 @@ using UnityEngine.UI;
 
 public class ScoreJuice : MonoBehaviour 
 {
+	private GameManager _gameManager;
 	private GameSceneManager _gameSceneManager;
     private const int _speed = 1500; //TODO: make this dependent on screen size?
 	public float timeRemaining = 0f;
 	float lifeTime = 1.5f;
 
-
 	Vector3 originalPosition;
 
 	Vector3 direction;
 
-	void Start()
+	public void Initialize(GameManager gameManager, GameSceneManager gameSceneManager)
 	{
-		_gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
+		_gameManager = gameManager;
+		_gameSceneManager = gameSceneManager;
 	}
 
 	public void Setup(Vector3 spawnPositionWorldSpace, Vector3 dir)
@@ -26,7 +27,7 @@ public class ScoreJuice : MonoBehaviour
 
 		direction = dir;
 
-		transform.position = Camera.main.WorldToScreenPoint(spawnPositionWorldSpace);
+		transform.position = _gameManager.Cam.WorldToScreenPoint(spawnPositionWorldSpace);
 		originalPosition = transform.position;
 	}
 
@@ -38,8 +39,8 @@ public class ScoreJuice : MonoBehaviour
 
         //Set position to original position + camera shake
         transform.position = originalPosition 
-            + Camera.main.WorldToScreenPoint(_gameSceneManager.GetCamOriginalPos()) 
-            - Camera.main.WorldToScreenPoint(Camera.main.transform.position);
+            + _gameManager.Cam.WorldToScreenPoint(_gameSceneManager.GetCamOriginalPos()) 
+            - _gameManager.Cam.WorldToScreenPoint(_gameManager.Cam.transform.position);
 
 		ClampGUI(transform, 0.5f);
 
@@ -48,11 +49,11 @@ public class ScoreJuice : MonoBehaviour
 
 	void ClampGUI(Transform t, float clampBorderOffset)
 	{
-		if(Camera.main.ScreenToWorldPoint(t.position).y > GameManager.TopY - clampBorderOffset)
+		if(_gameManager.Cam.ScreenToWorldPoint(t.position).y > GameManager.TopY - clampBorderOffset)
 		{
 			t.position = new Vector3(
                 t.position.x, 
-			    Camera.main.WorldToScreenPoint(
+			    _gameManager.Cam.WorldToScreenPoint(
                     new Vector3(
                         0, 
                         GameManager.TopY - clampBorderOffset,
@@ -64,26 +65,26 @@ public class ScoreJuice : MonoBehaviour
 
 			direction.y = -Mathf.Abs(direction.y);
 		}
-		else if(Camera.main.ScreenToWorldPoint(t.position).y < GameManager.BotY + clampBorderOffset)
+		else if(_gameManager.Cam.ScreenToWorldPoint(t.position).y < GameManager.BotY + clampBorderOffset)
 		{
 			t.position = new Vector3(t.position.x, 
-			                         Camera.main.WorldToScreenPoint(new Vector3(0,GameManager.BotY + clampBorderOffset,0)).y, 
+			                         _gameManager.Cam.WorldToScreenPoint(new Vector3(0,GameManager.BotY + clampBorderOffset,0)).y, 
 			                         t.position.z);
 
 			direction.y = Mathf.Abs(direction.y);
 		}
 
-		if(Camera.main.ScreenToWorldPoint(t.position).x > GameManager.RightX - clampBorderOffset)
+		if(_gameManager.Cam.ScreenToWorldPoint(t.position).x > GameManager.RightX - clampBorderOffset)
 		{
-			t.position = new Vector3(Camera.main.WorldToScreenPoint(new Vector3(GameManager.RightX - clampBorderOffset,0,0)).x, 
+			t.position = new Vector3(_gameManager.Cam.WorldToScreenPoint(new Vector3(GameManager.RightX - clampBorderOffset,0,0)).x, 
 			                         t.position.y, 
 			                         t.position.z);
 
 			direction.x = -Mathf.Abs(direction.x);
 		}
-		else if(Camera.main.ScreenToWorldPoint(t.position).x < GameManager.LeftX + clampBorderOffset)
+		else if(_gameManager.Cam.ScreenToWorldPoint(t.position).x < GameManager.LeftX + clampBorderOffset)
 		{
-			t.position = new Vector3(Camera.main.WorldToScreenPoint(new Vector3(GameManager.LeftX + clampBorderOffset,0,0)).x, 
+			t.position = new Vector3(_gameManager.Cam.WorldToScreenPoint(new Vector3(GameManager.LeftX + clampBorderOffset,0,0)).x, 
 			                         t.position.y, 
 			                         t.position.z);
 

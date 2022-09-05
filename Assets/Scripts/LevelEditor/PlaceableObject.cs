@@ -17,9 +17,11 @@ public class PlaceableObject : MonoBehaviour
 
 	private RaycastHit2D[] _hits;
 	private List<RaycastResult> _raycastResults;
+	private GameManager _gameManager;
 
-	public void Initialize()
+	public void Initialize(GameManager gameManager)
 	{
+		_gameManager = gameManager;
 		_raycastResults = new List<RaycastResult>();
 		_levelEditorSceneManager = GameObject.FindObjectOfType<LevelEditorSceneManager>();
 		_indicatorLine.transform.position = new Vector3(0, (GameManager.TopY + GameManager.BotY) / 2, 0);
@@ -67,13 +69,13 @@ public class PlaceableObject : MonoBehaviour
 				);
 		}
 
-		PlaceableObjectImage.transform.position = Camera.main.WorldToScreenPoint(transform.position);
+		PlaceableObjectImage.transform.position = _gameManager.Cam.WorldToScreenPoint(transform.position);
 	}
 
 	private void _handleTimeMarkerSnap(Vector2 input)
     {
 		PointerEventData eventData = new PointerEventData(EventSystem.current);
-		eventData.position = Camera.main.WorldToScreenPoint(input);
+		eventData.position = _gameManager.Cam.WorldToScreenPoint(input);
 		EventSystem.current.RaycastAll(eventData, _raycastResults);
 
 		for (int i = 0; i < _raycastResults.Count; i++)

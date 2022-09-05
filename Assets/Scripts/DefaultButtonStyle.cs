@@ -62,7 +62,9 @@ class DefaultButtonStyle : MonoBehaviour, IPointerEnterHandler, ISelectHandler, 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!EventSystem.current.alreadySelecting)
+        {
             EventSystem.current.SetSelectedGameObject(this.gameObject);
+        }
     }
 
     public void OnDeselect(BaseEventData eventData)
