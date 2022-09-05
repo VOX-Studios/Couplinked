@@ -241,12 +241,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 111346614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c851f0143451b1042b0056b1306a2e22, type: 3}
+  m_Script: {fileID: 11500000, guid: d29c1993c54903f4580a5bdbd04c33c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   NoHitPrefab: {fileID: 100000, guid: a19ac669ecbd05d4692889cd6741fd24, type: 3}
-  activeNoHits: []
-  inactiveNoHits: []
 --- !u!1 &207482975
 GameObject:
   m_ObjectHideFlags: 0
@@ -680,9 +678,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711c266c09e0bcc4180704020e7b2a62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noHitManager: {fileID: 111346616}
-  hitManager: {fileID: 622799778}
-  hitSplitManager: {fileID: 1486135162}
+  noHitManager: {fileID: 0}
+  hitManager: {fileID: 0}
+  hitSplitManager: {fileID: 0}
   _explosionManager: {fileID: 799985862}
   _nodePrefab: {fileID: 8521774271621704269, guid: 063a1966607b67943a00dd0408361467,
     type: 3}
@@ -1805,12 +1803,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 622799776}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a424eaad8cf1294fadbd83ff7cd40f7, type: 3}
+  m_Script: {fileID: 11500000, guid: 5fbbe39d270a3b24fa06e1f108d50275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HitPrefab: {fileID: 100000, guid: bf2a541aa0a5bfe43a4431481383b3ed, type: 3}
-  activeHits: []
-  inactiveHits: []
 --- !u!1 &627283834
 GameObject:
   m_ObjectHideFlags: 0
@@ -4512,7 +4508,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1486135160}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.15110151, y: -0.008653945, z: 0.16393383}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4528,12 +4524,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1486135160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4a32a37bc9e6954eb20e0c44ba68ffe, type: 3}
+  m_Script: {fileID: 11500000, guid: 340476044eb06774d9d6a37d96a7eb4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HitSplitPrefab: {fileID: 100000, guid: 79d5230f07adb674c9d50639f51e0f85, type: 3}
-  activeHitSplits: []
-  inactiveHitSplits: []
 --- !u!1 &1529670903
 GameObject:
   m_ObjectHideFlags: 0
