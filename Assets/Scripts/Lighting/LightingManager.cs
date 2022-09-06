@@ -25,9 +25,14 @@ namespace Assets.Scripts.Lighting
 
         private float _lightPunchOut;
 
+        //used for applying color to texture without generating garbage
+        private Color[] _colorPool;
+
         public void Initialize(GameManager gameManager)
         {
             _gameManager = gameManager;
+
+            _colorPool = new Color[_texelSize];    
             _baseLightMaterial = BaseLightRenderer.material;
             BaseLightTexture.width = Screen.width;
             BaseLightTexture.height = Screen.height;
@@ -124,20 +129,14 @@ namespace Assets.Scripts.Lighting
             _applyToTexture(_colorsTexture, lightIndex, color);
         }
 
+
+        
         private void _applyToTexture(Texture2D texture, int index, Color color)
         {
-            //get pixels
-            Color[] colors = texture.GetPixels(
-                x: index * _texelSize,
-                y: 0,
-                blockWidth: _texelSize,
-                blockHeight: 1
-                );
-
-            //fill the array with the new color
-            for (int i = 0; i < colors.Length; i++)
+            //fill the color pool with the new color
+            for (int i = 0; i < _colorPool.Length; i++)
             {
-                colors[i] = color;
+                _colorPool[i] = color;
             }
 
             //set pixels
@@ -146,7 +145,7 @@ namespace Assets.Scripts.Lighting
                 y: 0,
                 blockWidth: _texelSize,
                 blockHeight: 1,
-                colors: colors
+                colors: _colorPool
                 );
 
             //apply changes to the texture

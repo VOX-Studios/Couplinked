@@ -1,34 +1,29 @@
 ﻿using UnityEngine;
 
-public class PointMass
+public class PointMass : IPointMass
 {
-    public Vector3 Position;
-    public Vector3 Velocity;
-    public float InverseMass;
+    public Vector2 Position { get; set; }
+    public Vector2 Velocity { get; set; }
 
-    private Vector3 _acceleration;
     private float damping = 0.95f;
 
-    public PointMass(Vector3 position, float invMass)
+    public PointMass(Vector2 position)
     {
         Position = position;
-        InverseMass = invMass;
     }
 
-    public void ApplyForce(Vector3 force)
+    public void ApplyForce(Vector2 force)
     {
-        _acceleration += force * InverseMass;
+        Velocity += force;
     }
 
     public void Update()
     {
-        Velocity += _acceleration;
         Position += Velocity;
-        _acceleration = Vector3.zero;
 
         if (Velocity.sqrMagnitude < 0.001f * 0.001f) // float at worst has 6 digits of precision
         {
-            Velocity = Vector3.zero;
+            Velocity = Vector2.zero;
             return;
         }
 

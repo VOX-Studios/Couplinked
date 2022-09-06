@@ -4,14 +4,14 @@ using UnityEngine;
 public class GridLogic
 {
     Spring[] _springs;
-    public PointMass[,] Points;
+    public IPointMass[,] Points;
 
     public GridLogic(float width, float height, int gridDensity)
     {
         if(gridDensity == 0)
         {
             _springs = new Spring[0];
-            Points = new PointMass[0, 0];
+            Points = new IPointMass[0, 0];
             return;
         }    
 
@@ -25,7 +25,7 @@ public class GridLogic
         float startX = -((numColumns - 1) * spacing) / 2f;
         float startY = -((numRows - 1) * spacing) / 2f;
 
-        Points = new PointMass[numColumns, numRows];
+        Points = new IPointMass[numColumns, numRows];
 
         // create the point masses
         for (int y = 0; y < numRows; y++)
@@ -35,17 +35,19 @@ public class GridLogic
                 float xPos = startX + (spacing * x);
                 float yPos = startY + (spacing * y);
 
-                float invMass = 1;
 
                 if (x == 0 || y == 0 || x == numColumns - 1 || y == numRows - 1) // anchor the border of the grid 
                 {
-                    invMass = 0;
-                }
-
-                Points[x, y] = new PointMass(
-                    new Vector3(xPos, yPos, 0), 
-                    invMass
+                    Points[x, y] = new AnchoredPointMass(
+                        position: new Vector3(xPos, yPos, 0)
                     );
+                }
+                else
+                {
+                    Points[x, y] = new PointMass(
+                        position: new Vector3(xPos, yPos, 0)
+                    );
+                }
             }
         }
 
@@ -86,49 +88,51 @@ public class GridLogic
             _springs[i].Update();
         }
 
-        foreach (PointMass mass in Points)
+        foreach (IPointMass mass in Points)
         {
             mass.Update();
         }
     }
 
-    public void ApplyDirectedForce(Vector3 force, Vector3 position, float radius)
+    public void ApplyDirectedForce(Vector2 force, Vector2 position, float radius)
     {
-        foreach (PointMass mass in Points)
+        foreach (IPointMass mass in Points)
         {
-            if (Vector3.SqrMagnitude(position - mass.Position) < radius * radius)
+            float distanceSquared = Vector2.SqrMagnitude(position - mass.Position);
+            if (distanceSquared < radius * radius)
             {
-                mass.ApplyForce(10 * force / (10 + Vector3.Distance(position, mass.Position)));
+                Vector2 delta = mass.Position - position;
+
+                //have the force magnitude depend on distance from center
+                float forceMagnitude = (radius - delta.magnitude) / radius;
+                mass.ApplyForce(forceMagnitude * force * 5f);
             }
         }
     }
 
-    public void ApplyImplosiveForce(float force, Vector3 position, float radius)
+    public void ApplyImplosiveForce(float force, Vector2 position, float radius)
     {
-        foreach (PointMass mass in Points)
+        foreach (IPointMass mass in Points)
         {
-            float dist2 = Vector3.SqrMagnitude(position - mass.Position);
-            if (dist2 < radius * radius)
+            float distanceSquared = Vector2.SqrMagnitude(position - mass.Position);
+            if (distanceSquared < radius * radius)
             {
-                //mass.ApplyForce(10 * force * (position - mass.Position) / (100 + dist2));
+                Vector2 delta = position - mass.Position;
 
-                Vector3 delta = position - mass.Position;
-
-                //have the force magnitude depend on distance from center
-                float forceMagnitude = 1f; // (radius - delta.magnitude) / radius;
+                float forceMagnitude = 1f; // (radius - delta.magnitude) / radius; //have the force magnitude depend on distance from center
                 mass.ApplyForce((forceMagnitude * force * delta.normalized) / 10f);
             }
         }
     }
 
-    public void ApplyExplosiveForce(float force, Vector3 position, float radius)
+    public void ApplyExplosiveForce(float force, Vector2 position, float radius)
     {
-        foreach (PointMass mass in Points)
+        foreach (IPointMass mass in Points)
         {
-            float dist2 = Vector3.SqrMagnitude(position - mass.Position);
-            if (dist2 < radius * radius)
+            float distanceSquared = Vector2.SqrMagnitude(position - mass.Position);
+            if (distanceSquared < radius * radius)
             {
-                Vector3 delta = mass.Position - position;
+                Vector2 delta = mass.Position - position;
 
                 //have the force magnitude depend on distance from center
                 float forceMagnitude = (radius - delta.magnitude) / radius;

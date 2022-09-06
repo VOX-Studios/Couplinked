@@ -379,10 +379,17 @@ namespace Assets.Scripts.SceneManagers
             }
             else
             {
-                if (_gameInputs.Any(inputs => inputs.Any(input => input.PauseInput)))
+                //not using Linq.Any because it creates garbage
+                foreach(GameInput[] gameInputs in _gameInputs)
                 {
-                    _pause();
-                    return;
+                    foreach(GameInput gameInput in gameInputs)
+                    {
+                        if(gameInput.PauseInput)
+                        {
+                            _pause();
+                            return;
+                        }
+                    }
                 }
             }
 
