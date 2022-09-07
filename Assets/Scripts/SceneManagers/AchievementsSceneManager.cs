@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -24,6 +25,7 @@ namespace Assets.Scripts.SceneManagers
         void Start()
         {
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+            EventSystem.current.SetSelectedGameObject(_achievementsRightButton.gameObject);
 
             _achievementsLeftButton.onClick.AddListener(_handleAchievementsLeftButton);
             _achievementsRightButton.onClick.AddListener(_handleAchievementsRightButton);

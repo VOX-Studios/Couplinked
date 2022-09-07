@@ -491,8 +491,8 @@ public class GameManager : MonoBehaviour
 				return "You let a ring go off the screen.";
 			case ReasonForGameEndEnum.NoHitContactWithNode:
 				return "You let one of your nodes hit a red node";
-			case ReasonForGameEndEnum.NoHitContactWithElectricity:
-				return "You let your electricity hit a red node";
+			case ReasonForGameEndEnum.NoHitContactWithLaser:
+				return "You let your laser hit a red node";
 			case ReasonForGameEndEnum.Mismatch:
 				return "You matched the wrong color node.";
 			case ReasonForGameEndEnum.Win:

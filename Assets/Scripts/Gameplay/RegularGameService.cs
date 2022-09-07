@@ -309,7 +309,7 @@ class RegularGameService
 
         if (other.gameObject.tag == "Connector")
         {
-            SubtractLife(ReasonForGameEndEnum.NoHitContactWithElectricity, noHit.transform.position);
+            SubtractLife(ReasonForGameEndEnum.NoHitContactWithLaser, noHit.transform.position);
         }
         else
         {

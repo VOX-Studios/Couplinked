@@ -3,7 +3,7 @@
 	HitOffScreen,
 	HitSplitOffScreen,
 	NoHitContactWithNode,
-	NoHitContactWithElectricity,
+	NoHitContactWithLaser,
 	Mismatch,
 	Win,
 	Quit,
