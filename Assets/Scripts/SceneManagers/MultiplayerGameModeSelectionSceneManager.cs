@@ -9,9 +9,6 @@ namespace Assets.Scripts.SceneManagers
         private GameManager _gameManager;
 
         [SerializeField]
-        private Button _versusButton;
-
-        [SerializeField]
         private Button _coopButton;
         
         void Start()
@@ -20,7 +17,6 @@ namespace Assets.Scripts.SceneManagers
             EventSystem.current.SetSelectedGameObject(_coopButton.gameObject);
             _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            _versusButton.onClick.AddListener(_handleVersusButton);
             _coopButton.onClick.AddListener(_handleCoopButton);
         }
 
@@ -33,22 +29,10 @@ namespace Assets.Scripts.SceneManagers
             }
         }
 
-        private void _handleVersusButton()
-        {
-            _gameManager.SoundEffectManager.PlaySelect();
-            _tempStartSurvival();
-        }
-
         private void _handleCoopButton()
         {
             _gameManager.SoundEffectManager.PlaySelect();
             _gameManager.GameSetupInfo.GameMode = GameModeEnum.SurvivalCoOp;
-            _tempStartSurvival();
-        }
-
-        private void _tempStartSurvival()
-        {
-            _gameManager.GameSetupInfo.GameMode = GameModeEnum.Survival;
             _gameManager.GameDifficultyManager.ChangeDifficulty(GameDifficultyEnum.Hard);
             _gameManager.CurrentLevel = null;
             _gameManager.LoadScene(SceneNames.RuleSetSelection);
