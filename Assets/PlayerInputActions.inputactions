@@ -376,6 +376,28 @@
                 },
                 {
                     "name": "",
+                    "id": "63193bb5-9f44-4dc7-9360-8e32c3569ced",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10a6bebc-c3db-49f7-94c7-a761b26e5564",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "8b9b133b-853a-48af-9cf9-1f10891801fd",
                     "path": "<Gamepad>/start",
                     "interactions": "Press",
@@ -389,6 +411,17 @@
                     "name": "",
                     "id": "ae7b2936-8649-4279-8b4a-4ddee941fe0d",
                     "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Unpause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "24337db4-b434-4bae-8e02-b77c6a6cf2f3",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
